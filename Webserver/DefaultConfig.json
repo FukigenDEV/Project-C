@@ -1,0 +1,10 @@
+﻿{
+	"ConnectionSettings": {
+		//The address the server will listen to. Multiple addresses can be specified; use a comma to separate them. Ignored if autoDetectAddress is true.
+		"serverAddress": "localhost",
+		//Whether the server should automatically detect its address
+		"autoDetectAddress": true
+	},
+	"DatabaseSettings": {
+	}
+}
