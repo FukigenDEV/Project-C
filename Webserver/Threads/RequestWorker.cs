@@ -1,0 +1,70 @@
+﻿using Configurator;
+using Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Text;
+
+namespace Webserver.Threads {
+	class RequestWorker {
+		public static void Run(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+			while (true) {
+				HttpListenerContext Context = Queue.Take();
+				HttpListenerRequest Request = Context.Request;
+
+				//Append wwwroot to target
+				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl;
+
+				//Switch to contentType
+				switch (Request.ContentType) {
+
+					//JSON
+					case "application/json":
+
+						bool Handled = false;
+						//Search for the right endpoint.
+						foreach(Type T in Program.Endpoints) {
+							//Get endpoint info attribute. If the attribute is missing, show an error in console and continue to the next.
+							EndpointInfo Info = (EndpointInfo)Attribute.GetCustomAttribute(T, typeof(EndpointInfo));
+							if(Info == null) {
+								Log.Error("Endpoint " + T.Name + " has no EndpointInfo attribute");
+								continue;
+							}
+
+							//Check if this is the correct endpoint. If it is, call it.
+							if (Info.ContentType == Request.ContentType && Config.GetValue("WebserverSettings.wwwroot") + Info.URL == Target) {
+								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T, new object[] { Context });
+
+								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
+								Method.Invoke(ep, null);
+								Handled = true;
+							}
+						}
+						//If no endpoint was found, send a 404.
+						if (!Handled) {
+							Log.Info("Received " + Request.HttpMethod + " request for invalid endpoint at address " + Target + " from " + Request.UserHostName);
+							Utils.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), Context.Response, HttpStatusCode.NotFound);
+						}
+						break;
+
+					//HTML
+					default:
+						//Browsers apparently don't set content type when asking for webpages.
+						//If the page exists, load and send it. Otherwise, send a 404.
+						if (Program.WebPages.Contains(Target)) {
+							using StreamReader Reader = new StreamReader(File.Open(Target, FileMode.Open));
+							Utils.Send(Reader.ReadToEnd(), Context.Response, HttpStatusCode.OK);
+						} else {
+							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+Target+" from "+Request.UserHostName);
+							Utils.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), Context.Response, HttpStatusCode.NotFound);
+						}
+						break;
+				}
+			}
+		}
+	}
+}

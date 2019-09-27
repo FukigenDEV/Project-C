@@ -7,6 +7,11 @@
 
   <ItemGroup>
     <None Remove="DefaultConfig.json" />
+    <None Remove="DefaultErrorPage.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DefaultErrorPage.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Config\Config.csproj" />
+    <ProjectReference Include="..\DBManager\DBManager.csproj" />
     <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
 
