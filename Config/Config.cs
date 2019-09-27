@@ -62,7 +62,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="Setting">The setting to retrieve.</param>
 		/// <returns></returns>
-		public static dynamic GetVal(string Setting) {
+		public static dynamic GetValue(string Setting) {
 			string[] Pair = Setting.Split('.');
 			return LoadedConfig.GetValue(Pair[0]).ToObject<JObject>().GetValue(Pair[1]).ToObject(LoadedConfig.GetValue(Pair[0]).ToObject<JObject>().GetValue(Pair[1]).GetType());
 		}
