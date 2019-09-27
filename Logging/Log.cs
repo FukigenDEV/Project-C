@@ -27,7 +27,7 @@ namespace Logging {
 		/// <param name="Level">The log level. Only messages of the same level or above will be sent to an output stream.</param>
 		/// <param name="Filename"></param>
 		/// <param name="WriteToConsole"></param>
-		public Logger(LogLevel Level = LogLevel.Info, string Filename = "latest", bool WriteToConsole = true) {
+		public Logger(LogLevel Level = LogLevel.Debug, string Filename = "latest", bool WriteToConsole = true) {
 			this.Level = Level;
 			this.WriteToConsole = WriteToConsole;
 
@@ -46,29 +46,29 @@ namespace Logging {
 		/// Log a debug message. This should be used for development purposes.
 		/// </summary>
 		/// <param name="Message"></param>
-		public void Debug(string Message) => Log(LogLevel.Debug, Message);
+		public void Debug(object Message) => Log(LogLevel.Debug, Message);
 		/// <summary>
 		/// Log an informative message.
 		/// </summary>
 		/// <param name="Message"></param>
-		public void Info(string Message) => Log(LogLevel.Info, Message);
+		public void Info(object Message) => Log(LogLevel.Info, Message);
 		/// <summary>
 		/// Log a warning. Warnings indicate that something can or has gone wrong.
 		/// </summary>
 		/// <param name="Message"></param>
-		public void Warning(string Message) => Log(LogLevel.Warning, Message);
+		public void Warning(object Message) => Log(LogLevel.Warning, Message);
 		/// <summary>
 		/// Log an error message. These indicate that a bug prevented the program from completing a task.
 		/// If the program can't safely continue, use a Fatal message instead.
 		/// </summary>
 		/// <see cref="Fatal(string)"/>
 		/// <param name="Message"></param>
-		public void Error(string Message) => Log(LogLevel.Error, Message);
+		public void Error(object Message) => Log(LogLevel.Error, Message);
 		/// <summary>
 		/// Logs a fatal error message. These indicate that the program has stopped working due to a bug or other issue.
 		/// </summary>
 		/// <param name="Message"></param>
-		public void Fatal(string Message) => Log(LogLevel.Error, Message);
+		public void Fatal(object Message) => Log(LogLevel.Fatal, Message);
 
 		/// <summary>
 		/// Write a message to an output stream.
@@ -76,13 +76,13 @@ namespace Logging {
 		/// </summary>
 		/// <param name="Level"></param>
 		/// <param name="Message"></param>
-		private void Log(LogLevel Level, string Message) {
+		private void Log(LogLevel Level, object Message) {
 			if (this.Level <= Level) {
 				if (LastMsg.Day < DateTime.Now.Day || LastMsg.Month < DateTime.Now.Month) {
 					AdvanceFile();
 				}
 				LastMsg = DateTime.Now;
-				string Msg = LastMsg.ToShortTimeString() +" ["+Level.ToString().ToUpper()+"]: "+Message;
+				string Msg = LastMsg.ToShortTimeString() +" ["+Level.ToString().ToUpper()+"]: "+Message?.ToString();
 
 				//Write to streams
 				stdout.WriteLine(Msg);
@@ -140,6 +140,6 @@ namespace Logging {
 		Info,
 		Warning,
 		Error,
-		Critical
+		Fatal
 	}
 }
