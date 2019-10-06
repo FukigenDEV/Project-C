@@ -1,6 +1,5 @@
 ﻿using Configurator;
 using Logging;
-using DBManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,9 +21,6 @@ namespace Webserver {
 			Logger.Init();
 			Log = new Logger();
 			Log.Info("Server is starting!");
-
-			Log.Info("Initialising database...");
-			DatabaseManager.Init(Log);
 
 			Log.Info("Loading configuration files...");
 			Config.AddConfig(new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Webserver.DefaultConfig.json")));
@@ -50,13 +46,14 @@ namespace Webserver {
 				Log.Warning("Thread Count is set too high, which may impact performance. Consider lowering it.");
 			}
 
-			//Webpage file discovery
+			//Setup database
+			Database.Init(Log);
+
+			//Find all webpages and error pages, and store their filepaths.
 			WebPages = CrawlWebFolder((string)Config.GetValue("WebserverSettings.wwwroot"));
 			ErrorPages = CrawlErrorFolder((string)Config.GetValue("WebserverSettings.errorpages"));
 
-			WebPages.ForEach(Log.Debug);
-
-			//API discovery
+			//Find all API endpoints
 			Endpoints = new List<Type>();
 			foreach (Type type in Assembly.GetExecutingAssembly().GetTypes()) {
 				if (typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract) {
