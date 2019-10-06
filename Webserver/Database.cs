@@ -17,13 +17,6 @@ namespace Webserver {
 			Connection.Open();
 			   
 			Connection.Execute("CREATE TABLE Users (Username STRING, PasswordHash STRING)");
-
-			Connection.Execute("INSERT INTO Users (Username, PasswordHash) VALUES ('Administrator', 'yeet')");
-			Connection.Execute("INSERT INTO Users (Username, PasswordHash) VALUES ('Guest', 'yeet')");
-
-			User usr = Connection.QueryFirst<User>("SELECT * FROM Users LIMIT 1");
-			Console.WriteLine(usr.Username);
-			Console.WriteLine(usr.PasswordHash);
 		}
 	}
 }
