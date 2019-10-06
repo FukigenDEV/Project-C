@@ -76,7 +76,10 @@ namespace Configurator {
 			if(DefaultConfigString == null) {
 				DefaultConfigString = Reader.ReadToEnd();
 			} else {
-				DefaultConfigString = DefaultConfigString.Remove(DefaultConfigString.Length - 3) + "," + Reader.ReadToEnd().Remove(0, 1);
+				//TODO: Fix CRLF / LF bug
+				string NewConfig = Reader.ReadToEnd().Replace("\r\n", "\n").Remove(0, 1);
+				DefaultConfigString = DefaultConfigString.Replace("\r\n", "\n");
+				DefaultConfigString = DefaultConfigString.Remove(DefaultConfigString.Length - 2) + "," + NewConfig;
 			}
 		}
 	}
