@@ -13,14 +13,15 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="StatusCode">The HttpStatusCode</param>
 		/// <returns></returns>
-		public static string GetErrorPage(HttpStatusCode StatusCode) {
+		public static string GetErrorPage(HttpStatusCode StatusCode, string Message = "An error occured, and the request couldn't be processed. Please try again.") {
 			///Check if a custom error page exists
 			if (!Program.ErrorPages.ContainsKey((int)StatusCode)) {
 				//No custom page exists. Return the built-in page
 				using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Webserver.DefaultErrorPage.html"));
 				return reader.ReadToEnd()
 					.Replace("{ERRORTEXT}", StatusCode.ToString())
-					.Replace("{STATUSCODE}", ((int)StatusCode).ToString());
+					.Replace("{STATUSCODE}", ((int)StatusCode).ToString())
+					.Replace("{MSG}", Message);
 			} else {
 				//Return the custom page
 				using StreamReader reader = File.OpenText(Program.ErrorPages[(int)StatusCode]);

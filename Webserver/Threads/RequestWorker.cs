@@ -40,7 +40,14 @@ namespace Webserver.Threads {
 								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T, new object[] { Context });
 
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
-								Method.Invoke(ep, null);
+								try {
+									Method.Invoke(ep, null);
+#pragma warning disable CA1031 // Do not catch general exception types
+								} catch (Exception e) {
+									Utils.Send(Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), Context.Response, HttpStatusCode.InternalServerError);
+								}
+#pragma warning restore CA1031 // Do not catch general exception types
+
 								Handled = true;
 							}
 						}
