@@ -83,7 +83,7 @@ namespace Webserver {
 		public static List<string> CrawlWebFolder(string path) {
 			//Throw an exception if the folder can't be found.
 			if (!Directory.Exists(path)) {
-				throw new DirectoryNotFoundException("Could not find specified folder.");
+				Directory.CreateDirectory(path);
 			}
 
 			List<string> Result = new List<string>();
@@ -103,7 +103,7 @@ namespace Webserver {
 		public static Dictionary<int, string> CrawlErrorFolder(string path) {
 			//Throw an exception if the folder can't be found.
 			if (!Directory.Exists(path)) {
-				throw new DirectoryNotFoundException("Could not find specified folder.");
+				Directory.CreateDirectory(path);
 			}
 
 			Dictionary<int, string> Result = new Dictionary<int, string>();
