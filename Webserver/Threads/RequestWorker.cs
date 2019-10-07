@@ -66,7 +66,7 @@ namespace Webserver.Threads {
 							using StreamReader Reader = new StreamReader(File.Open(Target, FileMode.Open));
 							Utils.Send(Reader.ReadToEnd(), Context.Response, HttpStatusCode.OK);
 						} else {
-							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+Target+" from "+Request.UserHostName);
+							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+ Request.RawUrl + " from "+Request.UserHostName);
 							Utils.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), Context.Response, HttpStatusCode.NotFound);
 						}
 						break;
