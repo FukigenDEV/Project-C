@@ -17,9 +17,8 @@ namespace Configurator {
 		/// <param name="File"></param>
 		public static void SaveDefaultConfig(string Path = "Config.json", bool Overwrite = false) {
 			if (!File.Exists(Path) || Overwrite) {
-				using (StreamWriter ConfigFile = File.CreateText(Path)) {
-					ConfigFile.Write(DefaultConfigString);
-				}
+				using StreamWriter ConfigFile = File.CreateText(Path);
+				ConfigFile.Write(DefaultConfigString);
 			}
 		}
 
@@ -33,7 +32,13 @@ namespace Configurator {
 			}
 
 			//Parse JSON
-			JObject Config = JObject.Parse(File.ReadAllText(Path));
+			JObject Config;
+			try {
+				Config = JObject.Parse(File.ReadAllText(Path));
+			} catch (JsonReaderException e) {
+				return null;
+			}
+			
 
 			//Get differences, if any
 			Dictionary<string, List<string>> Missing = new Dictionary<string, List<string>>();
