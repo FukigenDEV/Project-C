@@ -1,10 +1,10 @@
 ﻿{
 	"logSettings": {
 		//The log file that all logs will be written to.
-		"stdout": "Log/Log.txt",
+		"stdout": "Log/latest.log",
 
 		//The log file that errors will be written to, in addition to the regular log file.
 		//This includes WARNING and FATAL messages.
-		"stderr": "Log/Log_err.txt"
+		"stderr": "Log/latest_err.log"
 	}
 }
