@@ -28,7 +28,11 @@ namespace Webserver {
 			Dictionary<string, List<string>> Missing = Config.LoadConfig();
 
 			//Display all missing and/or invalid config settings, if any.
-			if (Missing.Count > 0) {
+			if(Missing == null) {
+				Log.Fatal("The config file could not be read. Ensure that it is a valid JSON file. Press any key to exit.");
+				Console.ReadKey();
+				return;
+			} else if (Missing.Count > 0) {
 				Log.Fatal("Found one or more invalid or missing configuration settings;");
 				foreach (string Key in Missing.Keys) {
 					if (Missing[Key].Count == 0) { Console.Write(Key); }
@@ -67,9 +71,10 @@ namespace Webserver {
 			ListenerThread.Start();
 			List<Thread> WorkerThreads = new List<Thread>();
 			for (int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++) {
-				Thread Worker = new Thread(() => RequestWorker.Run(Log, Queue));
-				Worker.Start();
-				WorkerThreads.Add(Worker);
+				RequestWorker Worker = new RequestWorker(Log, Queue);
+				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
+				WorkerThread.Start();
+				WorkerThreads.Add(WorkerThread);
 			}
 
 			Console.ReadKey();

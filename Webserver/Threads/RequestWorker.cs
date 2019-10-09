@@ -3,6 +3,7 @@ using Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -11,7 +12,17 @@ using System.Text;
 
 namespace Webserver.Threads {
 	class RequestWorker {
-		public static void Run(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+		private readonly Logger Log;
+		private readonly BlockingCollection<HttpListenerContext> Queue;
+		private readonly SQLiteConnection Connection;
+
+		public RequestWorker(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+			this.Log = Log;
+			this.Queue = Queue;
+			this.Connection = Database.createConnection();
+		}
+
+		public void Run() {
 			while (true) {
 				HttpListenerContext Context = Queue.Take();
 				HttpListenerRequest Request = Context.Request;
