@@ -27,11 +27,7 @@
 		//###########################################################################
 		//# WARNING: All of the settings in this section MUST be kept confidential!	#
 		//###########################################################################
-
-		//The salt used for password hashing.
-		"passwordSalt": "f2e3bf3b8dfe10264ca9bda9970489752a19152b9626bf9327d317161efb3d3c207626f058cfc998370b729b3003fff480c7b7c8561387e2e64502b9c749d3ee",
-
 		//The password for the built-in Administrator account.
-		"administratorPassword":  "W@chtw00rd"
+		"AdministratorPassword":  "W@chtw00rd"
 	}
 }

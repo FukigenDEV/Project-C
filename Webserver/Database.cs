@@ -6,16 +6,63 @@ using Dapper;
 using System.IO;
 using System.Data.SQLite;
 using Webserver.Data;
+using Configurator;
+using Dapper.Contrib.Extensions;
 
 namespace Webserver {
 	static class Database {
 		public const string ConnectionString = "Data Source=Database.db;";
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="log"></param>
 		public static void Init(Logger log) {
-			SQLiteConnection.CreateFile("Database.db");
-			SQLiteConnection Connection = createConnection();
-			   
-			Connection.Execute("CREATE TABLE Users (Username STRING, PasswordHash STRING)");
+			log.Info("Initializing database...");
+
+			//Create the database if it doesn't exist already.
+			if (!File.Exists("Database.db")) {
+				SQLiteConnection.CreateFile("Database.db");
+			}
+			
+			//Connect to it
+			using SQLiteConnection Connection = createConnection();
+
+			//Create tables if they don't already exist.
+			Connection.Execute("CREATE TABLE IF NOT EXISTS Functions (" +
+				"Name				STRING PRIMARY KEY" +
+			")");
+
+			Connection.Execute("CREATE TABLE IF NOT EXISTS Departments (" +
+				"ID					INTEGER PRIMARY KEY," +
+				"Name				STRING NOT NULL" +
+			")");
+
+			Connection.Execute("CREATE TABLE IF NOT EXISTS Users (" +
+				"ID					INTEGER PRIMARY KEY, " +
+				"Email				STRING NOT NULL, " +
+				"PasswordHash		STRING NOT NULL," +
+				"Firstname			STRING," +
+				 "MiddleInitial		STRING," +
+				 "Lastname			STRING," +
+				 "Department		INTEGER REFERENCES Department(ID) ON UPDATE CASCADE," +
+				 "Function			STRING REFERENCES Function(Name) ON UPDATE CASCADE," +
+				 "WorkPhone			STRING," +
+				 "MobilePhone		STRING," +
+				 "Birthday			STRING," +
+				 "Country			STRING," +
+				 "Address			STRING," +
+				 "Postcode			STRING" +
+			")");
+
+			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
+			User Administrator = Connection.Get<User>(1);
+			if(Administrator == null) {
+				Connection.Insert(new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword")));
+			} else {
+				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
+				Connection.Update<User>(Administrator);
+			}
 		}
 
 		public static SQLiteConnection createConnection() {

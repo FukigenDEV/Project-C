@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Text;
 
 namespace Webserver {
+	/// <summary>
+	/// Static class containing methods that aren't big enough to warrant their own files, and are unique enough that they can't be grouped with anything else.
+	/// </summary>
 	static class Utils {
 		/// <summary>
 		/// Given a HttpStatusCode, returns the error page set for it.

@@ -17,7 +17,7 @@ namespace Webserver {
 		public static Dictionary<int, string> ErrorPages;
 		public static List<Type> Endpoints;
 
-		public static void Main(string[] _) {
+		public static void Main() {
 			Logger.Init();
 			Log = new Logger();
 			Log.Info("Server is starting!");
