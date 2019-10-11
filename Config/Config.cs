@@ -35,10 +35,12 @@ namespace Configurator {
 			JObject Config;
 			try {
 				Config = JObject.Parse(File.ReadAllText(Path));
-			} catch (JsonReaderException e) {
+#pragma warning disable CA1031 // Silence "Do not catch general exception types" message. There is absolutely no reason for this message to show up; it's already as specific as we can make it.
+			} catch (JsonReaderException) {
 				return null;
 			}
-			
+#pragma warning restore CA1031
+
 
 			//Get differences, if any
 			Dictionary<string, List<string>> Missing = new Dictionary<string, List<string>>();
@@ -81,7 +83,6 @@ namespace Configurator {
 			if(DefaultConfigString == null) {
 				DefaultConfigString = Reader.ReadToEnd();
 			} else {
-				//TODO: Fix CRLF / LF bug
 				string NewConfig = Reader.ReadToEnd().Replace("\r\n", "\n").Remove(0, 1);
 				DefaultConfigString = DefaultConfigString.Replace("\r\n", "\n");
 				DefaultConfigString = DefaultConfigString.Remove(DefaultConfigString.Length - 2) + "," + NewConfig;
