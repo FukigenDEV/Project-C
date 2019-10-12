@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.IO;
 using System.Net;
 using System.Text;
 
@@ -10,6 +12,7 @@ namespace Webserver {
 		public readonly SQLiteConnection Connection;
 		public readonly HttpListenerRequest Request;
 		public readonly HttpListenerResponse Response;
+		public readonly JObject Content;
 
 		/// <summary>
 		/// Provides methods for an API Endpoint. Classes inheriting this class will be be instantiated when the endpoint it represents is called by a client.
@@ -20,6 +23,8 @@ namespace Webserver {
 			this.Connection = Connection;
 			this.Request = Context.Request;
 			this.Response = Context.Response;
+			using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+			this.Content = JObject.Parse(streamReader.ReadToEnd());
 		}
 
 		/// <summary>
