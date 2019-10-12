@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Net;
 using System.Text;
 
 namespace Webserver {
 	public abstract class APIEndpoint {
 		public readonly HttpListenerContext Context;
+		public readonly SQLiteConnection Connection;
 		/// <summary>
 		/// Provides methods for an API Endpoint. Classes inheriting this class will be be instantiated when the endpoint it represents is called by a client.
 		/// </summary>
 		/// <param name="Context">The HttpListenerContext representing the client request</param>
-		protected APIEndpoint(HttpListenerContext Context) {
+		protected APIEndpoint(SQLiteConnection Connection, HttpListenerContext Context) {
 			this.Context = Context;
+			this.Connection = Connection;
 		}
 
 		/// <summary>

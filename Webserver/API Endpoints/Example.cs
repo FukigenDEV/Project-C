@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Net;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/example")]
 	class Example : APIEndpoint {
-		public Example(HttpListenerContext Context) : base(Context) { }
+		public Example(SQLiteConnection Connection, HttpListenerContext Context) : base(Connection, Context) { }
 
 		public override void GET() {
 			Send("Hello World!");

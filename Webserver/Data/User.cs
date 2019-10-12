@@ -1,6 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,11 +23,19 @@ namespace Webserver.Data {
 		public string Address { get; set; }
 		public string Postcode { get; set; }
 
+		/// <summary>
+		/// Creates a new user. The new user object will not be usable in the system until its inserted into the database.
+		/// </summary>
+		/// <param name="Email">The user's email address</param>
+		/// <param name="Password">The user's password. This will be converted into a salted hash and stored in the PasswordHash field.</param>
 		public User(string Email, string Password) {
 			this.Email = Email;
 			this.PasswordHash = CreateHash(Password, Email);
 		}
 
+		/// <summary>
+		/// Constructor for deserializing database rows into User objects
+		/// </summary>
 		public User(
 			long ID,
 			string Email,
