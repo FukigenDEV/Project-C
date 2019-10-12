@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -14,7 +15,6 @@ namespace Webserver.Data {
 		public string Firstname { get; set; }
 		public string MiddleInitial { get; set; }
 		public string Lastname { get; set; }
-		public int Department { get; set; }
 		public string Function { get; set; }
 		public string WorkPhone { get; set; }
 		public string MobilePhone { get; set; }
@@ -43,7 +43,6 @@ namespace Webserver.Data {
 			string Firstname,
 			string MiddleInitial,
 			string Lastname,
-			long Department,
 			string Function,
 			string WorkPhone,
 			string MobilePhone,
@@ -58,7 +57,6 @@ namespace Webserver.Data {
 			this.Firstname = Firstname;
 			this.MiddleInitial = MiddleInitial;
 			this.Lastname = Lastname;
-			this.Department = (int)Department;
 			this.Function = Function;
 			this.WorkPhone = WorkPhone;
 			this.MobilePhone = MobilePhone;
@@ -91,6 +89,17 @@ namespace Webserver.Data {
 			return String.Concat(sha
 				.ComputeHash(PassBytes.Concat(SaltBytes).ToArray())
 				.Select(item => item.ToString("x2")));
+		}
+
+
+		public bool isAdministrator(SQLiteConnection Connection) {
+			return (Connection.QueryFirstOrDefault<int>("SELECT Administrator FROM Permissions WHERE User = @ID", new { ID }) == 1) ? true : false;
+		}
+		public bool isMember(SQLiteConnection Connection, int Department) {
+			return (Connection.QueryFirstOrDefault<int>("SELECT Member FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
+		}
+		public bool isManager(SQLiteConnection Connection, int Department) {
+			return (Connection.QueryFirstOrDefault<int>("SELECT Manager FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
 		}
 	}
 }

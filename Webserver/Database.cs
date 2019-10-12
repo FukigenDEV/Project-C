@@ -38,6 +38,14 @@ namespace Webserver {
 				"Name				STRING NOT NULL" +
 			")");
 
+			Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
+				"User				INTEGER REFERENCES Users(ID) ON UPDATE CASCADE," +
+				"Department			INTEGER REFERENCES Departments(ID) ON UPDATE CASCADE," +
+				"Member				INTEGER," +
+				"Manager			INTEGER," +
+				"Administrator		INTEGER" +
+			")");
+
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Users (" +
 				"ID					INTEGER PRIMARY KEY, " +
 				"Email				STRING NOT NULL, " +
@@ -45,7 +53,6 @@ namespace Webserver {
 				"Firstname			STRING," +
 				 "MiddleInitial		STRING," +
 				 "Lastname			STRING," +
-				 "Department		INTEGER REFERENCES Department(ID) ON UPDATE CASCADE," +
 				 "Function			STRING REFERENCES Function(Name) ON UPDATE CASCADE," +
 				 "WorkPhone			STRING," +
 				 "MobilePhone		STRING," +
@@ -59,6 +66,7 @@ namespace Webserver {
 			User Administrator = Connection.Get<User>(1);
 			if(Administrator == null) {
 				Connection.Insert(new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword")));
+				Connection.Execute("INSERT INTO Permissions (User, Member, Manager, Administrator) VALUES (1, 0, 0, 1)");
 			} else {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Update<User>(Administrator);
