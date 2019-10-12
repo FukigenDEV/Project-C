@@ -48,7 +48,7 @@ namespace Webserver.Threads {
 
 							//Check if this is the correct endpoint. If it is, call it.
 							if (Info.ContentType == Request.ContentType && Config.GetValue("WebserverSettings.wwwroot") + Info.URL == Target) {
-								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T, new object[] { Context });
+								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T, new object[] { Connection, Context });
 
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
 								try {
