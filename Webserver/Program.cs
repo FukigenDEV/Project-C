@@ -95,7 +95,7 @@ namespace Webserver {
 			
 			//Add files to list
 			foreach(string Item in Directory.GetFiles(path)) {
-				Result.Add(Item.Replace('\\', '/').ToLower());
+				Result.Add(Item.Replace('\\', '/'));
 			}
 			//Crawl subfolders
 			foreach(string Dir in Directory.GetDirectories(path)) {

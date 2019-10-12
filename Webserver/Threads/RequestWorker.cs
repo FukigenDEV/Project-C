@@ -28,7 +28,7 @@ namespace Webserver.Threads {
 				HttpListenerRequest Request = Context.Request;
 
 				//Append wwwroot to target
-				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl;
+				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
 
 				//Switch to contentType
 				switch (Request.ContentType) {
