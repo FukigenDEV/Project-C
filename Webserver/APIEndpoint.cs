@@ -8,6 +8,9 @@ namespace Webserver {
 	public abstract class APIEndpoint {
 		public readonly HttpListenerContext Context;
 		public readonly SQLiteConnection Connection;
+		public readonly HttpListenerRequest Request;
+		public readonly HttpListenerResponse Response;
+
 		/// <summary>
 		/// Provides methods for an API Endpoint. Classes inheriting this class will be be instantiated when the endpoint it represents is called by a client.
 		/// </summary>
@@ -15,6 +18,8 @@ namespace Webserver {
 		protected APIEndpoint(SQLiteConnection Connection, HttpListenerContext Context) {
 			this.Context = Context;
 			this.Connection = Connection;
+			this.Request = Context.Request;
+			this.Response = Context.Response;
 		}
 
 		/// <summary>
@@ -76,6 +81,19 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="Data">The data to send.</param>
 		/// <param name="StatusCode"></param>
-		public void Send(object Data, HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Data.ToString(), Context.Response, StatusCode);
+		public void Send(object Data, HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Data.ToString(), Response, StatusCode);
+
+		/// <summary>
+		/// Send a cookie to the client.
+		/// </summary>
+		/// <param name="cookie">The Cookie object to send. Only the Name and Value fields will be used.</param>
+		public void AddCookie(Cookie cookie) => AddCookie(cookie.Name, cookie.Value);
+
+		/// <summary>
+		/// Send a cookie to the client. Always use this function to add cookies, as the built-in functions don't work properly.
+		/// </summary>
+		/// <param name="name">The cookie's name</param>
+		/// <param name="value">The cookie's value</param>
+		public void AddCookie(string name, string value) => Response.AppendHeader("Set-Cookie", name + "=" + value);
 	}
 }
