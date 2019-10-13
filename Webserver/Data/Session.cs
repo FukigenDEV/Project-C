@@ -46,7 +46,6 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public static Session GetUserSession(SQLiteConnection Connection, string SessionID) {
 			Session s = Connection.QueryFirst<Session>("SELECT * FROM Sessions WHERE SessionID = @SessionID", new { SessionID });
-			Console.WriteLine("3:" + s.SessionID);
 			if (s == null) return null;
 
 			long Timeout;

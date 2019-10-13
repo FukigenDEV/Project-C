@@ -14,9 +14,6 @@ namespace Webserver.API_Endpoints {
 		public Example(SQLiteConnection Connection, HttpListenerContext Context) : base(Connection, Context) { }
 
 		public override void GET() {
-
-			Console.WriteLine(Request.Cookies["yeet"].Value);
-
 			Send("Hello World!");
 		}
 	}
