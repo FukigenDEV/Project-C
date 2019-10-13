@@ -69,13 +69,12 @@ namespace Webserver.Threads {
 						}
 						break;
 
-					//HTML
+					//HTML, CSS, JS, images
 					default:
 						//Browsers apparently don't set content type when asking for webpages.
-						//If the page exists, load and send it. Otherwise, send a 404.
-						if (Program.WebPages.Contains(Target)) {
-							using StreamReader Reader = new StreamReader(File.Open(Target, FileMode.Open));
-							Utils.Send(Context.Response, Reader.ReadToEnd(), HttpStatusCode.OK);
+						//If the file exists, load and send it. Otherwise, send a 404.
+						if (Program.WebPages.Contains(Target) && File.Exists(Target)) {
+							Utils.Send(Context.Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
 						} else {
 							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+ Request.RawUrl + " from "+Request.UserHostName);
 							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);

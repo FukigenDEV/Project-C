@@ -33,18 +33,26 @@ namespace Webserver {
 		}
 
 		/// <summary>
+		/// Sends data to the client in the form of a byte array.
+		/// </summary>
+		/// <param name="Data">The data to be sent to the client.</param>
+		/// <param name="Response">The Response object</param>
+		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
+		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
+			Response.StatusCode = (int)StatusCode;
+			Response.OutputStream.Write(Data, 0, Data.Length);
+			Response.Close();
+		}
+		/// <summary>
 		/// Sends data to the client, answering the request.
 		/// </summary>
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
+
 		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
-			Response.StatusCode = (int)StatusCode;
-			if(Data != null) {
-				byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
-				Response.OutputStream.Write(Buffer, 0, Buffer.Length);
-			}
-			Response.OutputStream.Close();
+			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
+			Send(Response, Buffer, StatusCode);
 		}
 	}
 }
