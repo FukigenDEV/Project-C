@@ -62,6 +62,14 @@ namespace Webserver {
 				 "Postcode			STRING" +
 			")");
 
+			Connection.Execute("CREATE TABLE IF NOT EXISTS Sessions (" +
+				"ID					INTEGER PRIMARY KEY," +
+				"SessionID			STRING NOT NULL," +
+				"User				INTEGER REFERENCES Users(ID) NOT NULL," +
+				"Token				INTEGER NOT NULL," +
+				"RememberMe			INTEGER NOT NULL" +
+			")");
+
 			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
 			User Administrator = Connection.Get<User>(1);
 			if(Administrator == null) {

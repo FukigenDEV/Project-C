@@ -1,7 +1,8 @@
 import requests
-address = "http://localhost/example"
+address = "http://localhost/login"
 
-response = requests.get(address, json={"hello": "world"})
+Cookies = dict(SessionID="eXtPvwFWBkalwIkD0buJNA==")
+response = requests.get(address, json={}, cookies=Cookies)
 print(response.cookies.get_dict())
 print(response.content)
 print(response.status_code)

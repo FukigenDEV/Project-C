@@ -73,6 +73,31 @@ namespace Webserver.Data {
 		public void ChangePassword(string Password) => this.PasswordHash = CreateHash(Password, Email);
 
 		/// <summary>
+		/// Returns true if the user is an Administrator, otherwise false.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public bool isAdministrator(SQLiteConnection Connection) => (Connection.QueryFirstOrDefault<int>("SELECT Administrator FROM Permissions WHERE User = @ID", new { ID }) == 1) ? true : false;
+
+		/// <summary>
+		/// Returns true if the user is a member of the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Department"></param>
+		/// <returns></returns>
+		public bool isMember(SQLiteConnection Connection, int Department) => (Connection.QueryFirstOrDefault<int>("SELECT Member FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
+
+		/// <summary>
+		/// Returns true if the user is a manager of the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Department"></param>
+		/// <returns></returns>
+		public bool isManager(SQLiteConnection Connection, int Department) => (Connection.QueryFirstOrDefault<int>("SELECT Manager FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
+
+		/// ########################################### Static Methods
+
+		/// <summary>
 		/// Given a password and salt, returns a salted SHA512 hash.
 		/// </summary>
 		/// <param name="Password"></param>
@@ -91,15 +116,14 @@ namespace Webserver.Data {
 				.Select(item => item.ToString("x2")));
 		}
 
-
-		public bool isAdministrator(SQLiteConnection Connection) {
-			return (Connection.QueryFirstOrDefault<int>("SELECT Administrator FROM Permissions WHERE User = @ID", new { ID }) == 1) ? true : false;
-		}
-		public bool isMember(SQLiteConnection Connection, int Department) {
-			return (Connection.QueryFirstOrDefault<int>("SELECT Member FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
-		}
-		public bool isManager(SQLiteConnection Connection, int Department) {
-			return (Connection.QueryFirstOrDefault<int>("SELECT Manager FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
+		/// <summary>
+		/// Retrieve a user using their email address.
+		/// </summary>
+		/// <param name="Connection">The database connection</param>
+		/// <param name="Email">The user's email address</param>
+		/// <returns></returns>
+		public static User GetUserByEmail(SQLiteConnection Connection, string Email) {
+			return Connection.QueryFirst<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
 		}
 	}
 }

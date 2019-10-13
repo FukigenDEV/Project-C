@@ -38,10 +38,12 @@ namespace Webserver {
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public static void Send(object Data, HttpListenerResponse Response, HttpStatusCode StatusCode = HttpStatusCode.OK) {
+		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
 			Response.StatusCode = (int)StatusCode;
-			byte[] Buffer = Encoding.UTF8.GetBytes(Data?.ToString());
-			Response.OutputStream.Write(Buffer, 0, Buffer.Length);
+			if(Data != null) {
+				byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
+				Response.OutputStream.Write(Buffer, 0, Buffer.Length);
+			}
 			Response.OutputStream.Close();
 		}
 	}

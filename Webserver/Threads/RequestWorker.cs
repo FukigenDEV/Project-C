@@ -55,7 +55,7 @@ namespace Webserver.Threads {
 									Method.Invoke(ep, null);
 #pragma warning disable CA1031 // Do not catch general exception types
 								} catch (Exception e) {
-									Utils.Send(Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), Context.Response, HttpStatusCode.InternalServerError);
+									Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
 								}
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -65,7 +65,7 @@ namespace Webserver.Threads {
 						//If no endpoint was found, send a 404.
 						if (!Handled) {
 							Log.Info("Received " + Request.HttpMethod + " request for invalid endpoint at address " + Target + " from " + Request.UserHostName);
-							Utils.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), Context.Response, HttpStatusCode.NotFound);
+							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
 						break;
 
@@ -75,10 +75,10 @@ namespace Webserver.Threads {
 						//If the page exists, load and send it. Otherwise, send a 404.
 						if (Program.WebPages.Contains(Target)) {
 							using StreamReader Reader = new StreamReader(File.Open(Target, FileMode.Open));
-							Utils.Send(Reader.ReadToEnd(), Context.Response, HttpStatusCode.OK);
+							Utils.Send(Context.Response, Reader.ReadToEnd(), HttpStatusCode.OK);
 						} else {
 							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+ Request.RawUrl + " from "+Request.UserHostName);
-							Utils.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), Context.Response, HttpStatusCode.NotFound);
+							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
 						break;
 				}

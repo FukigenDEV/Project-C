@@ -24,10 +24,19 @@
 		"errorpages": "../../../../Views/errors"
 	},
 	"AuthenticationSettings": {
+		//The time in seconds until a session becomes invalid if left alone for too long while the "Keep me signed in" checkbox was enabled during login.
+		//Default is 604800, equal to 7 days.
+		"SessionTimeoutLong": 604800,
+		//The time in seconds until a session becomes invalid if left alone for too long.
+		//Default is 7200, equal to 2 hours.
+		"SessionTimeoutShort": 7200,
+		//The regex that all user passwords should comply to.
+		"PasswordRegex": "[A-z0-9]{10,}",
+
 		//###########################################################################
-		//# WARNING: All of the settings in this section MUST be kept confidential!	#
+		//# WARNING: All of the below settings MUST be kept confidential!			#
 		//###########################################################################
 		//The password for the built-in Administrator account.
-		"AdministratorPassword":  "W@chtw00rd"
+		"AdministratorPassword": "W@chtw00rd"
 	}
 }
