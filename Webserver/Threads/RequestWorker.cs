@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using Webserver.Data;
 
 namespace Webserver.Threads {
 	class RequestWorker {
@@ -49,6 +50,9 @@ namespace Webserver.Threads {
 
 							//Check if this is the correct endpoint. If it is, call it.
 							if (Info.ContentType == Request.ContentType && Config.GetValue("WebserverSettings.wwwroot") + Info.URL == Target) {
+								Handled = true;
+
+								//Create an instance of the endpoint and set the fields.
 								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T);
 								ep.Connection = Connection;
 								ep.Context = Context;
@@ -57,7 +61,25 @@ namespace Webserver.Threads {
 								using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
 								ep.Content = JObject.Parse(streamReader.ReadToEnd());
 
+								//Get the method
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
+
+								//Check session cookie if necessary.
+								if( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
+									Cookie SessionIDCookie = Request.Cookies["SessionID"];
+									if(SessionIDCookie == null) {
+										ep.Send(StatusCode: HttpStatusCode.Unauthorized);
+										continue;
+									}
+									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
+									if(s == null) {
+										Console.WriteLine("2");
+										ep.Send(StatusCode: HttpStatusCode.Unauthorized);
+										continue;
+									}
+									s.Renew(Connection);
+								}
+
 								try {
 									Method.Invoke(ep, null);
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -65,8 +87,6 @@ namespace Webserver.Threads {
 									Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
 								}
 #pragma warning restore CA1031 // Do not catch general exception types
-
-								Handled = true;
 							}
 						}
 						//If no endpoint was found, send a 404.

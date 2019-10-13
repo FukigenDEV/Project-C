@@ -15,6 +15,7 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/login")]
 	class Login : APIEndpoint {
+		[SkipSessionCheck]
 		public override void GET() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];
@@ -24,8 +25,7 @@ namespace Webserver.API_Endpoints {
 				s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 				
 				if(s != null) {
-					s.Token = (int)DateTime.UtcNow.Ticks;
-					Connection.Update<Session>(s);
+					s.Renew(Connection);
 					Send(StatusCode: HttpStatusCode.NoContent);
 				} else {
 					Send(StatusCode: HttpStatusCode.Unauthorized);
@@ -63,7 +63,7 @@ namespace Webserver.API_Endpoints {
 
 			//At this point, we know the user exists and that the credentials are valid. The user will now be logged in.
 			//Create a new session, store it, and send back the Session ID
-			s = new Session((long)Account.ID, (bool)RememberMe);
+			s = new Session(Account.ID, (bool)RememberMe);
 			Connection.Insert(s);
 
 			AddCookie("SessionID", s.SessionID);

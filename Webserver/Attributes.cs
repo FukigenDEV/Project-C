@@ -18,4 +18,10 @@ namespace Webserver {
 			this.URL = URL;
 		}
 	}
+
+	/// <summary>
+	/// If used on an endpoint method, the user session will not be checked for validity.
+	/// This means that the method is usable even if you don't supply a session cookie (though the method may require it anyway)
+	/// </summary>
+	public sealed class SkipSessionCheck : Attribute {}
 }

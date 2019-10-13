@@ -10,7 +10,7 @@ namespace Webserver.Data {
 	class Session {
 		public int ID { get; set; }
 		public int User { get; set; }
-		public int Token { get; set; }
+		public long Token { get; set; }
 		public string SessionID { get; set; }
 		public bool RememberMe { get; set; }
 
@@ -23,7 +23,7 @@ namespace Webserver.Data {
 			this.SessionID = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 			this.User = (int)User;
 			this.RememberMe = RememberMe;
-			this.Token = (int)DateTime.UtcNow.Ticks;
+			this.Token = DateTime.UtcNow.Ticks;
 		}
 
 		/// <summary>
@@ -32,12 +32,18 @@ namespace Webserver.Data {
 		public Session(long ID, string SessionID, long User, long Token, long RememberMe) {
 			this.ID = (int)ID;
 			this.User = (int)User;
-			this.Token = (int)Token;
+			this.Token = Token;
 			this.SessionID = SessionID;
 			this.RememberMe = ((int)RememberMe == 1) ? true : false;
 		}
 
-		private static DateTime Epoch { get; } = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+		/// <summary>
+		/// Renews the token
+		/// </summary>
+		public void Renew(SQLiteConnection Connection) {
+			this.Token = DateTime.UtcNow.Ticks;
+			Connection.Update<Session>(this);
+		}
 
 		/// <summary>
 		/// Gets a user session. If the session doesn't exist or is out of date, null will be returned.
@@ -46,7 +52,10 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public static Session GetUserSession(SQLiteConnection Connection, string SessionID) {
 			Session s = Connection.QueryFirstOrDefault<Session>("SELECT * FROM Sessions WHERE SessionID = @SessionID", new { SessionID });
-			if (s == null) return null;
+			if (s == null) {
+				Console.WriteLine("aaa");
+				return null;
+			}
 
 			long Timeout;
 			if (s.RememberMe) {
@@ -54,7 +63,7 @@ namespace Webserver.Data {
 			} else {
 				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
 			}
-			long TokenAge = (long)(DateTime.UtcNow - Epoch.AddSeconds(s.Token).ToLocalTime()).TotalSeconds;
+			long TokenAge = DateTime.UtcNow.Ticks - s.Token;
 
 			if(TokenAge > Timeout) {
 				Connection.Delete(s);
