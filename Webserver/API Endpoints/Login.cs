@@ -15,8 +15,6 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/login")]
 	class Login : APIEndpoint {
-		public Login(SQLiteConnection Connection, HttpListenerContext Context) : base(Connection, Context) { }
-
 		public override void GET() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];

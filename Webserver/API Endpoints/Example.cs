@@ -11,8 +11,6 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/example")]
 	class Example : APIEndpoint {
-		public Example(SQLiteConnection Connection, HttpListenerContext Context) : base(Connection, Context) { }
-
 		public override void GET() {
 			Send("Hello World!");
 		}

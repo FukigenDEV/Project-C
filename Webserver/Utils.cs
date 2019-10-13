@@ -41,7 +41,7 @@ namespace Webserver {
 		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
 			Response.StatusCode = (int)StatusCode;
 			Response.OutputStream.Write(Data, 0, Data.Length);
-			Response.Close();
+			Response.OutputStream.Close();
 		}
 		/// <summary>
 		/// Sends data to the client, answering the request.
@@ -51,6 +51,9 @@ namespace Webserver {
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 
 		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
+			if (Data == null) {
+				Data = "";
+			}
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Response, Buffer, StatusCode);
 		}

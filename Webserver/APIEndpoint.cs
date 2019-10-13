@@ -8,24 +8,11 @@ using System.Text;
 
 namespace Webserver {
 	public abstract class APIEndpoint {
-		public readonly HttpListenerContext Context;
-		public readonly SQLiteConnection Connection;
-		public readonly HttpListenerRequest Request;
-		public readonly HttpListenerResponse Response;
-		public readonly JObject Content;
-
-		/// <summary>
-		/// Provides methods for an API Endpoint. Classes inheriting this class will be be instantiated when the endpoint it represents is called by a client.
-		/// </summary>
-		/// <param name="Context">The HttpListenerContext representing the client request</param>
-		protected APIEndpoint(SQLiteConnection Connection, HttpListenerContext Context) {
-			this.Context = Context;
-			this.Connection = Connection;
-			this.Request = Context.Request;
-			this.Response = Context.Response;
-			using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-			this.Content = JObject.Parse(streamReader.ReadToEnd());
-		}
+		public HttpListenerContext Context;
+		public SQLiteConnection Connection;
+		public HttpListenerRequest Request;
+		public HttpListenerResponse Response;
+		public JObject Content;
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.

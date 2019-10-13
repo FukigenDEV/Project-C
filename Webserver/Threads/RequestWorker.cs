@@ -1,5 +1,6 @@
 ﻿using Configurator;
 using Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -48,7 +49,13 @@ namespace Webserver.Threads {
 
 							//Check if this is the correct endpoint. If it is, call it.
 							if (Info.ContentType == Request.ContentType && Config.GetValue("WebserverSettings.wwwroot") + Info.URL == Target) {
-								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T, new object[] { Connection, Context });
+								APIEndpoint ep = (APIEndpoint)Activator.CreateInstance(T);
+								ep.Connection = Connection;
+								ep.Context = Context;
+								ep.Response = Context.Response;
+								ep.Request = Context.Request;
+								using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+								ep.Content = JObject.Parse(streamReader.ReadToEnd());
 
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
 								try {
