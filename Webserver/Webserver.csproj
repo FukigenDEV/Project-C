@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="API Endpoints\Account.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="DefaultConfig.json" />
     <None Remove="DefaultErrorPage.html" />
   </ItemGroup>
@@ -17,6 +21,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="DefaultConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="API Endpoints\Account\Get.cs" />
   </ItemGroup>
 
   <ItemGroup>
