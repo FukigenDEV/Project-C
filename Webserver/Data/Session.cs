@@ -23,7 +23,7 @@ namespace Webserver.Data {
 			this.SessionID = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 			this.User = (int)User;
 			this.RememberMe = RememberMe;
-			this.Token = DateTime.UtcNow.Ticks;
+			this.Token = Utils.GetUnixTimestamp();
 		}
 
 		/// <summary>
@@ -41,7 +41,7 @@ namespace Webserver.Data {
 		/// Renews the token
 		/// </summary>
 		public void Renew(SQLiteConnection Connection) {
-			this.Token = DateTime.UtcNow.Ticks;
+			this.Token = Utils.GetUnixTimestamp();
 			Connection.Update<Session>(this);
 		}
 
@@ -62,7 +62,7 @@ namespace Webserver.Data {
 			} else {
 				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
 			}
-			long TokenAge = DateTime.UtcNow.Ticks - s.Token;
+			long TokenAge = Utils.GetUnixTimestamp() - s.Token;
 
 			if(TokenAge > Timeout) {
 				Connection.Delete(s);

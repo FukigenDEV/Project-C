@@ -65,5 +65,13 @@ namespace Webserver {
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Response, Buffer, StatusCode);
 		}
+
+		/// <summary>
+		/// Get the current UNIX timestamp
+		/// </summary>
+		/// <returns></returns>
+		public static int GetUnixTimestamp() {
+			return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+		}
 	}
 }
