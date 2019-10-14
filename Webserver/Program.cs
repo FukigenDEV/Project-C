@@ -20,6 +20,7 @@ namespace Webserver {
 		public static void Main() {
 			Logger.Init();
 			Log = new Logger();
+			Utils.Log = Log;
 			Log.Info("Server is starting!");
 
 			Log.Info("Loading configuration files...");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -10,6 +11,8 @@ namespace Webserver {
 	/// Static class containing methods that aren't big enough to warrant their own files, and are unique enough that they can't be grouped with anything else.
 	/// </summary>
 	static class Utils {
+		public static Logger Log;
+
 		/// <summary>
 		/// Given a HttpStatusCode, returns the error page set for it.
 		/// If no custom error page is set, a built-in default will be used instead.
@@ -39,9 +42,14 @@ namespace Webserver {
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
-			Response.StatusCode = (int)StatusCode;
-			Response.OutputStream.Write(Data, 0, Data.Length);
-			Response.OutputStream.Close();
+			try {
+				Response.StatusCode = (int)StatusCode;
+				Response.OutputStream.Write(Data, 0, Data.Length);
+				Response.OutputStream.Close();
+			} catch (HttpListenerException e) {
+				Log.Error("Failed to send data to host: " + e.Message);
+			}
+			
 		}
 		/// <summary>
 		/// Sends data to the client, answering the request.
