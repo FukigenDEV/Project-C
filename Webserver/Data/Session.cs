@@ -53,7 +53,6 @@ namespace Webserver.Data {
 		public static Session GetUserSession(SQLiteConnection Connection, string SessionID) {
 			Session s = Connection.QueryFirstOrDefault<Session>("SELECT * FROM Sessions WHERE SessionID = @SessionID", new { SessionID });
 			if (s == null) {
-				Console.WriteLine("aaa");
 				return null;
 			}
 

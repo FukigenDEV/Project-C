@@ -1,4 +1,5 @@
 ﻿using Configurator;
+using Dapper.Contrib.Extensions;
 using Logging;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,6 +32,7 @@ namespace Webserver.Threads {
 
 				//Append wwwroot to target
 				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
+				Console.WriteLine(Request.RawUrl.ToLower());
 
 				//Switch to contentType
 				switch (Request.ContentType) {
@@ -73,11 +75,11 @@ namespace Webserver.Threads {
 									}
 									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 									if(s == null) {
-										Console.WriteLine("2");
 										ep.Send(StatusCode: HttpStatusCode.Unauthorized);
 										continue;
 									}
 									s.Renew(Connection);
+									ep.RequestUser = Connection.Get<User>(s.User);
 								}
 
 								try {
@@ -103,9 +105,10 @@ namespace Webserver.Threads {
 						if (Program.WebPages.Contains(Target) && File.Exists(Target)) {
 							Utils.Send(Context.Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
 						} else {
-							Log.Info("Received "+Request.HttpMethod+" request for invalid webpage at address "+ Request.RawUrl + " from "+Request.UserHostName);
+							Log.Info("Received " + Request.HttpMethod + " request for invalid webpage at address " + Request.RawUrl + " from " + Request.UserHostName);
 							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
+						
 						break;
 				}
 			}

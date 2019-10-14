@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Net;
 using System.Text;
+using Webserver.Data;
 
 namespace Webserver {
 	public abstract class APIEndpoint {
@@ -13,6 +14,7 @@ namespace Webserver {
 		public HttpListenerRequest Request;
 		public HttpListenerResponse Response;
 		public JObject Content;
+		public User RequestUser; 
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.
