@@ -1,0 +1,42 @@
+﻿{
+	"ConnectionSettings": {
+		//The URLs the server will listen to. Multiple URLs can be specified.
+		//Examples: localhost, http://example.com, https://contoso.com
+		"ServerAddresses": [
+			"localhost"
+		],
+		//Whether the server should automatically detect its address. This address will be used in addition to the ones specified in ServerAddresses.
+		"AutoDetectAddress": true
+	},
+	"PerformanceSettings": {
+		//The amount of worker threads the server should use. More threads allows the server to handle more requests at once, but increases server load.
+		//Using more threads than this computer has logical processors can result in degraded performance.
+		//Recommended setting is the logical processor count minus 3.
+		"WorkerThreadCount": 5
+	},
+	"WebserverSettings": {
+		//The folder that contains the web pages and related files. All HTML, JS, CSS, etc files must be inside this folder (or its subfolders) to be accessible.
+		"wwwroot": "wwwroot",
+		//The folder that contains the error pages and related files.
+		//The HTML files for each page must use the error's status code as name (eg. "404.html")
+		//If an error page isn't found, a simple built-in page will be used.
+		//If this folder is placed outside of wwwroot, the pages can't be accessed using an URL. They will only appear if an error is triggered.
+		"errorpages": "wwwroot/errors"
+	},
+	"AuthenticationSettings": {
+		//The time in seconds until a session becomes invalid if left alone for too long while the "Keep me signed in" checkbox was enabled during login.
+		//Default is 604800, equal to 7 days.
+		"SessionTimeoutLong": 604800,
+		//The time in seconds until a session becomes invalid if left alone for too long.
+		//Default is 7200, equal to 2 hours.
+		"SessionTimeoutShort": 7200,
+		//The regex that all user passwords should comply to.
+		"PasswordRegex": "[A-z0-9]{10,}",
+
+		//###########################################################################
+		//# WARNING: All of the below settings MUST be kept confidential!			#
+		//###########################################################################
+		//The password for the built-in Administrator account.
+		"AdministratorPassword": "W@chtw00rd"
+	}
+}
