@@ -83,21 +83,21 @@ function GegevensBekijken() {
 function GegevensRegistreren() {
   return(
     <div className="main-window">
-      wooop
+      
     </div>
   );
 }
 function Notities() {
   return(
     <div className="main-window">
-      diefucking
+      
     </div>
   );
 }
 function Activiteitengeschiedenis() {
   return(
     <div className="main-window">
-      doo
+      
     </div>
   );
 }
