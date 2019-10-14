@@ -70,12 +70,12 @@ namespace Webserver.Threads {
 								if( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
 									Cookie SessionIDCookie = Request.Cookies["SessionID"];
 									if(SessionIDCookie == null) {
-										ep.Send(StatusCode: HttpStatusCode.Unauthorized);
+										ep.Send("No Session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 									if(s == null) {
-										ep.Send(StatusCode: HttpStatusCode.Unauthorized);
+										ep.Send("Expired session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									s.Renew(Connection);

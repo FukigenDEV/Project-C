@@ -48,6 +48,7 @@ namespace Webserver.Threads {
 			Listener.Start();
 			Log.Info("Now listening!");
 			while (true) {
+				//TODO Fix ObjectDisposedException: 'The collection has been disposed. Object name: 'BlockingCollection'.'
 				Queue.Add(Listener.GetContext());
 			}
 		}

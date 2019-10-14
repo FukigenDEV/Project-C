@@ -26,9 +26,11 @@ namespace Webserver.API_Endpoints {
 				
 				if(s != null) {
 					s.Renew(Connection);
-					Send(StatusCode: HttpStatusCode.NoContent);
+					Send("Renewed", HttpStatusCode.OK);
+					return;
 				} else {
-					Send(StatusCode: HttpStatusCode.Unauthorized);
+					Send("Expired session", HttpStatusCode.Unauthorized);
+					return;
 				}
 			}
 			
