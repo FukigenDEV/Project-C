@@ -16,12 +16,12 @@
 	},
 	"WebserverSettings": {
 		//The folder that contains the web pages and related files. All HTML, JS, CSS, etc files must be inside this folder (or its subfolders) to be accessible.
-		"wwwroot": "../../../../Views",
+		"wwwroot": "wwwroot",
 		//The folder that contains the error pages and related files.
 		//The HTML files for each page must use the error's status code as name (eg. "404.html")
 		//If an error page isn't found, a simple built-in page will be used.
 		//If this folder is placed outside of wwwroot, the pages can't be accessed using an URL. They will only appear if an error is triggered.
-		"errorpages": "../../../../Views/errors"
+		"errorpages": "wwwroot/errors"
 	},
 	"AuthenticationSettings": {
 		//The time in seconds until a session becomes invalid if left alone for too long while the "Keep me signed in" checkbox was enabled during login.
