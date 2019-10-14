@@ -123,7 +123,7 @@ namespace Webserver.Data {
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
 		public static User GetUserByEmail(SQLiteConnection Connection, string Email) {
-			return Connection.QueryFirst<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
+			return Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
 		}
 	}
 }
