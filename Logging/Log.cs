@@ -111,6 +111,10 @@ namespace Logging {
 			stdout?.Close();
 
 			//Create a temporary directory, then move the log files there.
+			//If the temp directory already exists (leftovers from a crash or whatever), delete it first
+			if (Directory.Exists("Logs\\temp")) {
+				Directory.Delete("Logs\\temp");
+			}
 			Directory.CreateDirectory("Logs\\temp");
 			File.Move("Logs\\latest.log", "Logs\\temp\\latest.log");
 			File.Move("Logs\\latest_err.log", "Logs\\temp\\latest_err.log");
