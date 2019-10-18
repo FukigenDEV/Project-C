@@ -32,7 +32,6 @@ namespace Webserver.Threads {
 
 				//Append wwwroot to target
 				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
-				Console.WriteLine(Request.RawUrl.ToLower());
 
 				//Switch to contentType
 				switch (Request.ContentType) {
@@ -66,8 +65,9 @@ namespace Webserver.Threads {
 								//Get the method
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
 
+								#region SkipSessionCheck
 								//Check session cookie if necessary.
-								if( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
+								if ( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
 									Cookie SessionIDCookie = Request.Cookies["SessionID"];
 									if(SessionIDCookie == null) {
 										ep.Send("No Session", HttpStatusCode.Unauthorized);
@@ -81,6 +81,45 @@ namespace Webserver.Threads {
 									s.Renew(Connection);
 									ep.RequestUser = Connection.Get<User>(s.User);
 								}
+								#endregion
+
+								#region PermissionLevel
+								//Check permission
+								PermissionLevel Attr = Method.GetCustomAttribute<PermissionLevel>();
+								if (Attr != null) {
+									//Check for endpoint conflicts
+									if (ep.RequestUser == null) {
+										Log.Error("Endpoint attribute conflict for endpoint "+Target);
+										ep.Send(StatusCode: HttpStatusCode.InternalServerError);
+										continue;
+									}
+
+									//Get Department value
+									if(!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
+										ep.Send("Missing Department", HttpStatusCode.BadRequest);
+										continue;
+									}
+
+									//Get department
+									Department Dept = Department.GetDepartmentByName(Connection, (string)DepartmentVal);
+									if(Dept == null) {
+										ep.Send("No such Department", HttpStatusCode.BadRequest);
+										continue;
+									}
+
+									//Get permissionlevel
+									PermLevel Level = ep.RequestUser.GetPermissionLevel(Connection, Dept.ID);
+									ep.RequestUserLevel = Level;
+									
+									//Check permission level
+									if(Level < Attr.Level) {
+										Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
+										Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level+"'");
+										ep.Send(StatusCode: HttpStatusCode.Forbidden);
+										continue;
+									}
+								}
+								#endregion
 
 								try {
 									Method.Invoke(ep, null);
