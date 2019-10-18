@@ -14,7 +14,8 @@ namespace Webserver {
 		public HttpListenerRequest Request;
 		public HttpListenerResponse Response;
 		public JObject Content;
-		public User RequestUser; 
+		public User RequestUser;
+		public PermLevel RequestUserLevel;
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.

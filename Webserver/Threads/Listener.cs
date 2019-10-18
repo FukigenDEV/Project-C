@@ -3,6 +3,7 @@ using Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -48,7 +49,6 @@ namespace Webserver.Threads {
 			Listener.Start();
 			Log.Info("Now listening!");
 			while (true) {
-				//TODO Fix ObjectDisposedException: 'The collection has been disposed. Object name: 'BlockingCollection'.'
 				Queue.Add(Listener.GetContext());
 			}
 		}

@@ -40,10 +40,9 @@ namespace Webserver {
 
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
 				"User				INTEGER REFERENCES Users(ID) ON UPDATE CASCADE," +
+				"Permission			INTEGER," +
 				"Department			INTEGER REFERENCES Departments(ID) ON UPDATE CASCADE," +
-				"Member				INTEGER," +
-				"Manager			INTEGER," +
-				"Administrator		INTEGER" +
+				"PRIMARY KEY (User, Department)" +
 			")");
 
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Users (" +
@@ -73,8 +72,10 @@ namespace Webserver {
 			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
 			User Administrator = Connection.Get<User>(1);
 			if(Administrator == null) {
-				Connection.Insert(new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword")));
-				Connection.Execute("INSERT INTO Permissions (User, Member, Manager, Administrator) VALUES (1, 0, 0, 1)");
+				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
+				Connection.Insert(Administrator);
+				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 0);
+				
 			} else {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Update<User>(Administrator);

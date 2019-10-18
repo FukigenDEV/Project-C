@@ -73,27 +73,38 @@ namespace Webserver.Data {
 		public void ChangePassword(string Password) => this.PasswordHash = CreateHash(Password, Email);
 
 		/// <summary>
-		/// Returns true if the user is an Administrator, otherwise false.
-		/// </summary>
-		/// <param name="Connection"></param>
-		/// <returns></returns>
-		public bool isAdministrator(SQLiteConnection Connection) => (Connection.QueryFirstOrDefault<int>("SELECT Administrator FROM Permissions WHERE User = @ID", new { ID }) == 1) ? true : false;
-
-		/// <summary>
-		/// Returns true if the user is a member of the specified department.
+		/// Get a user's permission level.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Department"></param>
 		/// <returns></returns>
-		public bool isMember(SQLiteConnection Connection, int Department) => (Connection.QueryFirstOrDefault<int>("SELECT Member FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
-
+		public PermLevel GetPermissionLevel(SQLiteConnection Connection, Department Department) => GetPermissionLevel(Connection, Department.ID);
 		/// <summary>
-		/// Returns true if the user is a manager of the specified department.
+		/// Get a user's permission level.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Department"></param>
 		/// <returns></returns>
-		public bool isManager(SQLiteConnection Connection, int Department) => (Connection.QueryFirstOrDefault<int>("SELECT Manager FROM Permissions WHERE User = @ID AND Department = @Department", new { ID, Department }) == 1) ? true : false;
+		public PermLevel GetPermissionLevel(SQLiteConnection Connection, int Department) => (PermLevel)Math.Max(
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE User = @ID AND Department = @Department", new { this.ID, Department }),
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @ID AND Permission = 3", new { this.ID })
+		);
+
+		/// <summary>
+		/// Set's a user permission level.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Level"></param>
+		/// <param name="Department"></param>
+		public void SetPermissionLevel(SQLiteConnection Connection, PermLevel Level, Department Department) => SetPermissionLevel(Connection, Level, Department.ID);
+		/// <summary>
+		/// Set's a user permission level.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Level"></param>
+		/// <param name="Department"></param>
+		public void SetPermissionLevel(SQLiteConnection Connection, PermLevel Level, int Department) => Connection.Execute("INSERT OR REPLACE INTO Permissions (User, Permission, Department) VALUES (@User, @Permission, @Department)", new { user = this.ID, Permission = Level, Department });
+
 
 		/// ########################################### Static Methods
 

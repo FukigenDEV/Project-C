@@ -11,6 +11,7 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/example")]
 	class Example : APIEndpoint {
+		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
 			Send("Hello World!");
 		}

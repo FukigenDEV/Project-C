@@ -70,8 +70,18 @@ namespace Webserver {
 		/// Get the current UNIX timestamp
 		/// </summary>
 		/// <returns></returns>
-		public static int GetUnixTimestamp() {
-			return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-		}
+		public static int GetUnixTimestamp() => (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+
+		
+	}
+
+	/// <summary>
+	/// Permission level enum
+	/// </summary>
+	public enum PermLevel {
+		User,
+		DeptMember,
+		Manager,
+		Administrator
 	}
 }
