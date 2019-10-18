@@ -9,6 +9,7 @@ using Webserver.Threads;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Linq;
+using static Webserver.Threads.Listener;
 
 namespace Webserver {
 	class Program {
@@ -29,7 +30,7 @@ namespace Webserver {
 			Dictionary<string, List<string>> Missing = Config.LoadConfig();
 
 			//Display all missing and/or invalid config settings, if any.
-			if(Missing == null) {
+			if (Missing == null) {
 				Log.Fatal("The config file could not be read. Ensure that it is a valid JSON file. Press any key to exit.");
 				Console.ReadKey();
 				return;
@@ -78,7 +79,7 @@ namespace Webserver {
 				WorkerThreads.Add(WorkerThread);
 			}
 
-			Console.ReadKey();
+			Console.ReadLine();
 		}
 
 		/// <summary>
