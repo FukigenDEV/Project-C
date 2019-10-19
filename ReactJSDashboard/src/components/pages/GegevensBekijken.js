@@ -1,9 +1,9 @@
-import React from 'react';
-export function GegevensBekijken() {
-    return(
-      <div className="main-window">
-  
-      <h1>Gegevens bekijken</h1>
+import React, { Component } from 'react';
+class GegevensBekijken extends Component {
+  render() {
+    return (
+      <div>
+        <h1>Gegevens bekijken</h1>
         <div className="tabel">
           <table>
             <tr>
@@ -36,3 +36,6 @@ export function GegevensBekijken() {
       </div>
     );
   }
+}
+
+export default GegevensBekijken;

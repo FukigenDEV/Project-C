@@ -1,0 +1,78 @@
+.App {
+  display: inline-block;
+  width: 100%;
+  height: 100vh;
+}
+
+.Nav-Bar{
+  height: 100vh;
+  width: 200px;
+  position: fixed;
+
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #f6f6f6;
+;
+  overflow-x: hidden;
+  padding: 0 !important;
+}
+
+.Align-Bottom{
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+}
+
+.App-link {
+  display: block;
+  font-size: 18px;
+  font-weight: 500;
+  color: #636363 !important;
+  text-transform: uppercase;
+  padding: 25px 20px;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: #0e1111;
+  transition: background 100ms ease-in-out;
+  /* color: black; */
+  /* padding: 6px 8px 6px 4px; */
+  /* border: 3px solid black; */
+  /* margin: 5px; */
+}
+
+.header {
+  color: #0e1111 !important;
+}
+
+.selected {
+  background-color: #cecece;
+}
+
+a:hover.App-link {
+  background-color: #d8d8d8;
+  color: #0e1111 !important;
+  text-decoration: none;
+}
+
+.logo{
+  margin: 5px;
+}
+
+.main-window{
+  background-color: #fcfeff;
+  /* margin: 5px 5px 5px 205px; */
+  padding: 20px 40px !important;
+  /* height: 95.5%; */
+  /* border-style: solid;
+  border-width: 0px 0px 0px 2px;
+  border-color: #0e1111; */
+}
+
+table, th, td {
+    border: 1px solid #0e1111;
+}
+
+th, td{
+  padding: 10px;
+}
