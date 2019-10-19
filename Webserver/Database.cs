@@ -12,13 +12,14 @@ using Dapper.Contrib.Extensions;
 namespace Webserver {
 	static class Database {
 		public const string ConnectionString = "Data Source=Database.db;";
+		private static readonly Logger Log = Program.Log;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="log"></param>
-		public static void Init(Logger log) {
-			log.Info("Initializing database...");
+		public static void Init() {
+			Log.Info("Initializing database...");
 
 			//Create the database if it doesn't exist already.
 			if (!File.Exists("Database.db")) {
@@ -75,7 +76,6 @@ namespace Webserver {
 				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Insert(Administrator);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 0);
-				
 			} else {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Update<User>(Administrator);

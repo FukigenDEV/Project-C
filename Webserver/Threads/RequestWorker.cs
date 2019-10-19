@@ -29,6 +29,19 @@ namespace Webserver.Threads {
 			while (true) {
 				HttpListenerContext Context = Queue.Take();
 				HttpListenerRequest Request = Context.Request;
+				HttpListenerResponse Response = Context.Response;
+
+				//Resolve redirects, if any
+				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+				if(URL == null) {
+					Log.Error("Couldn't resolve URL; infinite redirection loop");
+					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
+
+				} else if(URL != Request.RawUrl.ToLower()) {
+					Response.Redirect(URL);
+					Utils.Send(Response, null, HttpStatusCode.Redirect);
+					continue;
+				}
 
 				//Append wwwroot to target
 				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
@@ -70,12 +83,12 @@ namespace Webserver.Threads {
 								if ( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
 									Cookie SessionIDCookie = Request.Cookies["SessionID"];
 									if(SessionIDCookie == null) {
-										ep.Send("No Session", HttpStatusCode.Unauthorized);
+										Utils.Send(Response, "No Session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 									if(s == null) {
-										ep.Send("Expired session", HttpStatusCode.Unauthorized);
+										Utils.Send(Response, "Expired session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									s.Renew(Connection);
@@ -90,20 +103,20 @@ namespace Webserver.Threads {
 									//Check for endpoint conflicts
 									if (ep.RequestUser == null) {
 										Log.Error("Endpoint attribute conflict for endpoint "+Target);
-										ep.Send(StatusCode: HttpStatusCode.InternalServerError);
+										Utils.Send(Response, null, HttpStatusCode.InternalServerError);
 										continue;
 									}
 
 									//Get Department value
 									if(!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
-										ep.Send("Missing Department", HttpStatusCode.BadRequest);
+										Utils.Send(Response, "Missing Department", HttpStatusCode.BadRequest);
 										continue;
 									}
 
 									//Get department
 									Department Dept = Department.GetDepartmentByName(Connection, (string)DepartmentVal);
 									if(Dept == null) {
-										ep.Send("No such Department", HttpStatusCode.BadRequest);
+										Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
 										continue;
 									}
 
@@ -115,7 +128,7 @@ namespace Webserver.Threads {
 									if(Level < Attr.Level) {
 										Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
 										Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level+"'");
-										ep.Send(StatusCode: HttpStatusCode.Forbidden);
+										Utils.Send(Response, null, HttpStatusCode.Forbidden);
 										continue;
 									}
 								}
@@ -125,7 +138,7 @@ namespace Webserver.Threads {
 									Method.Invoke(ep, null);
 #pragma warning disable CA1031 // Do not catch general exception types
 								} catch (Exception e) {
-									Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
+									Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
 								}
 #pragma warning restore CA1031 // Do not catch general exception types
 							}
@@ -133,7 +146,7 @@ namespace Webserver.Threads {
 						//If no endpoint was found, send a 404.
 						if (!Handled) {
 							Log.Info("Received " + Request.HttpMethod + " request for invalid endpoint at address " + Target + " from " + Request.UserHostName);
-							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
+							Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
 						break;
 
@@ -141,11 +154,11 @@ namespace Webserver.Threads {
 					default:
 						//Browsers apparently don't set content type when asking for webpages.
 						//If the file exists, load and send it. Otherwise, send a 404.
-						if (Program.WebPages.Contains(Target) && File.Exists(Target)) {
-							Utils.Send(Context.Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
+						if (WebFiles.WebPages.Contains(Target) && File.Exists(Target)) {
+							Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
 						} else {
 							Log.Info("Received " + Request.HttpMethod + " request for invalid webpage at address " + Request.RawUrl + " from " + Request.UserHostName);
-							Utils.Send(Context.Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
+							Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
 						
 						break;

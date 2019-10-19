@@ -14,8 +14,6 @@ using static Webserver.Threads.Listener;
 namespace Webserver {
 	class Program {
 		public static Logger Log;
-		public static List<string> WebPages;
-		public static Dictionary<int, string> ErrorPages;
 		public static List<Type> Endpoints;
 
 		public static void Main() {
@@ -47,17 +45,10 @@ namespace Webserver {
 				return;
 			}
 
-			//Thread count check
-			if (Environment.ProcessorCount - 1 - (int)Config.GetValue("PerformanceSettings.WorkerThreadCount") < 2) {
-				Log.Warning("Thread Count is set too high, which may impact performance. Consider lowering it.");
-			}
-
-			//Setup database
-			Database.Init(Log);
-
-			//Find all webpages and error pages, and store their filepaths.
-			WebPages = CrawlWebFolder((string)Config.GetValue("WebserverSettings.wwwroot"));
-			ErrorPages = CrawlErrorFolder((string)Config.GetValue("WebserverSettings.errorpages"));
+			//Run inits
+			Database.Init();
+			WebFiles.Init();
+			Redirect.Init();
 
 			//Find all API endpoints
 			Endpoints = new List<Type>();
@@ -80,50 +71,6 @@ namespace Webserver {
 			}
 
 			Console.ReadLine();
-		}
-
-		/// <summary>
-		/// Recursively finds all web pages
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public static List<string> CrawlWebFolder(string path) {
-			//Throw an exception if the folder can't be found.
-			if (!Directory.Exists(path)) {
-				Directory.CreateDirectory(path);
-			}
-
-			List<string> Result = new List<string>();
-			
-			//Add files to list
-			foreach(string Item in Directory.GetFiles(path)) {
-				Result.Add(Item.Replace('\\', '/'));
-			}
-			//Crawl subfolders
-			foreach(string Dir in Directory.GetDirectories(path)) {
-				Result = Result.Concat(CrawlWebFolder(Dir)).ToList();
-			}
-
-			return Result;
-		}
-
-		public static Dictionary<int, string> CrawlErrorFolder(string path) {
-			//Throw an exception if the folder can't be found.
-			if (!Directory.Exists(path)) {
-				Directory.CreateDirectory(path);
-			}
-
-			Dictionary<int, string> Result = new Dictionary<int, string>();
-
-			//Add files to list
-			foreach (string Item in Directory.GetFiles(path)) {
-				if (Path.GetExtension(Item) == ".html" && int.TryParse(Path.GetFileNameWithoutExtension(Item), out int Code)) {
-					Result.Add(Code, Item.Replace('\\', '/').ToLower());
-				}
-
-			}
-
-			return Result;
 		}
 	}
 }
