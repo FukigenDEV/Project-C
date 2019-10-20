@@ -1,23 +1,19 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+import Navs from '../navs';
+import Main from '../main';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Navs from '../navs';
-import GegevensRegistreren from '../pages/GegevensRegistreren';
-import GegevensBekijken from '../pages/GegevensBekijken';
-import Notities from '../pages/Notities';
-import Activiteitengeschiedenis from '../pages/Activiteitengeschiedenis';
-import Backup from '../pages/Backup';
-import Uitloggen from '../pages/Uitloggen';
 
 class App extends Component {
   state = {
     navs: [
-      {id: 1, heading: 'Gegevens bekijken', link: '', active: true},
-      {id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', active: false},
-      {id: 3, heading: 'Notities', link: 'Notities', active: false},
-      {id: 4, heading: 'Activiteitengeschiedenis', link: 'Activiteitengeschiedenis', active: false},
-      {id: 5, heading: 'Back-up maken', link: 'Back-up', active: false}
+      {id: 1, heading: 'Gegevens bekijken', link: '', path: '/', active: true},
+      {id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', active: false},
+      {id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', active: false},
+      {id: 4, heading: 'Activiteitengeschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', active: false},
+      {id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', active: false},
+      {id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', active: false}
     ]
   };
 
@@ -35,7 +31,6 @@ class App extends Component {
     for (var i in navs) {
       navs[i].active = false;
     }
-    console.log(navs);
     this.setState({navs});
   }
 
@@ -44,37 +39,10 @@ class App extends Component {
       <div className="container-fluid">
         <div className="row">
           <Router>
-            <div className="col Nav-Bar">
-              <nav className="nav navbar-light bg-light flex-column">
-                <Link className="App-link header" to="/">
-                  <h1>PROJECT C</h1>
-                </Link>
-
-                <Navs navs={this.state.navs} onSelect={this.handleSelect} />
-              </nav>
-            </div>
+            <Navs navs={this.state.navs} onSelect={this.handleSelect} />
 
             <div className="col-9 main-window">
-              <Switch>
-                <Route exact path="/">
-                  <GegevensBekijken />
-                </Route>
-                <Route exact path="/GegevensRegistreren">
-                  <GegevensRegistreren />
-                </Route>
-                <Route exact path="/Notities">
-                  <Notities />
-                </Route>
-                <Route exact path="/Activiteitengeschiedenis">
-                  <Activiteitengeschiedenis />
-                </Route>
-                <Route exact path="/Back-up">
-                  <Backup />
-                </Route>
-                <Route exact path="/Uitloggen">
-                  <Uitloggen />
-                </Route>
-              </Switch>
+              <Main navs={this.state.navs} />
             </div>
           </Router>
         </div>
