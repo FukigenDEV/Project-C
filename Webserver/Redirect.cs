@@ -1,9 +1,7 @@
 ﻿using Configurator;
 using Logging;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Webserver {
@@ -60,7 +58,7 @@ namespace Webserver {
 				string[] LineContents = Line.Split(" => ");
 
 				//Check if the line is valid
-				if(LineContents.Length != 2) {
+				if (LineContents.Length != 2) {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Invalid format");
 					continue;
 				}

@@ -4,13 +4,10 @@ using Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using Webserver.Data;
 
 namespace Webserver.Threads {
@@ -33,11 +30,11 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
-				if(URL == null) {
+				if (URL == null) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop");
 					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
 
-				} else if(URL != Request.RawUrl.ToLower()) {
+				} else if (URL != Request.RawUrl.ToLower()) {
 					Response.Redirect(URL);
 					Utils.Send(Response, null, HttpStatusCode.Redirect);
 					continue;
@@ -54,10 +51,10 @@ namespace Webserver.Threads {
 
 						bool Handled = false;
 						//Search for the right endpoint.
-						foreach(Type T in Program.Endpoints) {
+						foreach (Type T in Program.Endpoints) {
 							//Get endpoint info attribute. If the attribute is missing, show an error in console and continue to the next.
 							EndpointInfo Info = (EndpointInfo)Attribute.GetCustomAttribute(T, typeof(EndpointInfo));
-							if(Info == null) {
+							if (Info == null) {
 								Log.Error("Endpoint " + T.Name + " has no EndpointInfo attribute");
 								continue;
 							}
@@ -80,18 +77,19 @@ namespace Webserver.Threads {
 
 								#region SkipSessionCheck
 								//Check session cookie if necessary.
-								if ( Method.GetCustomAttribute<SkipSessionCheck>() == null) {
+								if (Method.GetCustomAttribute<SkipSessionCheck>() == null) {
 									Cookie SessionIDCookie = Request.Cookies["SessionID"];
-									if(SessionIDCookie == null) {
+									if (SessionIDCookie == null) {
 										Utils.Send(Response, "No Session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
-									if(s == null) {
+									if (s == null) {
 										Utils.Send(Response, "Expired session", HttpStatusCode.Unauthorized);
 										continue;
 									}
 									s.Renew(Connection);
+									ep.UserSession = s;
 									ep.RequestUser = Connection.Get<User>(s.User);
 								}
 								#endregion
@@ -102,7 +100,7 @@ namespace Webserver.Threads {
 								if (Attr != null) {
 									//Check for endpoint conflicts
 									if (ep.RequestUser == null) {
-										Log.Error("Endpoint attribute conflict for endpoint "+Target);
+										Log.Error("Endpoint attribute conflict for endpoint " + Target);
 										Utils.Send(Response, null, HttpStatusCode.InternalServerError);
 										continue;
 									}
@@ -165,7 +163,7 @@ namespace Webserver.Threads {
 							Log.Info("Received " + Request.HttpMethod + " request for invalid webpage at address " + Request.RawUrl + " from " + Request.UserHostName);
 							Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 						}
-						
+
 						break;
 				}
 			}

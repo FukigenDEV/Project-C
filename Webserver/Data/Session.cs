@@ -2,12 +2,10 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Text;
 
 namespace Webserver.Data {
-	class Session {
+	public class Session {
 		public int ID { get; set; }
 		public int User { get; set; }
 		public long Token { get; set; }
@@ -64,7 +62,7 @@ namespace Webserver.Data {
 			}
 			long TokenAge = Utils.GetUnixTimestamp() - s.Token;
 
-			if(TokenAge > Timeout) {
+			if (TokenAge > Timeout) {
 				Connection.Delete(s);
 				return null;
 			} else {

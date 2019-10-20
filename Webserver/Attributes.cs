@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static Webserver.Utils;
 
 namespace Webserver {
-	
+
 	/// <summary>
 	/// Stores information about an API endpoint;
 	/// ContentType		-	The ContentType requests to this EndPoint should have.
@@ -26,7 +23,7 @@ namespace Webserver {
 	/// This means that the method is usable even if you don't supply a session cookie (though the method may require it anyway)
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method)]
-	public sealed class SkipSessionCheck : Attribute {}
+	public sealed class SkipSessionCheck : Attribute { }
 
 	/// <summary>
 	/// If used on an endpoint method, the method will only be usable by users with the specified permission level or above

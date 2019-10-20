@@ -9,14 +9,14 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
 			//Get required fields
-			if(!Content.TryGetValue("Email", out JToken Email)) {
+			if (!Content.TryGetValue("Email", out JToken Email)) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
 			User Acc = User.GetUserByEmail(Connection, (string)Email);
-			if(Acc == null) {
+			if (Acc == null) {
 				Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}

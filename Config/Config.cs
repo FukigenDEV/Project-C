@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Configurator {
 	public static class Config {
@@ -80,7 +78,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="ExtConfig"></param>
 		public static void AddConfig(StreamReader Reader) {
-			if(DefaultConfigString == null) {
+			if (DefaultConfigString == null) {
 				DefaultConfigString = Reader.ReadToEnd();
 			} else {
 				string NewConfig = Reader.ReadToEnd().Replace("\r\n", "\n").Remove(0, 1);

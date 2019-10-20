@@ -1,15 +1,13 @@
 ﻿using Configurator;
 using Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using Webserver.Threads;
-using System.Collections.Concurrent;
-using System.Net;
-using System.Linq;
-using static Webserver.Threads.Listener;
 
 namespace Webserver {
 	class Program {

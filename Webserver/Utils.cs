@@ -1,6 +1,5 @@
 ﻿using Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -42,7 +41,7 @@ namespace Webserver {
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
-			if(Data == null) {
+			if (Data == null) {
 				Data = Array.Empty<byte>();
 			}
 
@@ -53,7 +52,7 @@ namespace Webserver {
 			} catch (HttpListenerException e) {
 				Log.Error("Failed to send data to host: " + e.Message);
 			}
-			
+
 		}
 		/// <summary>
 		/// Sends data to the client, answering the request.
@@ -76,7 +75,7 @@ namespace Webserver {
 		/// <returns></returns>
 		public static int GetUnixTimestamp() => (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
-		
+
 	}
 
 	/// <summary>

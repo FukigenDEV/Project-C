@@ -1,13 +1,10 @@
-﻿using Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Configurator;
 using Dapper;
-using System.IO;
-using System.Data.SQLite;
-using Webserver.Data;
-using Configurator;
 using Dapper.Contrib.Extensions;
+using Logging;
+using System.Data.SQLite;
+using System.IO;
+using Webserver.Data;
 
 namespace Webserver {
 	static class Database {
@@ -25,7 +22,7 @@ namespace Webserver {
 			if (!File.Exists("Database.db")) {
 				SQLiteConnection.CreateFile("Database.db");
 			}
-			
+
 			//Connect to it
 			using SQLiteConnection Connection = createConnection();
 
@@ -72,7 +69,7 @@ namespace Webserver {
 
 			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
 			User Administrator = Connection.Get<User>(1);
-			if(Administrator == null) {
+			if (Administrator == null) {
 				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Insert(Administrator);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 0);

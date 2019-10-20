@@ -3,10 +3,8 @@ using Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace Webserver.Threads {
 	class Listener {
@@ -40,7 +38,7 @@ namespace Webserver.Threads {
 					addr = Address;
 				}
 
-				if(addr[^1] != '/') {
+				if (addr[^1] != '/') {
 					addr += '/';
 				}
 				Listener.Prefixes.Add(addr);

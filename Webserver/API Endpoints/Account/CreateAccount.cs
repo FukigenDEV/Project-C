@@ -1,6 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -11,7 +10,7 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void POST() {
 			//Get all required fields
-			if(
+			if (
 				!Content.TryGetValue("Email", out JToken Email) ||
 				!Content.TryGetValue("Password", out JToken Password) ||
 				!Content.TryGetValue("AccountType", out JToken AccountType) ||
@@ -40,7 +39,7 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 			//If the new user has a greater perm than the requestuser, send a 403 Forbidden.
-			if(level > RequestUserLevel) {
+			if (level > RequestUserLevel) {
 				Send("Can't create Admin as Manager", HttpStatusCode.Forbidden);
 				return;
 			}
@@ -56,12 +55,12 @@ namespace Webserver.API_Endpoints {
 			User NewUser = new User((string)Email, (string)Password);
 
 			//Set optional fields
-			foreach(var x in Content) {
-				if(x.Key == "Email" || x.Key == "Password") {
+			foreach (var x in Content) {
+				if (x.Key == "Email" || x.Key == "Password") {
 					continue;
 				}
 				PropertyInfo Prop = NewUser.GetType().GetProperty(x.Key);
-				if(Prop == null) {
+				if (Prop == null) {
 					continue;
 				}
 				dynamic Value = x.Value.ToObject(Prop.PropertyType);

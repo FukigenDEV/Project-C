@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.IO;
 using System.Net;
-using System.Text;
 using Webserver.Data;
 
 namespace Webserver {
@@ -16,6 +12,7 @@ namespace Webserver {
 		public JObject Content;
 		public User RequestUser;
 		public PermLevel RequestUserLevel;
+		public Session UserSession;
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace Webserver {
 	static class WebFiles {
@@ -62,7 +61,7 @@ namespace Webserver {
 			//Add files to list
 			foreach (string Item in Directory.GetFiles(path)) {
 				if (Path.GetExtension(Item) == ".html" && int.TryParse(Path.GetFileNameWithoutExtension(Item), out int Code)) {
-					if(!Enum.IsDefined(typeof(HttpStatusCode), Code)) {
+					if (!Enum.IsDefined(typeof(HttpStatusCode), Code)) {
 						Log.Warning("Skipping invalid errorpage at " + path + ": No such HTTP Status Code");
 					}
 					Result.Add(Code, Item.Replace('\\', '/').ToLower());
