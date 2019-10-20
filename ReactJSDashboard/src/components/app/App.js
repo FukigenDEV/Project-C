@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+import {GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen} from '../../index';
 import Navs from '../navs';
 import Main from '../main';
 import './App.css';
@@ -8,12 +9,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 class App extends Component {
   state = {
     navs: [
-      {id: 1, heading: 'Gegevens bekijken', link: '', path: '/', active: true},
-      {id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', active: false},
-      {id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', active: false},
-      {id: 4, heading: 'Activiteitengeschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', active: false},
-      {id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', active: false},
-      {id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', active: false}
+      {id: 1, heading: 'Gegevens bekijken', link: '', path: '/', component: GegevensBekijken, active: true},
+      {id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false},
+      {id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false},
+      {id: 4, heading: 'Activiteitengeschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false},
+      {id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false},
+      {id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false}
     ]
   };
 
@@ -40,10 +41,7 @@ class App extends Component {
         <div className="row">
           <Router>
             <Navs navs={this.state.navs} onSelect={this.handleSelect} />
-
-            <div className="col-9 main-window">
-              <Main navs={this.state.navs} />
-            </div>
+            <Main navs={this.state.navs} />
           </Router>
         </div>
       </div>
