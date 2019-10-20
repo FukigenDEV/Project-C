@@ -12,7 +12,6 @@ namespace Webserver.API_Endpoints {
 		public override void POST() {
 			//Get all required fields
 			if(
-				
 				!Content.TryGetValue("Email", out JToken Email) ||
 				!Content.TryGetValue("Password", out JToken Password) ||
 				!Content.TryGetValue("AccountType", out JToken AccountType) ||

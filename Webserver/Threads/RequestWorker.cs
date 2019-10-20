@@ -107,29 +107,34 @@ namespace Webserver.Threads {
 										continue;
 									}
 
-									//Get Department value
-									if(!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
-										Utils.Send(Response, "Missing Department", HttpStatusCode.BadRequest);
-										continue;
-									}
+									PermLevel Level;
+									if (ep.RequestUser.GetPermissionLevel(Connection, 0) == PermLevel.Administrator) {
+										Level = PermLevel.Administrator;
+									} else {
+										//Get Department value
+										if (!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
+											Utils.Send(Response, "Missing Department", HttpStatusCode.BadRequest);
+											continue;
+										}
 
-									//Get department
-									Department Dept = Department.GetDepartmentByName(Connection, (string)DepartmentVal);
-									if(Dept == null) {
-										Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
-										continue;
-									}
+										//Get department
+										Department Dept = Department.GetDepartmentByName(Connection, (string)DepartmentVal);
+										if (Dept == null) {
+											Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
+											continue;
+										}
 
-									//Get permissionlevel
-									PermLevel Level = ep.RequestUser.GetPermissionLevel(Connection, Dept.ID);
-									ep.RequestUserLevel = Level;
-									
-									//Check permission level
-									if(Level < Attr.Level) {
-										Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
-										Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level+"'");
-										Utils.Send(Response, null, HttpStatusCode.Forbidden);
-										continue;
+										//Get permissionlevel
+										Level = ep.RequestUser.GetPermissionLevel(Connection, Dept.ID);
+										ep.RequestUserLevel = Level;
+
+										//Check permission level
+										if (Level < Attr.Level) {
+											Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
+											Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
+											Utils.Send(Response, null, HttpStatusCode.Forbidden);
+											continue;
+										}
 									}
 								}
 								#endregion

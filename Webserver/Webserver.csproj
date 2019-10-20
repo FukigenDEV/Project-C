@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="API Endpoints\Account\Get.cs" />
+    <None Include="API Endpoints\Account\GetAccountInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
