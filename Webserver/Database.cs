@@ -36,6 +36,7 @@ namespace Webserver {
 				"Name				STRING NOT NULL" +
 			")");
 
+			//TODO: Perms aren't deleted after user account or dept is deleted
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
 				"User				INTEGER REFERENCES Users(ID) ON UPDATE CASCADE," +
 				"Permission			INTEGER," +
@@ -59,6 +60,7 @@ namespace Webserver {
 				 "Postcode			STRING" +
 			")");
 
+			//TODO: Sessions aren't deleted after user account is deleted
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Sessions (" +
 				"ID					INTEGER PRIMARY KEY," +
 				"SessionID			STRING NOT NULL," +
