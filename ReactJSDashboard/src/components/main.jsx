@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+import {Error} from '../index';
 
 class Main extends Component {
   getPointer = () => {
@@ -16,11 +17,13 @@ class Main extends Component {
 
   render() {
     const {navs} = this.props;
+    console.log(this.props.router);
 
     return (
       <div className="col-9 main-window">
         <Switch>
           { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+          <Route component={Error} />
         </Switch>
       </div>
     );
