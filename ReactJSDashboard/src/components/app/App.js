@@ -44,7 +44,7 @@ class App extends Component {
       <React.Fragment>
         <GlobalStyle />
         <div className="container-fluid">
-          <div className="row">
+          <div className="row"> 
             <Router>
               <Navs navs={this.state.navs} onSelect={this.handleSelect} />
               <Main navs={this.state.navs} />
