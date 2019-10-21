@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 class GegevensBekijken extends Component {
   render() {
     return (
-      <div>
+      <div className="shadow-sm p-3 mb-5 bg-white rounded">
         <h1>Gegevens bekijken</h1>
+        <br />
         <div className="tabel">
           <table>
             <tr>

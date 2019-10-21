@@ -15,11 +15,12 @@ class Main extends Component {
   }
 
   render() {
-    console.log(this.getPointer().component)
+    const {navs} = this.props;
+
     return (
       <div className="col-9 main-window">
         <Switch>
-          <Route exact path={this.getPointer().path} component={this.getPointer().component} />
+          { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
         </Switch>
       </div>
     );

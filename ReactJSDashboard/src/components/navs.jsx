@@ -7,12 +7,8 @@ class Navs extends Component {
     const {onSelect, navs} = this.props;
 
     return (
-      <div className="col Nav-Bar">
-        <nav className="nav navbar-light bg-light flex-column">
-          <Link className="App-link header" to="/">
-            <h1>PROJECT C</h1>
-          </Link>
-
+      <div className="col shadow-sm bg-white Nav-Bar">
+        <nav className="flex-column">
           { navs.map(nav => (<Nav key={nav.id} onSelect={onSelect} nav={nav} />)) }
         </nav>
       </div>
