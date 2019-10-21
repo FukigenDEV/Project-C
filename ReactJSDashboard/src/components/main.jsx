@@ -20,7 +20,7 @@ class Main extends Component {
     console.log(this.props.router);
 
     return (
-      <div className="col-9 main-window">
+      <div className="col-9 col-s-12 main-window">
         <Switch>
           { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
           <Route component={Error} />
