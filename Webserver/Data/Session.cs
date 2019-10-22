@@ -27,7 +27,7 @@ namespace Webserver.Data {
 		/// <summary>
 		/// Constructor for deserializing database rows into Session objects
 		/// </summary>
-		public Session(long ID, string SessionID, long User, long Token, long RememberMe) {
+		public Session(long ID, long User, string SessionID, long Token, long RememberMe) {
 			this.ID = (int)ID;
 			this.User = (int)User;
 			this.Token = Token;

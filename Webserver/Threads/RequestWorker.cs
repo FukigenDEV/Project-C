@@ -106,8 +106,8 @@ namespace Webserver.Threads {
 									}
 
 									PermLevel Level;
-									if (ep.RequestUser.GetPermissionLevel(Connection, 0) == PermLevel.Administrator) {
-										Level = PermLevel.Administrator;
+									if (ep.RequestUser.GetPermissionLevel(Connection, 1) == PermLevel.Administrator) {
+										ep.RequestUserLevel = PermLevel.Administrator;
 									} else {
 										//Get Department value
 										if (!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
