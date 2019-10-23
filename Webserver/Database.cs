@@ -88,8 +88,6 @@ namespace Webserver {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Update<User>(Administrator);
 			}
-
-			//Connection.Insert(new Department("TestDept"));
 		}
 
 		public static SQLiteConnection createConnection() {
