@@ -10,7 +10,7 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void PATCH() {
 			//Get required fields
-			if (!Content.TryGetValue("Email", out JToken Email)) {
+			if (!Content.TryGetValue<string>("Email", out JToken Email)) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
@@ -29,7 +29,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Change email if necessary
-			if(Content.TryGetValue("NewEmail", out JToken NewEmail)){
+			if(Content.TryGetValue<string>("NewEmail", out JToken NewEmail)){
 				//Check if the new address is valid
 				Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
 				if (rx.IsMatch((string)NewEmail)) {
@@ -41,8 +41,13 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Change password if necessary
-			if(Content.TryGetValue("Password", out JToken Password)) {
+			if(Content.TryGetValue<string>("Password", out JToken Password)) {
 				Acc.PasswordHash = User.CreateHash((string)Password, Acc.Email);
+			}
+
+			//Set department permissions if necessary
+			if(Content.TryGetValue("MemberDepartments", out JToken MemberDepartment)) {
+				
 			}
 
 			//Set optional fields

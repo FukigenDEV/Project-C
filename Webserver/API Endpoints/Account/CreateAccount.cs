@@ -11,10 +11,10 @@ namespace Webserver.API_Endpoints {
 		public override void POST() {
 			//Get all required fields
 			if (
-				!Content.TryGetValue("Email", out JToken Email) ||
-				!Content.TryGetValue("Password", out JToken Password) ||
-				!Content.TryGetValue("AccountType", out JToken AccountType) ||
-				!Content.TryGetValue("MemberOf", out JToken MemberDept)
+				!Content.TryGetValue<string>("Email", out JToken Email) ||
+				!Content.TryGetValue<string>("Password", out JToken Password) ||
+				!Content.TryGetValue<string>("AccountType", out JToken AccountType) ||
+				!Content.TryGetValue<string>("MemberOf", out JToken MemberDept)
 			) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;

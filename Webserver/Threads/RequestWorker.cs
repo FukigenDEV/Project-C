@@ -110,7 +110,7 @@ namespace Webserver.Threads {
 										ep.RequestUserLevel = PermLevel.Administrator;
 									} else {
 										//Get Department value
-										if (!ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
+										if (!ep.Content.TryGetValue<string>("Department", out JToken DepartmentVal)) {
 											Utils.Send(Response, "Missing Department", HttpStatusCode.BadRequest);
 											continue;
 										}

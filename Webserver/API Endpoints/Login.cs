@@ -31,9 +31,9 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Get the email and password from the request. If one of the values is missing, send a 400 Bad Request.
-			bool foundEmail = Content.TryGetValue("Email", out JToken Email);
-			bool foundPassword = Content.TryGetValue("Password", out JToken Password);
-			bool foundRememberMe = Content.TryGetValue("RememberMe", out JToken RememberMe);
+			bool foundEmail = Content.TryGetValue<string>("Email", out JToken Email);
+			bool foundPassword = Content.TryGetValue<string>("Password", out JToken Password);
+			bool foundRememberMe = Content.TryGetValue<string>("RememberMe", out JToken RememberMe);
 			if (!foundEmail || !foundPassword || !foundRememberMe) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;

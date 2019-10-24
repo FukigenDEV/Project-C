@@ -8,7 +8,7 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void DELETE() {
 			//Get required fields
-			if (!Content.TryGetValue("Email", out JToken Email)) {
+			if (!Content.TryGetValue<string>("Email", out JToken Email)) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
