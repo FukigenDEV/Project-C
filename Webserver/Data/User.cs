@@ -89,14 +89,14 @@ namespace Webserver.Data {
 		);
 
 		/// <summary>
-		/// Set's a user permission level.
+		/// Sets a user permission level.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Level"></param>
 		/// <param name="Department"></param>
 		public void SetPermissionLevel(SQLiteConnection Connection, PermLevel Level, Department Department) => SetPermissionLevel(Connection, Level, Department.ID);
 		/// <summary>
-		/// Set's a user permission level.
+		/// Sets a user permission level.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Level"></param>

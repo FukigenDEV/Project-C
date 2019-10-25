@@ -2,6 +2,8 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Logging;
+using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using Webserver.Data;
@@ -36,7 +38,6 @@ namespace Webserver {
 				"Name				STRING NOT NULL" +
 			")");
 
-			//TODO: Perms aren't deleted after user account or dept is deleted
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
 				"User				INTEGER NOT NULL," +
 				"Permission			INTEGER NOT NULL," +
@@ -63,7 +64,6 @@ namespace Webserver {
 				 "FOREIGN KEY(Function) REFERENCES Functions(Name) ON UPDATE CASCADE" +
 			")");
 
-			//TODO: Sessions aren't deleted after user account is deleted
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Sessions (" +
 				"ID					INTEGER PRIMARY KEY," +
 				"User				INTEGER NOT NULL," +
@@ -71,6 +71,13 @@ namespace Webserver {
 				"Token				INTEGER NOT NULL," +
 				"RememberMe			INTEGER NOT NULL," +
 				"FOREIGN KEY(User)	REFERENCES Users(ID) ON DELETE CASCADE" +
+			")");
+
+			Connection.Execute("CREATE TABLE IF NOT EXISTS GenericTableConfiguration (" +
+				"TableName			STRING PRIMARY KEY," +
+				"ReqValidation		INTEGER," +
+				"Department			INTEGER NOT NULL," +
+				"FOREIGN KEY(Department) REFERENCES Departments(ID) ON UPDATE CASCADE" +
 			")");
 
 			Department AdministratorDept = Connection.Get<Department>(1);
