@@ -1,5 +1,7 @@
 ﻿using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -46,8 +48,26 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Set department permissions if necessary
-			if(Content.TryGetValue("MemberDepartments", out JToken MemberDepartment)) {
-				
+			if(Content.TryGetValue<JObject>("MemberDepartments", out JToken MemberDepartment)) {
+				JObject Perms = (JObject)MemberDepartment;
+				foreach (KeyValuePair<string, JToken> Entry in Perms) {
+					//Check if the specified department exists, skip if it doesn't.
+					Department Dept = Department.GetDepartmentByName(Connection, Entry.Key);
+					if (Dept == null) {
+						continue;
+					}
+					//Check if the specified account type is valid. If it isn't, skip it.
+					if (!PermLevel.TryParse((string)Entry.Value, out PermLevel Level)) {
+						continue;
+					}
+					//If the new user has a greater perm than the requestuser, skip it.
+					if (Level > RequestUserLevel) {
+						continue;
+					}
+
+					//Set level
+					Acc.SetPermissionLevel(Connection, Level, Dept);
+				}
 			}
 
 			//Set optional fields
