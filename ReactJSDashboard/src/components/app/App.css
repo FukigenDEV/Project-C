@@ -4,15 +4,13 @@
   height: 100vh;
 }
 
-.Nav-Bar{
-  height: 100vh;
+.Nav-Bar {
   position: fixed;
-
   overflow-x: hidden;
   padding: 0 !important;
 }
 
-.Align-Bottom{
+.Align-Bottom {
   position: absolute;
   bottom: 20px;
   left: 0;
@@ -24,7 +22,6 @@
   font-weight: 600;
   color: #636363 !important;
   text-transform: uppercase;
-  padding: 25px 20px;
   border-style: solid;
   border-width: 0px 0px 1px 0px;
   border-color: #0e1111;
@@ -46,18 +43,38 @@ a:hover.App-link {
   background-color: #cecece;
 }
 
-.logo{
+.logo {
   margin: 5px;
 }
 
-.main-window{
+.main-window {
   padding: 20px 40px !important;
 }
 
 table, th, td {
-    border: 1px solid #0e1111;
+  border: 1px solid #0e1111;
 }
 
-th, td{
+th, td {
   padding: 10px;
+}
+
+.nav-icon {
+  font-size: 2em;
+  display: inline;
+  padding-left: 5px;
+}
+
+.navvv {
+  background-color: purple;
+}
+
+@media only screen and (min-width: 768px) {
+  .navvv {
+    background-color: red;
+    height: 100vh;
+  }
+  .navvv .App-link {
+    padding: 25px 20px;
+  }
 }

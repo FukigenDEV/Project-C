@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
-import {Dashboard, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen} from '../../index';
+import { BrowserRouter as Router } from "react-router-dom";
+import { Dashboard, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
 import Navs from '../navs';
 import Main from '../main';
 import './App.css';
@@ -12,13 +12,13 @@ const GlobalStyle = createGlobalStyle`body { background: rgb(2,0,36) !important;
 class App extends Component {
   state = {
     navs: [
-      {id: 0, heading: 'Project C', link: '', path: '/', component: Dashboard, active: true},
-      {id: 1, heading: 'Gegevens bekijken', link: 'GegevensBekijken', path: '/GegevensBekijken', component: GegevensBekijken, active: false},
-      {id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false},
-      {id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false},
-      {id: 4, heading: 'Activiteitengeschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false},
-      {id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false},
-      {id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false}
+      { id: 0, heading: 'Project C', link: '', path: '/', component: Dashboard, active: true, icon: 'home' },
+      { id: 1, heading: 'Gegevens bekijken', link: 'GegevensBekijken', path: '/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
+      { id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+      { id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false, icon: 'clipboard' },
+      { id: 4, heading: 'Activiteiten geschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
+      { id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false, icon: 'download' },
+      { id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
     ]
   };
 
@@ -26,9 +26,9 @@ class App extends Component {
     this.setFalse();
     const navs = [...this.state.navs];
     const index = navs.indexOf(nav);
-    navs[index] = {...nav};
+    navs[index] = { ...nav };
     navs[index].active = true;
-    this.setState({navs});
+    this.setState({ navs });
   }
 
   setFalse = () => {
@@ -36,7 +36,7 @@ class App extends Component {
     for (var i in navs) {
       navs[i].active = false;
     }
-    this.setState({navs});
+    this.setState({ navs });
   }
 
   render() {
@@ -44,7 +44,7 @@ class App extends Component {
       <React.Fragment>
         <GlobalStyle />
         <div className="container-fluid">
-          <div className="row"> 
+          <div className="row">
             <Router>
               <Navs navs={this.state.navs} onSelect={this.handleSelect} />
               <Main navs={this.state.navs} />
