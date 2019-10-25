@@ -103,14 +103,19 @@ namespace Webserver {
 		/// <returns></returns>
 		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) where T : class {
 			bool Found = obj.TryGetValue(propertyName, out Value);
+			if (!Found) {
+				return false;
+			}
 			try {
 				Value.ToObject<T>();
 			#pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
 			} catch (ArgumentException) {
 				return false;
+			} catch (InvalidCastException) {
+				return false;
 			}
 			#pragma warning restore CA1031
-			return Found;
+			return true;
 		}
 	}
 }
