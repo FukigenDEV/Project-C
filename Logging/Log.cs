@@ -1,11 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System.IO;
-using System.Reflection;
-using Configurator;
-using System.Collections.Concurrent;
+﻿using Configurator;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 
 namespace Logging {
 	public class Logger {
@@ -31,7 +28,7 @@ namespace Logging {
 			this.Level = Level;
 			this.WriteToConsole = WriteToConsole;
 
-			if(File.Exists("Logs\\latest.log") || File.Exists("Logs\\"+Filename + "_err.log")) {
+			if (File.Exists("Logs\\latest.log") || File.Exists("Logs\\" + Filename + "_err.log")) {
 				AdvanceFile();
 			} else {
 				if (!Directory.Exists("Logs")) {
@@ -82,7 +79,7 @@ namespace Logging {
 					AdvanceFile();
 				}
 				LastMsg = DateTime.Now;
-				string Msg = LastMsg.ToShortTimeString() +" ["+Level.ToString().ToUpper()+"]: "+Message?.ToString();
+				string Msg = LastMsg.ToShortTimeString() + " [" + Level.ToString().ToUpper() + "]: " + Message?.ToString();
 
 				//Write to streams
 				stdout.WriteLine(Msg);
@@ -92,7 +89,7 @@ namespace Logging {
 					Console.WriteLine(Msg);
 				}
 
-				if(Level >= LogLevel.Warning) {
+				if (Level >= LogLevel.Warning) {
 					stderr.WriteLine(Msg);
 					stderr.Flush();
 				}
@@ -111,16 +108,20 @@ namespace Logging {
 			stdout?.Close();
 
 			//Create a temporary directory, then move the log files there.
+			//If the temp directory already exists (leftovers from a crash or whatever), delete it first
+			if (Directory.Exists("Logs\\temp")) {
+				Directory.Delete("Logs\\temp");
+			}
 			Directory.CreateDirectory("Logs\\temp");
 			File.Move("Logs\\latest.log", "Logs\\temp\\latest.log");
 			File.Move("Logs\\latest_err.log", "Logs\\temp\\latest_err.log");
 
 			//Add a number to the filename to prevent duplicate archives
 			string Timestamp = CreationDate.ToString("yyyy-MM-dd_HH-mm");
-			int FileCount = Directory.GetFiles("Logs", "Log_"+Timestamp+"_*.zip").Length;
+			int FileCount = Directory.GetFiles("Logs", "Log_" + Timestamp + "_*.zip").Length;
 
 			//Compress the files
-			ZipFile.CreateFromDirectory("Logs\\temp", "Logs\\Log_"+Timestamp + "_"+FileCount+".zip");
+			ZipFile.CreateFromDirectory("Logs\\temp", "Logs\\Log_" + Timestamp + "_" + FileCount + ".zip");
 
 			//Delete temp folder
 			Directory.Delete("Logs\\temp", true);
@@ -129,7 +130,7 @@ namespace Logging {
 			stdout = File.CreateText("Logs\\latest.log");
 			stderr = File.CreateText("Logs\\latest_err.log");
 		}
- 
+
 	}
 
 	/// <summary>

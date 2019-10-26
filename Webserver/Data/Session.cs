@@ -2,12 +2,10 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Text;
 
 namespace Webserver.Data {
-	class Session {
+	public class Session {
 		public int ID { get; set; }
 		public int User { get; set; }
 		public long Token { get; set; }
@@ -23,13 +21,13 @@ namespace Webserver.Data {
 			this.SessionID = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 			this.User = (int)User;
 			this.RememberMe = RememberMe;
-			this.Token = DateTime.UtcNow.Ticks;
+			this.Token = Utils.GetUnixTimestamp();
 		}
 
 		/// <summary>
 		/// Constructor for deserializing database rows into Session objects
 		/// </summary>
-		public Session(long ID, string SessionID, long User, long Token, long RememberMe) {
+		public Session(long ID, long User, string SessionID, long Token, long RememberMe) {
 			this.ID = (int)ID;
 			this.User = (int)User;
 			this.Token = Token;
@@ -41,7 +39,7 @@ namespace Webserver.Data {
 		/// Renews the token
 		/// </summary>
 		public void Renew(SQLiteConnection Connection) {
-			this.Token = DateTime.UtcNow.Ticks;
+			this.Token = Utils.GetUnixTimestamp();
 			Connection.Update<Session>(this);
 		}
 
@@ -53,7 +51,6 @@ namespace Webserver.Data {
 		public static Session GetUserSession(SQLiteConnection Connection, string SessionID) {
 			Session s = Connection.QueryFirstOrDefault<Session>("SELECT * FROM Sessions WHERE SessionID = @SessionID", new { SessionID });
 			if (s == null) {
-				Console.WriteLine("aaa");
 				return null;
 			}
 
@@ -63,9 +60,9 @@ namespace Webserver.Data {
 			} else {
 				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
 			}
-			long TokenAge = DateTime.UtcNow.Ticks - s.Token;
+			long TokenAge = Utils.GetUnixTimestamp() - s.Token;
 
-			if(TokenAge > Timeout) {
+			if (TokenAge > Timeout) {
 				Connection.Delete(s);
 				return null;
 			} else {

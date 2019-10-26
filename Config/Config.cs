@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Configurator {
 	public static class Config {
@@ -35,11 +33,11 @@ namespace Configurator {
 			JObject Config;
 			try {
 				Config = JObject.Parse(File.ReadAllText(Path));
-#pragma warning disable CA1031 // Silence "Do not catch general exception types" message. There is absolutely no reason for this message to show up; it's already as specific as we can make it.
+			#pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
 			} catch (JsonReaderException) {
 				return null;
 			}
-#pragma warning restore CA1031
+			#pragma warning restore CA1031
 
 
 			//Get differences, if any
@@ -80,7 +78,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="ExtConfig"></param>
 		public static void AddConfig(StreamReader Reader) {
-			if(DefaultConfigString == null) {
+			if (DefaultConfigString == null) {
 				DefaultConfigString = Reader.ReadToEnd();
 			} else {
 				string NewConfig = Reader.ReadToEnd().Replace("\r\n", "\n").Remove(0, 1);
