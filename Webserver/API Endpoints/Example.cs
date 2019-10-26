@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace Webserver.API_Endpoints {
 
@@ -10,8 +11,7 @@ namespace Webserver.API_Endpoints {
 	class Example : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
-			Console.WriteLine(Content.TryGetValue("test", out JToken Value));
-			Console.WriteLine(Content.TryGetValue<string>("test", out JToken Value2));
+			Console.WriteLine(RequestParams["null"][0]);
 
 			Send();
 		}

@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.IO;
 using System.Net;
@@ -34,6 +36,7 @@ namespace Webserver.Threads {
 				if (URL == null) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop");
 					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
+					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
 					Response.Redirect(URL);
 					Utils.Send(Response, null, HttpStatusCode.Redirect);
@@ -41,7 +44,7 @@ namespace Webserver.Threads {
 				}
 
 				//Append wwwroot to target
-				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
+				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
 
 				//Switch to contentType
 				switch (Request.ContentType) {
@@ -69,14 +72,20 @@ namespace Webserver.Threads {
 								ep.Context = Context;
 								ep.Response = Context.Response;
 								ep.Request = Context.Request;
+								//Convert query string to a Dict because NameValueCollections are trash
+								foreach (string key in Request.QueryString) {
+									ep.RequestParams.Add(key ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
+								}
+
 								try {
 									using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
 									ep.Content = JObject.Parse(streamReader.ReadToEnd());
-								} catch (JsonReaderException e) {
+#pragma warning disable CA1031 // Do not catch general exception types
+								} catch (JsonReaderException) {
 									Utils.Send(Response, "Invalid JSON", HttpStatusCode.BadRequest);
 									continue;
 								}
-								
+#pragma warning restore CA1031 // Do not catch general exception types
 
 								//Get the method
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);

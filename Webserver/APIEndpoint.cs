@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Net;
 using Webserver.Data;
@@ -13,6 +15,7 @@ namespace Webserver {
 		public User RequestUser;
 		public PermLevel RequestUserLevel;
 		public Session UserSession;
+		public Dictionary<string, List<string>> RequestParams = new Dictionary<string, List<string>>();
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.
