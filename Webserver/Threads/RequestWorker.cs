@@ -1,6 +1,7 @@
 ﻿using Configurator;
 using Dapper.Contrib.Extensions;
 using Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -68,8 +69,14 @@ namespace Webserver.Threads {
 								ep.Context = Context;
 								ep.Response = Context.Response;
 								ep.Request = Context.Request;
-								using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-								ep.Content = JObject.Parse(streamReader.ReadToEnd());
+								try {
+									using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+									ep.Content = JObject.Parse(streamReader.ReadToEnd());
+								} catch (JsonReaderException e) {
+									Utils.Send(Response, "Invalid JSON", HttpStatusCode.BadRequest);
+									continue;
+								}
+								
 
 								//Get the method
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
