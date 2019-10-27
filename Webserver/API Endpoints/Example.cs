@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Net;
-using System.Text;
 
 namespace Webserver.API_Endpoints {
 
@@ -11,8 +9,11 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/example")]
 	class Example : APIEndpoint {
+		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
-			Send("Hello World!");
+			Console.WriteLine(RequestParams["null"][0]);
+
+			Send();
 		}
 	}
 }

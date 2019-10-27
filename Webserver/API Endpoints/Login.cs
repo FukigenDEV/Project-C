@@ -1,10 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using Webserver.Data;
 
@@ -15,28 +11,30 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/login")]
 	class Login : APIEndpoint {
-		[SkipSessionCheck]
-		public override void GET() {
+		[RequireBody]
+		public override void POST() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];
 			Session s;
-			if(SessionIDCookie != null) {
+			if (SessionIDCookie != null) {
 				//Get the session belonging to this session ID. If the session is still valid, renew it. If it isn't, send back a 401 Unauthorized, signaling that the client should send an email and password to reauthenticate
 				s = Session.GetUserSession(Connection, SessionIDCookie.Value);
-				
-				if(s != null) {
+
+				if (s != null) {
 					s.Renew(Connection);
-					Send(StatusCode: HttpStatusCode.NoContent);
+					Send("Renewed", HttpStatusCode.OK);
+					return;
 				} else {
-					Send(StatusCode: HttpStatusCode.Unauthorized);
+					Send("Expired session", HttpStatusCode.Unauthorized);
+					return;
 				}
 			}
-			
+
 			//Get the email and password from the request. If one of the values is missing, send a 400 Bad Request.
-			bool foundEmail = Content.TryGetValue("Email", out JToken Email);
-			bool foundPassword = Content.TryGetValue("Password", out JToken Password);
-			bool foundRememberMe = Content.TryGetValue("RememberMe", out JToken RememberMe);
-			if(!foundEmail || !foundPassword || !foundRememberMe) {
+			bool foundEmail = Content.TryGetValue<string>("Email", out JToken Email);
+			bool foundPassword = Content.TryGetValue<string>("Password", out JToken Password);
+			bool foundRememberMe = Content.TryGetValue<string>("RememberMe", out JToken RememberMe);
+			if (!foundEmail || !foundPassword || !foundRememberMe) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
@@ -50,13 +48,13 @@ namespace Webserver.API_Endpoints {
 
 			//Check if the user exists. If it doesn't, send a 400 Bad Request
 			User Account = User.GetUserByEmail(Connection, (string)Email);
-			if(Account == null) {
+			if (Account == null) {
 				Send("No such user", HttpStatusCode.BadRequest);
 				return;
 			}
-			
+
 			//Check password. If its invalid, return a 401 Unauthorized
-			if(Account.PasswordHash != User.CreateHash((string)Password, (string)Email)) {
+			if (Account.PasswordHash != User.CreateHash((string)Password, (string)Email)) {
 				Send(StatusCode: HttpStatusCode.Unauthorized);
 				return;
 			}
@@ -67,7 +65,13 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(s);
 
 			AddCookie("SessionID", s.SessionID);
-			Send(StatusCode:HttpStatusCode.NoContent);
+			Send(StatusCode: HttpStatusCode.NoContent);
+		}
+
+		[PermissionLevel(PermLevel.User)]
+		public override void DELETE() {
+			Connection.Delete(UserSession);
+			Send(StatusCode: HttpStatusCode.OK);
 		}
 	}
 }
