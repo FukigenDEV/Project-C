@@ -45,7 +45,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the department is valid
-			Department Dept = Department.GetDepartmentByName(Connection, (string)MemberDept);
+			Data.Department Dept = Data.Department.GetDepartmentByName(Connection, (string)MemberDept);
 			if (Dept == null) {
 				Send("No such department", HttpStatusCode.BadRequest);
 				return;
