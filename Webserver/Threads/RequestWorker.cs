@@ -1,9 +1,12 @@
 ﻿using Configurator;
 using Dapper.Contrib.Extensions;
 using Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.IO;
 using System.Net;
@@ -33,7 +36,7 @@ namespace Webserver.Threads {
 				if (URL == null) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop");
 					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
-
+					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
 					Response.Redirect(URL);
 					Utils.Send(Response, null, HttpStatusCode.Redirect);
@@ -41,7 +44,7 @@ namespace Webserver.Threads {
 				}
 
 				//Append wwwroot to target
-				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.RawUrl.ToLower();
+				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
 
 				//Switch to contentType
 				switch (Request.ContentType) {
@@ -69,73 +72,73 @@ namespace Webserver.Threads {
 								ep.Context = Context;
 								ep.Response = Context.Response;
 								ep.Request = Context.Request;
-								using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-								ep.Content = JObject.Parse(streamReader.ReadToEnd());
+								//Convert query string to a Dict because NameValueCollections are trash
+								foreach (string key in Request.QueryString) {
+									ep.RequestParams.Add(key ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
+								}
+
+								try {
+									using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+									ep.Content = JObject.Parse(streamReader.ReadToEnd());
+#pragma warning disable CA1031 // Do not catch general exception types
+								} catch (JsonReaderException) {
+									Utils.Send(Response, "Invalid JSON", HttpStatusCode.BadRequest);
+									continue;
+								}
+#pragma warning restore CA1031 // Do not catch general exception types
 
 								//Get the method
 								MethodInfo Method = ep.GetType().GetMethod(Request.HttpMethod);
 
-								#region SkipSessionCheck
-								//Check session cookie if necessary.
-								if (Method.GetCustomAttribute<SkipSessionCheck>() == null) {
+								PermissionLevel Attr = Method.GetCustomAttribute<PermissionLevel>();
+								if(Attr != null) {
+									//Check cookie. If its missing, send a 401 Unauthorized if the cookie is missing. (because a user MUST be logged in to use an endpoint with a PermissionLevel attribute)
 									Cookie SessionIDCookie = Request.Cookies["SessionID"];
 									if (SessionIDCookie == null) {
 										Utils.Send(Response, "No Session", HttpStatusCode.Unauthorized);
 										continue;
 									}
+
+									//Check if a session exists with the Session ID contained in the session cookie. If none is found or the session has expired, send back a 401 Unauthorized
 									Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 									if (s == null) {
 										Utils.Send(Response, "Expired session", HttpStatusCode.Unauthorized);
 										continue;
 									}
+									//Renew the session, and save it in the endpoint object.
 									s.Renew(Connection);
 									ep.UserSession = s;
-									ep.RequestUser = Connection.Get<User>(s.User);
-								}
-								#endregion
 
-								#region PermissionLevel
-								//Check permission
-								PermissionLevel Attr = Method.GetCustomAttribute<PermissionLevel>();
-								if (Attr != null) {
-									//Check for endpoint conflicts
-									if (ep.RequestUser == null) {
-										Log.Error("Endpoint attribute conflict for endpoint " + Target);
-										Utils.Send(Response, null, HttpStatusCode.InternalServerError);
+									//Save user in endpoint object
+									ep.RequestUser = Connection.Get<User>(s.User);
+
+									//Get department name. If none was found, assume Administrators
+									string DepartmentName;
+									if(ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
+										DepartmentName = (string)DepartmentVal;
+									} else {
+										DepartmentName = "Administrators";
+									}
+
+									//Get department. If none was found, send 400 Bad Request
+									Department Dept = Department.GetDepartmentByName(Connection, DepartmentName);
+									if (Dept == null) {
+										Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
 										continue;
 									}
 
-									PermLevel Level;
-									if (ep.RequestUser.GetPermissionLevel(Connection, 1) == PermLevel.Administrator) {
-										ep.RequestUserLevel = PermLevel.Administrator;
-									} else {
-										//Get Department value
-										if (!ep.Content.TryGetValue<string>("Department", out JToken DepartmentVal)) {
-											Utils.Send(Response, "Missing Department", HttpStatusCode.BadRequest);
-											continue;
-										}
+									//Get permissionlevel
+									PermLevel Level = ep.RequestUser.GetPermissionLevel(Connection, Dept.ID);
+									ep.RequestUserLevel = Level;
 
-										//Get department
-										Department Dept = Department.GetDepartmentByName(Connection, (string)DepartmentVal);
-										if (Dept == null) {
-											Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
-											continue;
-										}
-
-										//Get permissionlevel
-										Level = ep.RequestUser.GetPermissionLevel(Connection, Dept.ID);
-										ep.RequestUserLevel = Level;
-
-										//Check permission level
-										if (Level < Attr.Level) {
-											Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
-											Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
-											Utils.Send(Response, null, HttpStatusCode.Forbidden);
-											continue;
-										}
+									//Check permission level
+									if (Level < Attr.Level) {
+										Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
+										Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
+										Utils.Send(Response, null, HttpStatusCode.Forbidden);
+										continue;
 									}
 								}
-								#endregion
 
 								try {
 									Method.Invoke(ep, null);
