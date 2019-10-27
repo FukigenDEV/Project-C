@@ -82,8 +82,7 @@ namespace Webserver.Threads {
 									ep.Content = JObject.Parse(streamReader.ReadToEnd());
 #pragma warning disable CA1031 // Do not catch general exception types
 								} catch (JsonReaderException) {
-									Utils.Send(Response, "Invalid JSON", HttpStatusCode.BadRequest);
-									continue;
+									ep.Content = null;
 								}
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -114,8 +113,8 @@ namespace Webserver.Threads {
 
 									//Get department name. If none was found, assume Administrators
 									string DepartmentName;
-									if(ep.Content.TryGetValue("Department", out JToken DepartmentVal)) {
-										DepartmentName = (string)DepartmentVal;
+									if(ep.RequestParams.ContainsKey("Department")) {
+										DepartmentName = ep.RequestParams["Department"][0];
 									} else {
 										DepartmentName = "Administrators";
 									}
@@ -134,7 +133,7 @@ namespace Webserver.Threads {
 									//Check permission level
 									if (Level < Attr.Level) {
 										Log.Warning("User " + ep.RequestUser.Email + " attempted to access API endpoint " + Target + " without sufficient permissions");
-										Log.Warning("Department: '" + (string)DepartmentVal + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
+										Log.Warning("Department: '" + DepartmentName + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
 										Utils.Send(Response, null, HttpStatusCode.Forbidden);
 										continue;
 									}
