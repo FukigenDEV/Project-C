@@ -33,6 +33,18 @@ namespace Webserver {
 				"Name				STRING PRIMARY KEY" +
 			")");
 
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Companys (" +
+            "ID					INTEGER PRIMARY KEY," +
+            "Name				STRING NOT NULL," +
+            "Street             STRING," +
+            "HouseNumber        INTEGER," +
+            "PostCode           STRING," +
+            "City               STRING," +
+            "Country            STRING," +
+            "PhoneNumber        STRING," +
+            "Email              STRING" +
+            ")");
+
             Connection.Execute("CREATE TABLE IF NOT EXISTS Departments (" +
             "ID					INTEGER PRIMARY KEY," +
             "Name				STRING NOT NULL," +

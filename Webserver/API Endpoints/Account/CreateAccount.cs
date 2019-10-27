@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	internal partial class Account : APIEndpoint {
+	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void POST() {
 			//Get all required fields
@@ -22,20 +22,20 @@ namespace Webserver.API_Endpoints {
 
 			//Check if a user already exists with this email. If it isn't, send a 400 Bad Request
 			if (User.GetUserByEmail(Connection, (string)Email) != null) {
-				Send("Already exists", HttpStatusCode.BadRequest);
+				Send("A user with this email already exists", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the email is valid. If it isn't, send a 400 Bad Request.
 			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
 			if (!rx.IsMatch((string)Email)) {
-				Send("Invalid Email", HttpStatusCode.BadRequest);
+				Send("Invalid email", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the specified account type is valid.
 			if (!PermLevel.TryParse((string)AccountType, out PermLevel level)) {
-				Send("Invalid AccountType", HttpStatusCode.BadRequest);
+				Send("Invalid accountType", HttpStatusCode.BadRequest);
 				return;
 			}
 			//If the new user has a greater perm than the requestuser, send a 403 Forbidden.
@@ -45,7 +45,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the department is valid
-			Data.Department Dept = Data.Department.GetDepartmentByName(Connection, (string)MemberDept);
+			Department Dept = Department.GetDepartmentByName(Connection, (string)MemberDept);
 			if (Dept == null) {
 				Send("No such department", HttpStatusCode.BadRequest);
 				return;

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	internal partial class Account : APIEndpoint {
+	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void PATCH() {
 			//Get required fields
@@ -52,7 +52,7 @@ namespace Webserver.API_Endpoints {
 				JObject Perms = (JObject)MemberDepartment;
 				foreach (KeyValuePair<string, JToken> Entry in Perms) {
                     //Check if the specified department exists, skip if it doesn't.
-                    Data.Department Dept = Data.Department.GetDepartmentByName(Connection, Entry.Key);
+                    Department Dept = Department.GetDepartmentByName(Connection, Entry.Key);
 					if (Dept == null) {
 						continue;
 					}

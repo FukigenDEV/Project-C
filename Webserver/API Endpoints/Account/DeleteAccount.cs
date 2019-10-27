@@ -4,7 +4,7 @@ using System.Net;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	internal partial class Account : APIEndpoint {
+	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void DELETE() {
 			//Get required fields

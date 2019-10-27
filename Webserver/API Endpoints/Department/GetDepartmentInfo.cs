@@ -4,11 +4,12 @@ using System;
 using System.Net;
 using System.Collections.Generic;
 using System.Text;
+using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
     [EndpointInfo("application/json", "/department")]
-    internal partial class Department : APIEndpoint
+    internal partial class DepartmentEndPoint : APIEndpoint
     {
         public override void GET()
         {
@@ -19,8 +20,16 @@ namespace Webserver.API_Endpoints
                 return;
             }
 
-            //Check if the specified department exists. If it doesn't, send a 404 Not Found
-            Data.Department department = Data.Department.GetDepartmentByName(Connection, RequestParams["name"][0]);
+            if (RequestParams["name"][0] == "all")
+            {
+                List<Department> departments = Department.GetAllDepartments(Connection);
+                Send(JsonConvert.SerializeObject(departments), HttpStatusCode.OK);
+
+                return;
+            }
+
+            // Check if the specified department exists. If it doesn't, send a 404 Not Found
+            Department department = Department.GetDepartmentByName(Connection, RequestParams["name"][0]);
             if (department == null)
             {
                 Send("No such department", HttpStatusCode.NotFound);
