@@ -33,11 +33,11 @@ namespace Configurator {
 			JObject Config;
 			try {
 				Config = JObject.Parse(File.ReadAllText(Path));
-			#pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
+#pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
 			} catch (JsonReaderException) {
 				return null;
 			}
-			#pragma warning restore CA1031
+#pragma warning restore CA1031
 
 
 			//Get differences, if any

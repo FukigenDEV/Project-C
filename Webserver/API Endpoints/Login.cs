@@ -11,6 +11,7 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointInfo("application/json", "/login")]
 	class Login : APIEndpoint {
+		[RequireBody]
 		public override void POST() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];
