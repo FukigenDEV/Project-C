@@ -8,6 +8,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	internal partial class Account : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
+		[RequireBody]
 		public override void POST() {
 			//Get all required fields
 			if (
@@ -27,7 +28,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the email is valid. If it isn't, send a 400 Bad Request.
-			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
+			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*\\.[A-z]{1}");
 			if (!rx.IsMatch((string)Email)) {
 				Send("Invalid Email", HttpStatusCode.BadRequest);
 				return;
@@ -40,12 +41,12 @@ namespace Webserver.API_Endpoints {
 			}
 			//If the new user has a greater perm than the requestuser, send a 403 Forbidden.
 			if (level > RequestUserLevel) {
-				Send("Can't create "+level+" as "+RequestUserLevel, HttpStatusCode.Forbidden);
+				Send("Can't create " + level + " as " + RequestUserLevel, HttpStatusCode.Forbidden);
 				return;
 			}
 
 			//Check if the department is valid
-			Department Dept = Department.GetDepartmentByName(Connection, (string)MemberDept);
+			Data.Department Dept = Data.Department.GetDepartmentByName(Connection, (string)MemberDept);
 			if (Dept == null) {
 				Send("No such department", HttpStatusCode.BadRequest);
 				return;
