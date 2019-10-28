@@ -8,6 +8,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
+		[RequireBody]
 		public override void POST() {
 			//Get all required fields
 			if (
@@ -40,7 +41,7 @@ namespace Webserver.API_Endpoints {
 			}
 			//If the new user has a greater perm than the requestuser, send a 403 Forbidden.
 			if (level > RequestUserLevel) {
-				Send("Can't create "+level+" as "+RequestUserLevel, HttpStatusCode.Forbidden);
+				Send("Can't create " + level + " as " + RequestUserLevel, HttpStatusCode.Forbidden);
 				return;
 			}
 

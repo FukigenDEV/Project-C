@@ -6,6 +6,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Administrator)]
+		[RequireBody]
 		public override void DELETE() {
 			//Get required fields
 			if (!Content.TryGetValue<string>("Email", out JToken Email)) {

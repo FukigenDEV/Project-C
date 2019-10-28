@@ -29,4 +29,9 @@ namespace Webserver {
 			this.Level = Level;
 		}
 	}
+
+	/// <summary>
+	/// If used on an endpoint method, any calls to this method will automatically be rejected with a 400 Bad Request.
+	/// </summary>
+	public sealed class RequireBody : Attribute { }
 }
