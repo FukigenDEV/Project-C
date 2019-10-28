@@ -13,10 +13,10 @@ namespace Webserver.API_Endpoints
     {
         public override void POST()
         {
-            // Get all required values
+			// Get all required values
             if (!Content.TryGetValue<string>("name", out JToken name) ||
                 !Content.TryGetValue<string>("street", out JToken street) ||
-                !Content.TryGetValue<string>("houseNumber", out JToken houseNumber) ||
+                !Content.TryGetValue<int>("houseNumber", out JToken houseNumber) ||
                 !Content.TryGetValue<string>("postCode", out JToken postCode) ||
                 !Content.TryGetValue<string>("city", out JToken city) ||
                 !Content.TryGetValue<string>("country", out JToken country) ||

@@ -101,7 +101,7 @@ namespace Webserver {
 		/// <param name="propertyName"></param>
 		/// <param name="Value"></param>
 		/// <returns></returns>
-		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) where T : class {
+		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) {
 			bool Found = obj.TryGetValue(propertyName, out Value);
 			if (!Found) {
 				return false;
