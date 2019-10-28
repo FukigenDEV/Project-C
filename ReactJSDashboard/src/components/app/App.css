@@ -1,0 +1,99 @@
+.App {
+  display: inline-block;
+  width: 100%;
+  height: 100vh;
+}
+
+.Nav-Bar {
+  position: fixed;
+  overflow-x: hidden;
+  padding: 0 !important;
+}
+
+.Align-Bottom {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+}
+
+.App-link {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #636363 !important;
+  text-transform: uppercase;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: #0e1111;
+  transition: background 100ms ease-in-out;
+}
+
+a:hover.App-link {
+  background-color: #d8d8d8;
+  color: #0e1111 !important;
+  text-decoration: none;
+}
+
+.header {
+  background-color: #FFF !important;
+  color: #0e1111 !important;
+}
+
+.selected {
+  background-color: #cecece;
+}
+
+.logo {
+  margin: 5px;
+}
+
+.main-window {
+  padding: 20px 40px !important;
+}
+
+table, th, td {
+  border: 1px solid #0e1111;
+}
+
+th, td {
+  padding: 10px;
+}
+
+.nav-icon {
+  font-size: 2em;
+  display: inline;
+  padding-left: 5px;
+}
+
+.navvv {
+  background-color: purple;
+}
+
+@media only screen and (min-width: 768px) {
+  .navvv {
+    background-color: red;
+    height: 100vh;
+  }
+  .navvv .App-link {
+    padding: 25px 20px;
+  }
+}
+
+/* Login */
+
+.login-form {
+  display: inline-block;
+  width: auto;
+}
+
+.login-form input,button {
+  width: 350px;
+}
+
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}

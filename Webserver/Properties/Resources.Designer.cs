@@ -61,11 +61,18 @@ namespace Webserver.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [ConnectionSettings]
-        ///;The address the server will listen to. Multiple addresses can be specified; use a comma to separate them. Ignored if autoDetectAddress is true.
-        ///serverAddress=localhost
-        ///;Whether the server should automatically detect its address.
-        ///autoDetectAddress=true.
+        ///   Looks up a localized string similar to {
+        ///	&quot;ConnectionSettings&quot;: {
+        ///		//The URLs the server will listen to. Multiple URLs can be specified.
+        ///		//Examples: localhost, http://example.com, https://contoso.com
+        ///		&quot;ServerAddresses&quot;: [
+        ///			&quot;localhost&quot;
+        ///		],
+        ///		//Whether the server should automatically detect its address. This address will be used in addition to the ones specified in ServerAddresses.
+        ///		&quot;AutoDetectAddress&quot;: true
+        ///	},
+        ///	&quot;PerformanceSettings&quot;: {
+        ///		//The amount of worker threads the server should use. More threads allows the server to ha [rest of string was truncated]&quot;;.
         /// </summary>
         public static string DefaultConfig {
             get {
