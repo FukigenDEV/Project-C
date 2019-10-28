@@ -78,3 +78,22 @@ th, td {
     padding: 25px 20px;
   }
 }
+
+/* Login */
+
+.login-form {
+  display: inline-block;
+  width: auto;
+}
+
+.login-form input,button {
+  width: 350px;
+}
+
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
