@@ -28,7 +28,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the email is valid. If it isn't, send a 400 Bad Request.
-			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
+			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*\\.[A-z]{1}");
 			if (!rx.IsMatch((string)Email)) {
 				Send("Invalid Email", HttpStatusCode.BadRequest);
 				return;
