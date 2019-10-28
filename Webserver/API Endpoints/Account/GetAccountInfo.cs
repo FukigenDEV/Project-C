@@ -5,7 +5,7 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
 	[EndpointInfo("application/json", "/account")]
-	internal partial class Account : APIEndpoint {
+	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
 			//Get required fields

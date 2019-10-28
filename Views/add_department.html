@@ -6,17 +6,17 @@
 </head>
 
 <body>
-	<p>Add a Department</p>
+	<p><b>Add a Department</b></p>
 
 	<form id="add_department_form" method="POST">
-		Department name: <input id="department_name" type="text" name="department_name"></br>
-		Department description: <input id="department_description" type="text" name="department_description"></br>
-		</br>
-		<input type="submit" value="Add"></br>
+		Department name: <input id="department_name" type="text" name="department_name"><br/>
+		Department description: <input id="department_description" type="text" name="department_description"><br/>
+		<br/>
+		<input type="submit" value="Add"><br/>
 
-		<p id="result"></p>
+		<p id="message"></p>
 	</form>
-
+	
 	<script>
 	$("#add_department_form").on("submit", function(event) {
 		event.preventDefault();
@@ -31,7 +31,11 @@
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#result").html(xhr.responseText);
+				if (xhr.status === 200) {
+					window.location.href = "add_user.html";
+				} else {
+					$("#message").html(xhr.responseText);
+				}
 			}
 		}
 		

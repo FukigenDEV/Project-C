@@ -4,10 +4,11 @@ using System;
 using System.Net;
 using System.Collections.Generic;
 using System.Text;
+using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    internal partial class Department : APIEndpoint
+    internal partial class DepartmentEndPoint : APIEndpoint
     {
         public override void POST()
         {
@@ -19,7 +20,7 @@ namespace Webserver.API_Endpoints
                 return;
             }
 
-            Data.Department newDepartment = new Data.Department((string)name, (string)description);
+            Department newDepartment = new Department((string)name, (string)description);
 
             // Store department to database
             Connection.Insert(newDepartment);

@@ -25,6 +25,8 @@ namespace Webserver.Data {
             this.Description = Description;
         }
 
+        public static List<Department> GetAllDepartments(SQLiteConnection Connection) => Connection.Query<Department>("SELECT * FROM Departments").AsList();
+
 		public static Department GetDepartmentByName(SQLiteConnection Connection, string name) => Connection.QueryFirstOrDefault<Department>("SELECT * FROM Departments WHERE Name = @Name", new { name });
 	}
 }
