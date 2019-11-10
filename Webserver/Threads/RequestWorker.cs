@@ -32,10 +32,10 @@ namespace Webserver.Threads {
 				HttpListenerResponse Response = Context.Response;
 
 				//Resolve redirects, if any
-				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
 				if (URL == null) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop");
-					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: "+ Request.Url.LocalPath.ToLower());
+					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
 					Response.Redirect(URL);
