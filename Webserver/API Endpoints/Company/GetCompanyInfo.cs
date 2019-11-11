@@ -8,8 +8,8 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointInfo("application/json", "/department")]
-    internal partial class DepartmentEndPoint : APIEndpoint
+    [EndpointInfo("application/json", "/company")]
+    internal partial class CompanyEndPoint : APIEndpoint
     {
         public override void GET()
         {
@@ -22,22 +22,22 @@ namespace Webserver.API_Endpoints
 
             if (RequestParams["name"][0] == "")
             {
-                List<Department> departments = Department.GetAllDepartments(Connection);
-                Send(JsonConvert.SerializeObject(departments), HttpStatusCode.OK);
+                List<Company> companies = Company.GetAllCompanies(Connection);
+                Send(JsonConvert.SerializeObject(companies), HttpStatusCode.OK);
 
                 return;
             }
 
-            // Check if the specified department exists. If it doesn't, send a 404 Not Found
-            Department department = Department.GetDepartmentByName(Connection, RequestParams["name"][0]);
-            if (department == null)
+            // Check if the specified company exists. If it doesn't, send a 404 Not Found
+            Company company = Company.GetCompanyByName(Connection, RequestParams["name"][0]);
+            if (company == null)
             {
-                Send("No such department", HttpStatusCode.NotFound);
+                Send("No such company", HttpStatusCode.NotFound);
                 return;
             }
 
             // Build and send response
-            JObject JSON = JObject.FromObject(department);
+            JObject JSON = JObject.FromObject(company);
             Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
         }
     }

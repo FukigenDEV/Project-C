@@ -8,8 +8,7 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointInfo("application/json", "/company")]
-    internal partial class CompanyEndpoint : APIEndpoint
+    internal partial class CompanyEndPoint : APIEndpoint
     {
         public override void POST()
         {

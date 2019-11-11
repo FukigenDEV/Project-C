@@ -1,0 +1,57 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Edit Company</title>
+</head>
+
+<body>
+	<p>Edit Company</p>
+
+	<form id="edit_company_form" method="GET">
+		Company name: <input id="company_name" type="text" name="company_name"><br/>
+		<br/>
+		New company name: <input id="new_company_name" type="text" name="new_company_name"><br/>
+		New company street: <input id="new_company_street" type="text" name="new_company_street"><br/>
+		New company house number: <input id="new_company_house_number" type="number" name="new_company_house_number"><br/>
+		New company post code: <input id="new_company_post_code" type="text" name="new_company_post_code"><br/>
+		New company city: <input id="new_company_city" type="text" name="new_company_city"><br/>
+		New company country: <input id="new_company_country" type="text" name="new_company_country"><br/>
+		New company phone number: <input id="new_company_phone_number" type="text" name="new_company_phone_number"><br/>
+		New company email: <input id="new_company_email" type="email" name="new_company_email"><br/>
+		<br/>
+		<input type="submit" value="Edit"><br/>
+
+		<p id="result"></p>
+	</form>
+
+	<script>
+	$("#edit_company_form").on("submit", function(event) {
+		event.preventDefault();
+		
+		var name = $("#company_name").val();
+		var newName = $("#new_company_name").val();
+		var newStreet = $("#new_company_street").val();
+		var newHouseNumber = $("#new_company_house_number").val();
+		var newPostCode = $("#new_company_post_code").val();
+		var newCity = $("#new_company_city").val();
+		var newCountry = $("#new_company_country").val();
+		var newPhoneNumber = $("#new_company_phone_number").val();
+		var newEmail = $("#new_company_email").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("PATCH", "/company", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#result").html(xhr.responseText);
+			}
+		}
+
+		var data = JSON.stringify({"name": name, "newName": newName, "newStreet": newStreet, "newHouseNumber": newHouseNumber, "newPostCode": newPostCode, "newCity": newCity, "newCountry": newCountry, "newPhoneNumber": newPhoneNumber, "newEmail": newEmail});
+		xhr.send(data);
+	});
+	</script>
+</body>

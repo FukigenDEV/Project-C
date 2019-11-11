@@ -1,0 +1,44 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Add Department</title>
+</head>
+
+<body>
+	<p><b>Add a Department</b></p>
+
+	<form id="add_department_form" method="POST">
+		Department name: <input id="department_name" type="text" name="department_name"><br/>
+		Department description: <input id="department_description" type="text" name="department_description"><br/>
+		<br/>
+		<input type="submit" value="Add"><br/>
+
+		<p id="message"></p>
+	</form>
+	
+	<script>
+	$("#add_department_form").on("submit", function(event) {
+		event.preventDefault();
+
+		var name = $("#department_name").val();
+		var description = $("#department_description").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("POST", "/department", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					$("#message").html(xhr.responseText);
+				}
+			}
+		}
+		
+		var data = JSON.stringify({"name": name, "description": description});
+		xhr.send(data);
+	});
+	</script>
+</body>

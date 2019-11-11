@@ -2,14 +2,14 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-	<title>View Departments</title>
+	<title>View Company</title>
 </head>
 
 <body>
-	<p>View Departments</p>
+	<p>View Company</p>
 
-	<form id="view_department_form" method="GET">
-		Department name: <input id="department_name" type="text" name="department_name"><br/>
+	<form id="view_company_form" method="GET">
+		Company name: <input id="company_name" type="text" name="company_name"><br/>
 		<br/>
 		<input type="submit" value="View"><br/>
 
@@ -17,14 +17,14 @@
 	</form>
 
 	<script>
-	$("#view_department_form").on("submit", function(event) {
+	$("#view_company_form").on("submit", function(event) {
 		event.preventDefault();
 		
-		var name = $("#department_name").val();
+		var name = $("#company_name").val();
 
 		var xhr = new XMLHttpRequest();
 		
-		xhr.open("GET", "/department?name=" + name, true);
+		xhr.open("GET", "/company?name=" + name, true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
 		xhr.onreadystatechange = function() {

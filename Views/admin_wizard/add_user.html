@@ -43,7 +43,7 @@
 	<script>
 	$(window).load(function(event) {
 		var xhr = new XMLHttpRequest();
-		var url = "/department?name=all";
+		var url = "/department?name=";
 		xhr.open("GET", url, true);
 
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -87,7 +87,7 @@
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
 				if (xhr.status === 200) {
-					window.location.href = "admin_wizard_finished.html";
+					window.location.href = "/admin_wizard/finished.html";
 				} else {
 					$("#message").html(xhr.responseText);
 				}

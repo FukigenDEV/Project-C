@@ -2,29 +2,34 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-	<title>Delete Department</title>
+	<title>Edit Department</title>
 </head>
 
 <body>
-	<p>Delete a Department</p>
+	<p>Edit Departments</p>
 
-	<form id="add_department_form" method="DELETE">
+	<form id="edit_department_form" method="GET">
 		Department name: <input id="department_name" type="text" name="department_name"><br/>
 		<br/>
-		<input type="submit" value="Delete"><br/>
+		New department name: <input id="new_department_name" type="text" name="new_department_name"><br/>
+		New department description: <input id="new_department_description" type="text" name="new_department_description"><br/>
+		<br/>
+		<input type="submit" value="Edit"><br/>
 
 		<p id="result"></p>
 	</form>
 
 	<script>
-	$("#add_department_form").on("submit", function(event) {
+	$("#edit_department_form").on("submit", function(event) {
 		event.preventDefault();
-
+		
 		var name = $("#department_name").val();
+		var newName = $("#new_department_name").val();
+		var newDescription = $("#new_department_description").val();
 
 		var xhr = new XMLHttpRequest();
 		
-		xhr.open("DELETE", "/department", true);
+		xhr.open("PATCH", "/department", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
 		xhr.onreadystatechange = function() {
@@ -32,8 +37,8 @@
 				$("#result").html(xhr.responseText);
 			}
 		}
-		
-		var data = JSON.stringify({"name": name});
+
+		var data = JSON.stringify({"name": name, "newName": newName, "newDescription": newDescription});
 		xhr.send(data);
 	});
 	</script>
