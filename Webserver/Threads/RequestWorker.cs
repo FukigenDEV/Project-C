@@ -32,7 +32,8 @@ namespace Webserver.Threads {
 				HttpListenerResponse Response = Context.Response;
 
 				//Resolve redirects, if any
-				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
+				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+
 				if (URL == null) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: "+ Request.Url.LocalPath.ToLower());
 					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
@@ -94,9 +95,9 @@ namespace Webserver.Threads {
 						try {
 							using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
 							ep.Content = JObject.Parse(streamReader.ReadToEnd());
-						} catch (JsonReaderException) {
+						} catch (JsonReaderException e) {
 							if (Method.GetCustomAttribute<RequireBody>() != null) {
-								Utils.Send(Response, "Body is required", HttpStatusCode.BadRequest);
+								Utils.Send(Response, "Invalid JSON: "+e.Message, HttpStatusCode.BadRequest);
 								continue;
 							}
 							ep.Content = null;
