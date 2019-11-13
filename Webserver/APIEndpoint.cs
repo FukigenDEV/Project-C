@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using Webserver.Data;
 
 namespace Webserver {
@@ -56,9 +58,20 @@ namespace Webserver {
 
 		/// <summary>
 		/// Called when a HTTP.OPTIONS request is sent to this endpoint.
-		/// An OPTIONS request is used to describe the communication options for the target resource.
+		/// The OPTIONS method returns the HTTP methods that the server supports for the specified URL.
+		/// The method cannot be overriden, as its implementation must be the same for all endpoints.
 		/// </summary>
-		public virtual void OPTIONS() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
+		public void OPTIONS() {
+			List<string> AllowedMethods = new List<string>();
+			foreach(MethodInfo Method in GetType().GetMethods()) {
+				if(Method.DeclaringType == GetType()) {
+					AllowedMethods.Add(Method.Name);
+				}
+			}
+
+			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
+			Utils.Send(Response, null, HttpStatusCode.OK);
+		}
 
 		/// <summary>
 		/// Called when a HTTP.TRACE request is sent to this endpoint.
