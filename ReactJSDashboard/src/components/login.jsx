@@ -48,7 +48,7 @@ class Login extends Component {
 
   getBadgeClasses = () => {
     let classes = 'alert mr-3 ml-3 ';
-    classes += (this.state.alert.type === 204 || 200) ? "alert-success" : "alert-danger";
+    classes += (this.state.alert.type === 204 || this.state.alert.type === 200) ? "alert-success" : "alert-danger";
     classes += (this.state.alert.type === 0) ? " d-none" : " d-block";
     return classes;
   }
