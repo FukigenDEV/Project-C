@@ -12,18 +12,34 @@ import { bool } from 'prop-types';
 const GlobalStyle = createGlobalStyle`body { background: rgb(2,0,36) !important; background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(35,35,102,1) 30%, rgba(0,142,255,1) 100%) !important;}`
 
 class App extends Component {
-  state = {
-    loggedin: { value: false },
-    navs: [
-      { id: 0, heading: 'Project C', link: '', path: '/', component: Dashboard, active: true, icon: 'home' },
-      { id: 1, heading: 'Gegevens bekijken', link: 'GegevensBekijken', path: '/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-      { id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
-      { id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false, icon: 'clipboard' },
-      { id: 4, heading: 'Activiteiten geschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
-      { id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false, icon: 'download' },
-      { id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
-    ]
-  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      loggedin: { value: false },
+      navs: [
+        { id: 0, heading: 'Project C', link: '', path: '/', component: Dashboard, active: true, icon: 'home' },
+        { id: 1, heading: 'Gegevens bekijken', link: 'GegevensBekijken', path: '/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
+        { id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+        { id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false, icon: 'clipboard' },
+        { id: 4, heading: 'Activiteiten geschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
+        { id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false, icon: 'download' },
+        { id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
+      ]
+    };
+    
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "/login", true);
+    xhr.onreadystatechange = () => {
+      if(xhr.status === 200 || xhr.status === 204) {
+        const loggedin = {...this.state.loggedin};
+        loggedin.value = true;
+        this.setState({loggedin});
+      }
+    }
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send("{}");
+  }
 
   handleSelect = nav => {
     this.setFalse();
@@ -50,22 +66,8 @@ class App extends Component {
     this.setState({ navs });
   }
 
-  componentWillMount() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/login", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.status === 200 || xhr.status === 204) {
-        const loggedin = {...this.state.loggedin};
-        loggedin.value = true;
-        this.setState({loggedin});
-      }
-    }
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send("{}");
-  }
-
   render() {
-    console.log('loggedin: ', this.state.loggedin.value);
+    // Will need to find a different solution here...
     if(this.state.loggedin.value) {
       return (
         <React.Fragment>
@@ -89,5 +91,6 @@ class App extends Component {
       );
     }
   }
+
 }
 export default App;

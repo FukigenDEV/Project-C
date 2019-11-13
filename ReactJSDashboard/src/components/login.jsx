@@ -24,6 +24,7 @@ class Login extends Component {
     const data = JSON.stringify(obj);
 
     let xhr = new XMLHttpRequest();
+    // Deployment: /login
     xhr.open("POST", "/login", true);
     xhr.onreadystatechange = () => {
       if(xhr.readyState === 4) {
