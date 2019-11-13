@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Net;
 using System.Text.RegularExpressions;
 using Webserver.Data;
@@ -15,17 +16,13 @@ namespace Webserver.API_Endpoints {
 		public override void POST() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];
-			Session s;
 			if (SessionIDCookie != null) {
 				//Get the session belonging to this session ID. If the session is still valid, renew it. If it isn't, send back a 401 Unauthorized, signaling that the client should send an email and password to reauthenticate
-				s = Session.GetUserSession(Connection, SessionIDCookie.Value);
+				Session CurrentSession = Session.GetUserSession(Connection, SessionIDCookie.Value);
 
-				if (s != null) {
-					s.Renew(Connection);
+				if (CurrentSession != null) {
+					CurrentSession.Renew(Connection);
 					Send("Renewed", HttpStatusCode.OK);
-					return;
-				} else {
-					Send("Expired session", HttpStatusCode.Unauthorized);
 					return;
 				}
 			}
@@ -61,16 +58,17 @@ namespace Webserver.API_Endpoints {
 
 			//At this point, we know the user exists and that the credentials are valid. The user will now be logged in.
 			//Create a new session, store it, and send back the Session ID
-			s = new Session(Account.ID, (bool)RememberMe);
-			Connection.Insert(s);
+			Session NewSession = new Session(Account.ID, (bool)RememberMe);
+			Connection.Insert(NewSession);
 
-			AddCookie("SessionID", s.SessionID);
+			AddCookie("SessionID", NewSession.SessionID, NewSession.GetRemainingTime());
 			Send(StatusCode: HttpStatusCode.NoContent);
 		}
 
 		[PermissionLevel(PermLevel.User)]
 		public override void DELETE() {
 			Connection.Delete(UserSession);
+			AddCookie("SessionID", "", 0);
 			Send(StatusCode: HttpStatusCode.OK);
 		}
 	}

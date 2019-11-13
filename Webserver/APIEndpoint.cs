@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using Webserver.Data;
 
 namespace Webserver {
@@ -55,9 +58,20 @@ namespace Webserver {
 
 		/// <summary>
 		/// Called when a HTTP.OPTIONS request is sent to this endpoint.
-		/// An OPTIONS request is used to describe the communication options for the target resource.
+		/// The OPTIONS method returns the HTTP methods that the server supports for the specified URL.
+		/// The method cannot be overriden, as its implementation must be the same for all endpoints.
 		/// </summary>
-		public virtual void OPTIONS() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
+		public void OPTIONS() {
+			List<string> AllowedMethods = new List<string>();
+			foreach(MethodInfo Method in GetType().GetMethods()) {
+				if(Method.DeclaringType == GetType()) {
+					AllowedMethods.Add(Method.Name);
+				}
+			}
+
+			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
+			Utils.Send(Response, null, HttpStatusCode.OK);
+		}
 
 		/// <summary>
 		/// Called when a HTTP.TRACE request is sent to this endpoint.
@@ -82,13 +96,22 @@ namespace Webserver {
 		/// Send a cookie to the client.
 		/// </summary>
 		/// <param name="cookie">The Cookie object to send. Only the Name and Value fields will be used.</param>
-		public void AddCookie(Cookie cookie) => AddCookie(cookie.Name, cookie.Value);
+		public void AddCookie(Cookie cookie) => AddCookie(cookie.Name, cookie.Value, (int)cookie.Expires.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
 
 		/// <summary>
 		/// Send a cookie to the client. Always use this function to add cookies, as the built-in functions don't work properly.
 		/// </summary>
 		/// <param name="name">The cookie's name</param>
 		/// <param name="value">The cookie's value</param>
-		public void AddCookie(string name, string value) => Response.AppendHeader("Set-Cookie", name + "=" + value);
+		public void AddCookie(string name, string value, long Expire) {
+			string CookieVal = name + "=" + value;
+
+			if(Expire < 0) {
+				throw new ArgumentOutOfRangeException("Negative cookie expiration");
+			}
+			CookieVal += "; Max-Age=" + Expire;
+
+			Response.AppendHeader("Set-Cookie", CookieVal);
+		}
 	}
 }

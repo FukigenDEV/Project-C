@@ -43,6 +43,17 @@ namespace Webserver.Data {
 			Connection.Update<Session>(this);
 		}
 
+		public long GetRemainingTime() {
+			long Timeout;
+			if (this.RememberMe) {
+				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutLong");
+			} else {
+				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
+			}
+			long TokenAge = Utils.GetUnixTimestamp() - this.Token;
+			return Timeout - TokenAge;
+		}
+
 		/// <summary>
 		/// Gets a user session. If the session doesn't exist or is out of date, null will be returned.
 		/// </summary>

@@ -33,9 +33,10 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+
 				if (URL == null) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop");
-					Utils.Send(Response, null, HttpStatusCode.LoopDetected);
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: "+ Request.Url.LocalPath.ToLower());
+					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
 					Response.Redirect(URL);
@@ -83,7 +84,7 @@ namespace Webserver.Threads {
 
 						//Convert query string to a Dict because NameValueCollections are trash
 						foreach (string key in Request.QueryString) {
-							ep.RequestParams.Add(key ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
+							ep.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 						}
 
 						//Get the method
@@ -94,9 +95,9 @@ namespace Webserver.Threads {
 						try {
 							using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
 							ep.Content = JObject.Parse(streamReader.ReadToEnd());
-						} catch (JsonReaderException) {
+						} catch (JsonReaderException e) {
 							if (Method.GetCustomAttribute<RequireBody>() != null) {
-								Utils.Send(Response, "Body is required", HttpStatusCode.BadRequest);
+								Utils.Send(Response, "Invalid JSON: "+e.Message, HttpStatusCode.BadRequest);
 								continue;
 							}
 							ep.Content = null;
