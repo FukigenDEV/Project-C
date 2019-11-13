@@ -84,7 +84,7 @@ namespace Webserver.Threads {
 
 						//Convert query string to a Dict because NameValueCollections are trash
 						foreach (string key in Request.QueryString) {
-							ep.RequestParams.Add(key ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
+							ep.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 						}
 
 						//Get the method

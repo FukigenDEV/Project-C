@@ -19,6 +19,12 @@ namespace Webserver.API_Endpoints
                 return;
             }
 
+			//Don't allow users to delete the Administrators and All Users departments.
+			if((string) name == "Administrators" || (string)name == "All Users") {
+				Send("Cannot delete system department", HttpStatusCode.Forbidden);
+				return;
+			}
+
             //Check if the specified department exists. If it doesn't, send a 404 Not Found
             Department department = Department.GetDepartmentByName(Connection, (string)name);
             if (department == null)
