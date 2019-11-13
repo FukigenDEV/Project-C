@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Net;
 using System.Text.RegularExpressions;
 using Webserver.Data;
@@ -60,13 +61,14 @@ namespace Webserver.API_Endpoints {
 			Session NewSession = new Session(Account.ID, (bool)RememberMe);
 			Connection.Insert(NewSession);
 
-			AddCookie("SessionID", NewSession.SessionID);
+			AddCookie("SessionID", NewSession.SessionID, NewSession.GetRemainingTime());
 			Send(StatusCode: HttpStatusCode.NoContent);
 		}
 
 		[PermissionLevel(PermLevel.User)]
 		public override void DELETE() {
 			Connection.Delete(UserSession);
+			AddCookie("SessionID", "", 0);
 			Send(StatusCode: HttpStatusCode.OK);
 		}
 	}

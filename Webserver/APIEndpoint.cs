@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
@@ -82,13 +83,22 @@ namespace Webserver {
 		/// Send a cookie to the client.
 		/// </summary>
 		/// <param name="cookie">The Cookie object to send. Only the Name and Value fields will be used.</param>
-		public void AddCookie(Cookie cookie) => AddCookie(cookie.Name, cookie.Value);
+		public void AddCookie(Cookie cookie) => AddCookie(cookie.Name, cookie.Value, (int)cookie.Expires.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
 
 		/// <summary>
 		/// Send a cookie to the client. Always use this function to add cookies, as the built-in functions don't work properly.
 		/// </summary>
 		/// <param name="name">The cookie's name</param>
 		/// <param name="value">The cookie's value</param>
-		public void AddCookie(string name, string value) => Response.AppendHeader("Set-Cookie", name + "=" + value);
+		public void AddCookie(string name, string value, long Expire) {
+			string CookieVal = name + "=" + value;
+
+			if(Expire < 0) {
+				throw new ArgumentOutOfRangeException("Negative cookie expiration");
+			}
+			CookieVal += "; Max-Age=" + Expire;
+
+			Response.AppendHeader("Set-Cookie", CookieVal);
+		}
 	}
 }
