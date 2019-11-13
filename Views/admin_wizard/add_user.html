@@ -35,9 +35,13 @@
 		</div>
 
 		<br/>
-		<input type="submit" value="Next"><br/>
+		<input type="submit" value="Add"><br/>
 
 		<p id="message"></p>
+	</form>
+
+	<form id="to_next_form">
+		<input type="submit" value="Next"><br/>
 	</form>
 
 	<script>
@@ -86,16 +90,18 @@
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					window.location.href = "/admin_wizard/finished.html";
-				} else {
-					$("#message").html(xhr.responseText);
-				}
+				$("#message").html(xhr.responseText);
 			}
 		}
 		
 		var data = JSON.stringify({"Email": email, "Password": password, "AccountType": accountType, "MemberOf": department });
 		xhr.send(data);
+	});
+
+	$("#to_next_form").on("submit", function(event) {
+		window.location.href = "/admin_wizard/finished.html";
+
+		return false;
 	});
 	</script>
 </body>
