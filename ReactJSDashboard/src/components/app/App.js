@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import { BrowserRouter as Router } from "react-router-dom";
+import { HashRouter as Router } from "react-router-dom";
 import { Dashboard, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
 import Login from '../login';
 import Navs from '../navs';

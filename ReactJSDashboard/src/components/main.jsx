@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
-import {Error} from '../index';
+import {Error, } from '../index';
+import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
 class Main extends Component {
   getPointer = () => {
@@ -17,8 +18,6 @@ class Main extends Component {
 
   render() {
     const {navs} = this.props;
-    console.log(this.props.router);
-
     return (
       <div className="col-9 col-s-12 main-window">
         <Switch>
