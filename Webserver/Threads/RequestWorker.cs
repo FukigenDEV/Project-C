@@ -205,7 +205,7 @@ namespace Webserver.Threads {
 
 				case "OPTIONS":
 					Response.Headers.Add("Allow", "GET, HEAD, OPTIONS");
-					if (Program.CORSAddresses.Contains(Request.LocalEndPoint.ToString())) {
+					if (Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString())) {
 						Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
 					}
 					Utils.Send(Response, null, HttpStatusCode.OK);

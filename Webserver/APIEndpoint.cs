@@ -90,7 +90,6 @@ namespace Webserver {
 				}
 			}
 			if (Program.CORSAddresses.Contains("http://"+Request.LocalEndPoint.ToString())) {
-				Console.WriteLine("yeet");
 				Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
 			}
 			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
