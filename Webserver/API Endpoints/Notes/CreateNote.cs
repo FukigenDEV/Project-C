@@ -14,9 +14,18 @@ namespace Webserver.API_Endpoints
         {
             // Get all required values
             if (!Content.TryGetValue<string>("title", out JToken title) ||
-                !Content.TryGetValue<string>("text", out JToken text))
+                !Content.TryGetValue<string>("text", out JToken text) ||
+                !Content.TryGetValue<string>("author", out JToken author))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
+                return;
+            }
+
+            // Check if the author is valid
+            User user = User.GetUserByEmail(Connection, (string)author);
+            if (user == null)
+            {
+                Send("No such user", HttpStatusCode.BadRequest);
                 return;
             }
 
@@ -27,7 +36,7 @@ namespace Webserver.API_Endpoints
 				return;
 			}
 
-			Note newNote = new Note((string)title, (string)text);
+			Note newNote = new Note((string)title, (string)text, user.ID);
 
             // Store note to database
             Connection.Insert(newNote);
