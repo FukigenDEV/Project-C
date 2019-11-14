@@ -9,13 +9,14 @@ namespace Webserver.API_Endpoints {
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		[RequireBody]
+		[RequireContentType("application/json")]
 		public override void POST() {
 			//Get all required fields
 			if (
-				!Content.TryGetValue<string>("Email", out JToken Email) ||
-				!Content.TryGetValue<string>("Password", out JToken Password) ||
-				!Content.TryGetValue<string>("AccountType", out JToken AccountType) ||
-				!Content.TryGetValue<string>("MemberOf", out JToken MemberDept)
+				!JSON.TryGetValue<string>("Email", out JToken Email) ||
+				!JSON.TryGetValue<string>("Password", out JToken Password) ||
+				!JSON.TryGetValue<string>("AccountType", out JToken AccountType) ||
+				!JSON.TryGetValue<string>("MemberOf", out JToken MemberDept)
 			) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
@@ -56,7 +57,7 @@ namespace Webserver.API_Endpoints {
 			User NewUser = new User((string)Email, (string)Password);
 
 			//Set optional fields
-			foreach (var x in Content) {
+			foreach (var x in JSON) {
 				if (x.Key == "Email" || x.Key == "Password") {
 					continue;
 				}

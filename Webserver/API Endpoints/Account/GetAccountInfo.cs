@@ -4,9 +4,10 @@ using System.Net;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	[EndpointInfo("application/json", "/account")]
+	[EndpointURL("/account")]
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
+		[RequireContentType("application/json")]
 		public override void GET() {
 			//Get required fields
 			string Email;

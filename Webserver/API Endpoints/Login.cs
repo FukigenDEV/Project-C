@@ -10,9 +10,10 @@ namespace Webserver.API_Endpoints {
 	/// <summary>
 	/// API endpoint to manage user logins.
 	/// </summary>
-	[EndpointInfo("application/json", "/login")]
+	[EndpointURL("/login")]
 	class Login : APIEndpoint {
 		[RequireBody]
+		[RequireContentType("application/json")]
 		public override void POST() {
 			//Check if a session cookie was sent.
 			Cookie SessionIDCookie = Request.Cookies["SessionID"];
@@ -28,9 +29,9 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Get the email and password from the request. If one of the values is missing, send a 400 Bad Request.
-			bool foundEmail = Content.TryGetValue<string>("Email", out JToken Email);
-			bool foundPassword = Content.TryGetValue<string>("Password", out JToken Password);
-			bool foundRememberMe = Content.TryGetValue<string>("RememberMe", out JToken RememberMe);
+			bool foundEmail = JSON.TryGetValue<string>("Email", out JToken Email);
+			bool foundPassword = JSON.TryGetValue<string>("Password", out JToken Password);
+			bool foundRememberMe = JSON.TryGetValue<string>("RememberMe", out JToken RememberMe);
 			if (!foundEmail || !foundPassword || !foundRememberMe) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;

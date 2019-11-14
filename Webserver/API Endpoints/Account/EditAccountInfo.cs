@@ -11,9 +11,10 @@ namespace Webserver.API_Endpoints {
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		[RequireBody]
+		[RequireContentType("application/json")]
 		public override void PATCH() {
 			//Get required fields
-			if (!Content.TryGetValue<string>("Email", out JToken Email)) {
+			if (!JSON.TryGetValue<string>("Email", out JToken Email)) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
@@ -32,7 +33,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Change email if necessary
-			if (Content.TryGetValue<string>("NewEmail", out JToken NewEmail)) {
+			if (JSON.TryGetValue<string>("NewEmail", out JToken NewEmail)) {
 				//Check if the new address is valid
 				Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
 				if (rx.IsMatch((string)NewEmail)) {
@@ -44,12 +45,12 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Change password if necessary
-			if (Content.TryGetValue<string>("Password", out JToken Password)) {
+			if (JSON.TryGetValue<string>("Password", out JToken Password)) {
 				Acc.PasswordHash = User.CreateHash((string)Password, Acc.Email);
 			}
 
 			//Set department permissions if necessary
-			if (Content.TryGetValue<JObject>("MemberDepartments", out JToken MemberDepartment)) {
+			if (JSON.TryGetValue<JObject>("MemberDepartments", out JToken MemberDepartment)) {
 				JObject Perms = (JObject)MemberDepartment;
 				foreach (KeyValuePair<string, JToken> Entry in Perms) {
                     //Check if the specified department exists, skip if it doesn't.
@@ -72,7 +73,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Set optional fields
-			foreach (var x in Content) {
+			foreach (var x in JSON) {
 				if (x.Key == "Email" || x.Key == "PasswordHash") {
 					continue;
 				}

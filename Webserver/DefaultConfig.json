@@ -1,9 +1,14 @@
 ﻿{
 	"ConnectionSettings": {
-		//The URLs the server will listen to. Multiple URLs can be specified.
+		//The URLs the server will listen to. Multiple URLs can be specified. HTTP:// is prefixed where needed.
 		//Examples: localhost, http://example.com, https://contoso.com
 		"ServerAddresses": [
 			"localhost"
+		],
+		//Allow external domains to communicate with this server. This is primarily useful when a system's front-end is running on a different webserver.
+		//Only the addresses specified in the ServerAddresses are allowed by default. Use an asterisk (*) to allow all domains. HTTP:// is prefixed where needed.
+		"AccessControl": [
+
 		],
 		//Whether the server should automatically detect its address. This address will be used in addition to the ones specified in ServerAddresses.
 		"AutoDetectAddress": true
