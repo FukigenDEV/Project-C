@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -13,6 +14,7 @@ namespace Webserver {
 	class Program {
 		public static Logger Log;
 		public static List<Type> Endpoints;
+		public static List<string> CORSAddresses = new List<string>();
 
 		public static void Main() {
 			Logger.Init();
@@ -42,6 +44,11 @@ namespace Webserver {
 				Console.ReadKey();
 				return;
 			}
+
+			//Check CORS addresses
+			CORSAddresses = Utils.ParseAddresses(Config.GetValue("ConnectionSettings.AccessControl").ToObject<List<string>>());
+			List<string> Addresses = Utils.ParseAddresses(Configurator.Config.GetValue("ConnectionSettings.ServerAddresses").ToObject<List<string>>());
+			CORSAddresses = CORSAddresses.Concat(Addresses).ToList();
 
 			//Run inits
 			Database.Init();

@@ -10,11 +10,13 @@ namespace Webserver.API_Endpoints
 {
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-        public override void POST()
+		[RequireContentType("application/json")]
+		[RequireBody]
+		public override void POST()
         {
             // Get all required values
-            if (!Content.TryGetValue<string>("name", out JToken name) ||
-                !Content.TryGetValue<string>("description", out JToken description))
+            if (!JSON.TryGetValue<string>("name", out JToken name) ||
+                !JSON.TryGetValue<string>("description", out JToken description))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;

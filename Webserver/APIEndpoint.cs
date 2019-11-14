@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -14,10 +15,30 @@ namespace Webserver {
 		public SQLiteConnection Connection;
 		public HttpListenerRequest Request;
 		public HttpListenerResponse Response;
-		public JObject Content;
-		public User RequestUser;
+
+		/// <summary>
+		/// The request's body, converted to a JObject. Only available for endpoint methods that require "application/json" as content type.
+		/// </summary>
+		public JObject JSON = null;
+		/// <summary>
+		/// The request's body. Null if the content type requires conversion first. In this case, the body will be located in another variable.
+		/// </summary>
+		public dynamic Content = null;
+		/// <summary>
+		/// The user who sent the request. Null if no user was logged in. 
+		/// </summary>
+		public User RequestUser = null;
+		/// <summary>
+		/// The permission level of the user who sent the request.
+		/// </summary>
 		public PermLevel RequestUserLevel;
-		public Session UserSession;
+		/// <summary>
+		/// The session object of the user who sent the request.
+		/// </summary>
+		public Session UserSession = null;
+		/// <summary>
+		/// The request parameters that were used with this request.
+		/// </summary>
 		public Dictionary<string, List<string>> RequestParams = new Dictionary<string, List<string>>();
 
 		/// <summary>
@@ -68,7 +89,9 @@ namespace Webserver {
 					AllowedMethods.Add(Method.Name);
 				}
 			}
-
+			if (Program.CORSAddresses.Contains("http://"+Request.LocalEndPoint.ToString())) {
+				Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
+			}
 			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
 			Utils.Send(Response, null, HttpStatusCode.OK);
 		}
@@ -90,7 +113,13 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="Data">The data to send.</param>
 		/// <param name="StatusCode"></param>
-		public void Send(object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, Data?.ToString(), StatusCode);
+		/// <param name="ContentType"></param>,
+		public void Send(object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
+			if(ContentType == null) {
+				ContentType = new StackTrace().GetFrame(1).GetMethod().GetCustomAttribute<RequireContentType>().ContentType;
+			}
+			Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
+		}
 
 		/// <summary>
 		/// Send a cookie to the client.
