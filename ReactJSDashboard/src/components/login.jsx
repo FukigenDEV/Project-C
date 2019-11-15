@@ -18,13 +18,18 @@ class Login extends Component {
     }
   }
 
+  componentDidMount() {
+    if(this.props.loggedin === true) {
+      this.props.onLogin(200);
+    }
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     const obj = this.state.login;
     const data = JSON.stringify(obj);
 
     let xhr = new XMLHttpRequest();
-    // Deployment: /login
     xhr.open("POST", "/login", true);
     xhr.onreadystatechange = () => {
       if(xhr.readyState === 4) {

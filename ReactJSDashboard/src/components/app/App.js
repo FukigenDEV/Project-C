@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import { HashRouter as Router } from "react-router-dom";
-import { Dashboard, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
+import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
+import { createHashHistory } from 'history';
+import { Dashboard, Home, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
 import Login from '../login';
-import Navs from '../navs';
-import Main from '../main';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { bool } from 'prop-types';
 
-const GlobalStyle = createGlobalStyle`body { background: rgb(2,0,36) !important; background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(35,35,102,1) 30%, rgba(0,142,255,1) 100%) !important;}`
+const Background = createGlobalStyle`body { background: rgb(2,0,36) !important; background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(35,35,102,1) 30%, rgba(0,142,255,1) 100%) !important;}`
+const history = createHashHistory();
 
 class App extends Component {
 
@@ -18,27 +18,15 @@ class App extends Component {
     this.state = {
       loggedin: { value: false },
       navs: [
-        { id: 0, heading: 'Project C', link: '', path: '/', component: Dashboard, active: true, icon: 'home' },
-        { id: 1, heading: 'Gegevens bekijken', link: 'GegevensBekijken', path: '/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-        { id: 2, heading: 'Gegevens Registreren', link: 'GegevensRegistreren', path: '/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
-        { id: 3, heading: 'Notities', link: 'Notities', path: '/Notities', component: Notities, active: false, icon: 'clipboard' },
-        { id: 4, heading: 'Activiteiten geschiedenis', link: 'Activiteitengeschiedenis', path: '/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
-        { id: 5, heading: 'Back-up maken', link: 'Back-up', path: '/Back-up', component: Backup, active: false, icon: 'download' },
-        { id: 6, heading: 'Uitloggen', link: 'Uitloggen', path: '/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
+        { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'home' },
+        { id: 1, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
+        { id: 2, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+        { id: 3, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
+        { id: 4, heading: 'Activiteiten geschiedenis', link: '/dashboard/Activiteitengeschiedenis', path: '/dashboard/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
+        { id: 5, heading: 'Back-up maken', link: '/dashboard/Back-up', path: '/dashboard/Back-up', component: Backup, active: false, icon: 'download' },
+        { id: 6, heading: 'Uitloggen', link: '/dashboard/Uitloggen', path: '/dashboard/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
       ]
     };
-    
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/login", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.status === 200 || xhr.status === 204) {
-        const loggedin = {...this.state.loggedin};
-        loggedin.value = true;
-        this.setState({loggedin});
-      }
-    }
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send("{}");
   }
 
   handleSelect = nav => {
@@ -55,6 +43,7 @@ class App extends Component {
       const loggedin = {...this.state.loggedin};
       loggedin.value = true;
       this.setState({loggedin});
+      history.push('/dashboard');
     }
   }
 
@@ -66,30 +55,35 @@ class App extends Component {
     this.setState({ navs });
   }
 
-  render() {
-    // Will need to find a different solution here...
-    if(this.state.loggedin.value) {
-      return (
-        <React.Fragment>
-          <GlobalStyle />
-          <div className="container-fluid">
-            <div className="row">
-              <Router>
-                <Navs navs={this.state.navs} onSelect={this.handleSelect} />
-                <Main navs={this.state.navs} />
-              </Router>
-            </div>
-          </div>
-        </React.Fragment>
-      );
-    } else {
-      return (
-        <React.Fragment>
-          <GlobalStyle />
-          <Login onLogin={this.handleLogin} />
-        </React.Fragment>
-      );
+  setLoggedin = () => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "/login", true);
+    xhr.onreadystatechange = () => {
+      if(xhr.status === 200 || xhr.status === 204) {
+        const loggedin = {...this.state.loggedin};
+        loggedin.value = true;
+        this.setState({loggedin});
+      } else {
+        const loggedin = {...this.state.loggedin};
+        loggedin.value = false;
+        this.setState({loggedin});
+        history.push('/');
+      }
     }
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send("{}");
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <Background />
+        <Router>
+          <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} />} />
+          <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} />} />
+        </Router>
+      </React.Fragment>
+    );
   }
 
 }

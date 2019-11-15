@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from "./components/app/App";
-import Dashboard from './components/pages/Dashboard';
+import Dashboard from './components/dashboard';
+import Home from './components/pages/Home'
+import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
 import GegevensBekijken from './components/pages/GegevensBekijken';
 import Notities from './components/pages/Notities';
@@ -22,6 +24,8 @@ serviceWorker.unregister();
 
 export {
     Dashboard,
+    Navs,
+    Home,
     GegevensRegistreren,
     GegevensBekijken,
     Notities,
