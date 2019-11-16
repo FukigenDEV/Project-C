@@ -43,8 +43,12 @@ class App extends Component {
       const loggedin = {...this.state.loggedin};
       loggedin.value = true;
       this.setState({loggedin});
-      history.push('/dashboard');
+      this.handleRedirect('/dashboard');
     }
+  }
+
+  handleRedirect = location => {
+    history.push(location);
   }
 
   setFalse = () => {
@@ -60,14 +64,9 @@ class App extends Component {
     xhr.open("POST", "/login", true);
     xhr.onreadystatechange = () => {
       if(xhr.status === 200 || xhr.status === 204) {
-        const loggedin = {...this.state.loggedin};
-        loggedin.value = true;
-        this.setState({loggedin});
+        if(this.state.loggedin.value === false) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin});}
       } else {
-        const loggedin = {...this.state.loggedin};
-        loggedin.value = false;
-        this.setState({loggedin});
-        history.push('/');
+        if(this.state.loggedin.value === true) {const loggedin = {...this.state.loggedin}; loggedin.value = false; this.setState({loggedin});}
       }
     }
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -79,8 +78,8 @@ class App extends Component {
       <React.Fragment>
         <Background />
         <Router>
-          <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} />} />
-          <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} />} />
+          <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
+          <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
         </Router>
       </React.Fragment>
     );

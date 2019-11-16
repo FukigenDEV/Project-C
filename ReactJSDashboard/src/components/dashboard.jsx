@@ -12,20 +12,27 @@ class Dashboard extends Component {
   }
 
   render() {
-    const {navs, onSelect} = this.props;
-    return (
-      <div className="container-fluid">
-        <div className="row">
-          <Navs navs={navs} onSelect={onSelect} />
-          <div className="col-9 col-s-12 main-window">
-            <Switch>
-              { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
-              <Route component={Error} />
-            </Switch>
+    const {navs, loggedin, onSelect, onRedirect, onRender} = this.props;
+    onRender();
+
+    if(loggedin.value === true) {
+      return (
+        <div className="container-fluid">
+          <div className="row">
+            <Navs navs={navs} onSelect={onSelect} />
+            <div className="col-9 col-s-12 main-window">
+              <Switch>
+                { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+                <Route component={Error} />
+              </Switch>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      onRedirect('/');
+      return (<div></div>);
+    }
   }
 }
 

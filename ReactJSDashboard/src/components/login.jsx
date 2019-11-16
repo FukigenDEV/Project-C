@@ -19,9 +19,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    if(this.props.loggedin === true) {
-      this.props.onLogin(200);
-    }
+    this.props.onMount();
   }
 
   handleSubmit = (event) => {
@@ -59,6 +57,12 @@ class Login extends Component {
   }
 
   render() {
+    const {onRedirect, loggedin} = this.props;
+
+    if(loggedin.value) {
+      onRedirect('/dashboard');
+    }
+
     return (
       <div className="container mx-auto vertical-center">
         <div className="mx-auto vertical-center">
