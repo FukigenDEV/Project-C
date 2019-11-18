@@ -72,6 +72,7 @@ namespace Webserver.API_Endpoints {
 			//Upload account to database and set permission
 			Connection.Insert(NewUser);
 			NewUser.SetPermissionLevel(Connection, level, Dept);
+			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
 
 			//Send OK
 			Send(StatusCode: HttpStatusCode.OK);
