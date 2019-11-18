@@ -61,7 +61,15 @@ class App extends Component {
       }
     }
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send("{}");
+    // xhr.send("{}");
+  }
+
+  componentWillUnmount() {
+    console.log("UNMOUNTED")
+    // let xhr = new XMLHttpRequest();
+    // xhr.open("DELETE", "/login", true);
+    // xhr.setRequestHeader('Content-Type', 'application/json');
+    // xhr.send("{}");
   }
 
   render() {
