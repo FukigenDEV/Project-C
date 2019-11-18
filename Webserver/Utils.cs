@@ -1,6 +1,7 @@
 ﻿using Logging;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -41,13 +42,14 @@ namespace Webserver {
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
+		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
 			if (Data == null) {
 				Data = Array.Empty<byte>();
 			}
 
 			try {
 				Response.StatusCode = (int)StatusCode;
+				Response.ContentType = ContentType;
 				Response.OutputStream.Write(Data, 0, Data.Length);
 				Response.OutputStream.Close();
 			} catch (HttpListenerException e) {
@@ -62,12 +64,12 @@ namespace Webserver {
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 
-		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK) {
+		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
 			if (Data == null) {
 				Data = "";
 			}
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
-			Send(Response, Buffer, StatusCode);
+			Send(Response, Buffer, StatusCode, ContentType);
 		}
 
 		/// <summary>
@@ -76,7 +78,33 @@ namespace Webserver {
 		/// <returns></returns>
 		public static int GetUnixTimestamp() => (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
+		/// <summary>
+		/// Given a list of addresses, adds a "http://" prefix and "/" suffix where necessary.
+		/// </summary>
+		/// <param name="Addresses"></param>
+		/// <returns></returns>
+		public static List<string> ParseAddresses(List<string> Addresses) {
+			List<string> Result = new List<string>();
+			foreach (string Address in Addresses) {
+				if (Address == "*") {
+					continue;
+				}
 
+				//There has to be a better way!
+				string addr;
+				if (!Address.StartsWith("http://")) {
+					addr = "http://" + Address;
+				} else {
+					addr = Address;
+				}
+
+				if (addr[^1] != '/') {
+					addr += '/';
+				}
+				Result.Add(addr);
+			}
+			return Result;
+		}
 	}
 
 	/// <summary>
@@ -101,7 +129,7 @@ namespace Webserver {
 		/// <param name="propertyName"></param>
 		/// <param name="Value"></param>
 		/// <returns></returns>
-		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) where T : class {
+		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) {
 			bool Found = obj.TryGetValue(propertyName, out Value);
 			if (!Found) {
 				return false;

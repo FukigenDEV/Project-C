@@ -3,17 +3,13 @@
 namespace Webserver {
 
 	/// <summary>
-	/// Stores information about an API endpoint;
-	/// ContentType		-	The ContentType requests to this EndPoint should have.
-	/// URL				-	The URL used to reach this endpoint. The wwwroot folder is automatically added.
+	/// Stores the URL that this endpoint can be reached at.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class)]
-	public sealed class EndpointInfo : Attribute {
-		public string ContentType;
+	public sealed class EndpointURL : Attribute {
 		public string URL;
 
-		public EndpointInfo(string ContentType, string URL) {
-			this.ContentType = ContentType;
+		public EndpointURL(string URL) {
 			this.URL = URL;
 		}
 	}
@@ -31,7 +27,18 @@ namespace Webserver {
 	}
 
 	/// <summary>
-	/// If used on an endpoint method, any calls to this method will automatically be rejected with a 400 Bad Request.
+	/// If used on an endpoint method, any calls to this method will automatically be rejected with a 400 Bad Request if the request body is empty.
 	/// </summary>
 	public sealed class RequireBody : Attribute { }
+
+	/// <summary>
+	/// If used on an endpoint method, any requests to it will only be accepted if the content type matches.
+	/// Will also be used to set the content type for the response.
+	/// </summary>
+	public sealed class RequireContentType : Attribute {
+		public string ContentType;
+		public RequireContentType(string ContentType) {
+			this.ContentType = ContentType;
+		}
+	}
 }

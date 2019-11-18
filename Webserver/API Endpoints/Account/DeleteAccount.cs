@@ -4,12 +4,13 @@ using System.Net;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	internal partial class Account : APIEndpoint {
+	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Administrator)]
 		[RequireBody]
+		[RequireContentType("application/json")]
 		public override void DELETE() {
 			//Get required fields
-			if (!Content.TryGetValue<string>("Email", out JToken Email)) {
+			if (!JSON.TryGetValue<string>("Email", out JToken Email)) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}

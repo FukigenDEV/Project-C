@@ -33,12 +33,25 @@ namespace Webserver {
 				"Name				STRING PRIMARY KEY" +
 			")");
 
-			Connection.Execute("CREATE TABLE IF NOT EXISTS Departments (" +
-				"ID					INTEGER PRIMARY KEY," +
-				"Name				STRING NOT NULL" +
-			")");
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Companys (" +
+            "ID					INTEGER PRIMARY KEY," +
+            "Name				STRING NOT NULL," +
+            "Street             STRING," +
+            "HouseNumber        INTEGER," +
+            "PostCode           STRING," +
+            "City               STRING," +
+            "Country            STRING," +
+            "PhoneNumber        STRING," +
+            "Email              STRING" +
+            ")");
 
-			Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Departments (" +
+            "ID					INTEGER PRIMARY KEY," +
+            "Name				STRING NOT NULL," +
+            "Description        STRING" +
+            ")");
+
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
 				"User				INTEGER NOT NULL," +
 				"Permission			INTEGER NOT NULL," +
 				"Department			INTEGER," +
@@ -82,7 +95,7 @@ namespace Webserver {
 
 			Department AdministratorDept = Connection.Get<Department>(1);
 			if(AdministratorDept == null) {
-				Connection.Insert(new Department("Administrators"));
+				Connection.Insert(new Department("Administrators", "Department for Administrators"));
 			}
 
 			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
