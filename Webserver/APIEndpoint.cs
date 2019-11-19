@@ -116,7 +116,7 @@ namespace Webserver {
 		/// <param name="ContentType"></param>,
 		public void Send(object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
 			if(ContentType == null) {
-				ContentType = new StackTrace().GetFrame(1).GetMethod().GetCustomAttribute<RequireContentType>().ContentType;
+				ContentType = new StackTrace().GetFrame(1).GetMethod().GetCustomAttribute<RequireContentType>()?.ContentType ?? "text/html";
 			}
 			Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
 		}
