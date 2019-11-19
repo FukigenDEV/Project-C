@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Configurator;
+using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Reflection;
@@ -29,9 +30,16 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the email is valid. If it isn't, send a 400 Bad Request.
-			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*\\.[A-z]{1}");
-			if (!rx.IsMatch((string)Email)) {
+			Regex EmailRx = new Regex("[A-z0-9]*@[A-z0-9]*\\.[A-z]{1}");
+			if (!EmailRx.IsMatch((string)Email)) {
 				Send("Invalid email", HttpStatusCode.BadRequest);
+				return;
+			}
+
+			//Check if the password is valid. If it isn't, send a 400 Bad Request.
+			Regex PasswordRx = new Regex(Config.GetValue("AuthenticationSettings.PasswordRegex"));
+			if (!PasswordRx.IsMatch((string)Password)) {
+				Send("Password does not meet requirements", HttpStatusCode.BadRequest);
 				return;
 			}
 
