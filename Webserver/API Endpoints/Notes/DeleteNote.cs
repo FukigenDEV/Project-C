@@ -10,6 +10,7 @@ namespace Webserver.API_Endpoints
 {
     internal partial class NoteEndPoint : APIEndpoint
     {
+        [RequireContentType("application/json")]
         public override void DELETE()
         {
             // Get required fields

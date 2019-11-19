@@ -8,9 +8,10 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointInfo("application/json", "/note")]
+    [EndpointURL("/note")]
     internal partial class NoteEndPoint : APIEndpoint
     {
+        [RequireContentType("application/json")]
         public override void GET()
         {
             // Get required fields

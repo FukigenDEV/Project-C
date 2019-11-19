@@ -10,11 +10,13 @@ namespace Webserver.API_Endpoints
 {
     internal partial class NoteEndPoint : APIEndpoint
     {
+        [RequireContentType("application/json")]
+        [RequireBody]
         public override void POST()
         {
             // Get all required values
-            if (!Content.TryGetValue<string>("title", out JToken title) ||
-                !Content.TryGetValue<string>("text", out JToken text))
+            if (!JSON.TryGetValue<string>("title", out JToken title) ||
+                !JSON.TryGetValue<string>("text", out JToken text))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
@@ -27,7 +29,7 @@ namespace Webserver.API_Endpoints
 				return;
 			}
 
-			Note newNote = new Note((string)title, (string)text);
+            Note newNote = new Note((string)title, (string)text);
 
             // Store note to database
             Connection.Insert(newNote);

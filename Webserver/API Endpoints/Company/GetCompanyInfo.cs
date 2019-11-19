@@ -8,7 +8,8 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointInfo("application/json", "/company")]
+    [RequireContentType("application/json")]
+    [EndpointURL("/company")]
     internal partial class CompanyEndPoint : APIEndpoint
     {
         public override void GET()
