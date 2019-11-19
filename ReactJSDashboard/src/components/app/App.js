@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
 import { createHashHistory } from 'history';
-import { Dashboard, Home, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
+import { Dashboard, Home, Admin, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
 import Login from '../login';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { bool } from 'prop-types';
 
 const Background = createGlobalStyle`body { background: rgb(2,0,36) !important; background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(35,35,102,1) 30%, rgba(0,142,255,1) 100%) !important;}`
 const history = createHashHistory();
@@ -16,15 +15,16 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedin: { value: false },
+      loggedin: { value: null },
       navs: [
-        { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'home' },
-        { id: 1, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-        { id: 2, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
-        { id: 3, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
-        { id: 4, heading: 'Activiteiten geschiedenis', link: '/dashboard/Activiteitengeschiedenis', path: '/dashboard/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
-        { id: 5, heading: 'Back-up maken', link: '/dashboard/Back-up', path: '/dashboard/Back-up', component: Backup, active: false, icon: 'download' },
-        { id: 6, heading: 'Uitloggen', link: '/dashboard/Uitloggen', path: '/dashboard/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
+        { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
+        { id: 1, heading: 'Admin', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'admin' },
+        { id: 2, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
+        { id: 3, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+        { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
+        { id: 5, heading: 'Activiteiten geschiedenis', link: '/dashboard/Activiteitengeschiedenis', path: '/dashboard/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
+        { id: 6, heading: 'Back-up maken', link: '/dashboard/Back-up', path: '/dashboard/Back-up', component: Backup, active: false, icon: 'download' },
+        { id: 7, heading: 'Uitloggen', link: '/dashboard/Uitloggen', path: '/dashboard/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
       ]
     };
   }
@@ -64,9 +64,9 @@ class App extends Component {
     xhr.open("POST", "/login", true);
     xhr.onreadystatechange = () => {
       if(xhr.status === 200 || xhr.status === 204) {
-        if(this.state.loggedin.value === false) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin});}
+        if(this.state.loggedin.value !== true) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin});}
       } else {
-        if(this.state.loggedin.value === true) {const loggedin = {...this.state.loggedin}; loggedin.value = false; this.setState({loggedin});}
+        if(this.state.loggedin.value !== false) {const loggedin = {...this.state.loggedin}; loggedin.value = false; this.setState({loggedin});}
       }
     }
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -74,15 +74,20 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <React.Fragment>
-        <Background />
-        <Router>
-          <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
-          <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
-        </Router>
-      </React.Fragment>
-    );
+    if(this.state.loggedin.value === null) {
+      this.setLoggedin();
+      return(<div></div>);
+    } else {
+      return (
+        <React.Fragment>
+          <Background />
+          <Router>
+            <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
+            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
+          </Router>
+        </React.Fragment>
+      );
+    }
   }
 
 }
