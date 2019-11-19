@@ -6,9 +6,9 @@ import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
 
 import Admin from './components/pages/admin/Admin';
-import Users from './components/pages/admin/Users';
-import Departments from './components/pages/admin/Departments';
-import Company from './components/pages/admin/Company'
+import addUsers from './components/pages/admin/add/Users';
+import addDepartments from './components/pages/admin/add/Departments';
+import addCompany from './components/pages/admin/add/Company'
 
 import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
@@ -33,9 +33,9 @@ export {
     Navs,
     Home,
     Admin,
-    Users,
-    Departments,
-    Company,
+    addUsers,
+    addDepartments,
+    addCompany,
     GegevensRegistreren,
     GegevensBekijken,
     Notities,
