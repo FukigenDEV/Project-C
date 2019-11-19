@@ -10,14 +10,22 @@ namespace Webserver.API_Endpoints
 {
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-        public override void DELETE()
+		[RequireContentType("application/json")]
+		[RequireBody]
+		public override void DELETE()
         {
             // Get required fields
-            if (!Content.TryGetValue<string>("name", out JToken name))
+            if (!JSON.TryGetValue<string>("name", out JToken name))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
             }
+
+			//Don't allow users to delete the Administrators and All Users departments.
+			if((string) name == "Administrators" || (string)name == "All Users") {
+				Send("Cannot delete system department", HttpStatusCode.Forbidden);
+				return;
+			}
 
             //Check if the specified department exists. If it doesn't, send a 404 Not Found
             Department department = Department.GetDepartmentByName(Connection, (string)name);

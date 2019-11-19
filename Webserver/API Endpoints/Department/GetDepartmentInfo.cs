@@ -8,10 +8,11 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointInfo("application/json", "/department")]
+    [EndpointURL("/department")]
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-        public override void GET()
+		[RequireContentType("application/json")]
+		public override void GET()
         {
             // Get required fields
             if (!RequestParams.ContainsKey("name"))

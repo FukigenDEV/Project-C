@@ -8,19 +8,22 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    internal partial class CompanyEndPoint : APIEndpoint
+    [EndpointURL("/company")]
+    internal partial class CompanyEndpoint : APIEndpoint
     {
-        public override void POST()
+		[RequireContentType("application/json")]
+		[RequireBody]
+		public override void POST()
         {
 			// Get all required values
-            if (!Content.TryGetValue<string>("name", out JToken name) ||
-                !Content.TryGetValue<string>("street", out JToken street) ||
-                !Content.TryGetValue<int>("houseNumber", out JToken houseNumber) ||
-                !Content.TryGetValue<string>("postCode", out JToken postCode) ||
-                !Content.TryGetValue<string>("city", out JToken city) ||
-                !Content.TryGetValue<string>("country", out JToken country) ||
-                !Content.TryGetValue<string>("phoneNumber", out JToken phoneNumber) ||
-                !Content.TryGetValue<string>("email", out JToken email))
+            if (!JSON.TryGetValue<string>("name", out JToken name) ||
+                !JSON.TryGetValue<string>("street", out JToken street) ||
+                !JSON.TryGetValue<int>("houseNumber", out JToken houseNumber) ||
+                !JSON.TryGetValue<string>("postCode", out JToken postCode) ||
+                !JSON.TryGetValue<string>("city", out JToken city) ||
+                !JSON.TryGetValue<string>("country", out JToken country) ||
+                !JSON.TryGetValue<string>("phoneNumber", out JToken phoneNumber) ||
+                !JSON.TryGetValue<string>("email", out JToken email))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;

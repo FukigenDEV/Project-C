@@ -12,10 +12,12 @@ namespace Webserver.API_Endpoints
 {
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-        public override void PATCH()
+		[RequireContentType("application/json")]
+		[RequireBody]
+		public override void PATCH()
         {
             // Get required fields
-            if (!Content.TryGetValue<string>("name", out JToken name))
+            if (!JSON.TryGetValue<string>("name", out JToken name))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
@@ -30,13 +32,13 @@ namespace Webserver.API_Endpoints
             }
 
             // Change name if necessary
-            if (Content.TryGetValue<string>("newName", out JToken newName))
+            if (JSON.TryGetValue<string>("newName", out JToken newName))
             {
                 department.Name = (string)newName;
             }
 
             // Change description if necessary
-            if (Content.TryGetValue<string>("newDescription", out JToken newDescription))
+            if (JSON.TryGetValue<string>("newDescription", out JToken newDescription))
             {
                 department.Description = (string)newDescription;
             }

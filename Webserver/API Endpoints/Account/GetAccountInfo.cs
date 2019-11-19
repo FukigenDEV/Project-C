@@ -4,26 +4,47 @@ using System.Net;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	[EndpointInfo("application/json", "/account")]
+	[EndpointURL("/account")]
 	internal partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
+		[RequireContentType("application/json")]
 		public override void GET() {
 			//Get required fields
-			if (!RequestParams.ContainsKey("Email")) {
-				Send("Missing params", HttpStatusCode.BadRequest);
-				return;
+			string Email;
+			if (RequestParams.ContainsKey("email")) {
+				Email = RequestParams["email"][0];
+			} else {
+				Email = RequestUser.Email;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
-			User Acc = User.GetUserByEmail(Connection, RequestParams["Email"][0]);
+			User Acc = User.GetUserByEmail(Connection, Email);
 			if (Acc == null) {
 				Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}
 
-			//Build and send response
-			JObject JSON = JObject.FromObject(Acc);
-			JSON.Remove("PasswordHash"); //For security
+			//If a department was specified, only return permission level and department
+			JObject JSON;
+			if (RequestParams.ContainsKey("department")) {
+				//Get department. If no department is found, return a 404
+				Department Dept = Department.GetDepartmentByName(Connection, RequestParams["department"][0]);
+				if(Dept == null) {
+					Send("No such department", HttpStatusCode.NotFound);
+					return;
+				}
+				//Build JSON
+				JSON = new JObject {
+					{ "Department", Dept.Name },
+					{ "Permission:", Acc.GetPermissionLevel(Connection, Dept).ToString() }
+				};
+			} else {
+				//Convert user object to JSON
+				JSON = JObject.FromObject(Acc);
+				JSON.Remove("PasswordHash"); //For security
+			}
+
+			//Send response
 			Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
 		}
 	}
