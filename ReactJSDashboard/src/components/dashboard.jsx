@@ -22,8 +22,14 @@ class Dashboard extends Component {
             <Navs navs={navs} onSelect={onSelect} />
             <div className="col-9 col-s-12 main-window">
               <Switch>
+<<<<<<< HEAD
                 <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onRedirect={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+=======
+                <Route path="/dashboard/Admin" component={Admin} />
+                <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onRedirect={onRedirect} />} />
+                { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+>>>>>>> e8daf7ec30210ea8bae3832255172f5a8a8cf465
                 <Route component={Error} />
               </Switch>
             </div>
