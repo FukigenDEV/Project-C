@@ -11,7 +11,9 @@
             "localhost:3000"
 		],
 		//Whether the server should automatically detect its address. This address will be used in addition to the ones specified in ServerAddresses.
-		"AutoDetectAddress": true
+		"AutoDetectAddress": true,
+		//The port that the server should run on. Only used if AutoDetectAddress is true.
+		"AutoDetectPort": 80
 	},
 	"PerformanceSettings": {
 		//The amount of worker threads the server should use. More threads allows the server to handle more requests at once, but increases server load.

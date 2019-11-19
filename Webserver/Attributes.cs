@@ -33,7 +33,7 @@ namespace Webserver {
 
 	/// <summary>
 	/// If used on an endpoint method, any requests to it will only be accepted if the content type matches.
-	/// Will also be used to set the content type for the response.
+	/// Will also be used to set the content type for the response sent using APIEndpoint.Send, unless manually overriden.
 	/// </summary>
 	public sealed class RequireContentType : Attribute {
 		public string ContentType;

@@ -67,6 +67,7 @@ namespace Webserver.API_Endpoints {
 		}
 
 		[PermissionLevel(PermLevel.User)]
+		[RequireContentType("application/json")]
 		public override void DELETE() {
 			Connection.Delete(UserSession);
 			AddCookie("SessionID", "", 0);
