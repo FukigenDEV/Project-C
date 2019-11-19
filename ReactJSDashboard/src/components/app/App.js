@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
 import { createHashHistory } from 'history';
-import { Dashboard, Home, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen } from '../../index';
+import { Dashboard, Home, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen, AdminWizard } from '../../index';
 import Login from '../login';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,7 +24,8 @@ class App extends Component {
         { id: 3, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
         { id: 4, heading: 'Activiteiten geschiedenis', link: '/dashboard/Activiteitengeschiedenis', path: '/dashboard/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
         { id: 5, heading: 'Back-up maken', link: '/dashboard/Back-up', path: '/dashboard/Back-up', component: Backup, active: false, icon: 'download' },
-        { id: 6, heading: 'Uitloggen', link: '/dashboard/Uitloggen', path: '/dashboard/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' }
+        { id: 6, heading: 'Uitloggen', link: '/dashboard/Uitloggen', path: '/dashboard/Uitloggen', component: Uitloggen, active: false, icon: 'sign-out-alt' },
+        { id: 7, heading: 'Admin wizard', link: '/dashboard/AdminWizard', path: '/dashboard/AdminWizard', component: AdminWizard, active: false, icon: 'sign-out-alt' }
       ]
     };
   }
