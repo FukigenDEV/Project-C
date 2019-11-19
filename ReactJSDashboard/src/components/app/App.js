@@ -70,7 +70,7 @@ class App extends Component {
       }
     }
     xhr.setRequestHeader('Content-Type', 'application/json');
-    // xhr.send("{}");
+    xhr.send("{}");
   }
 
   componentWillUnmount() {
@@ -92,6 +92,7 @@ class App extends Component {
       </React.Fragment>
     );
   }
+
 
 }
 export default App;
