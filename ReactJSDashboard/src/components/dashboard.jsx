@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
-import {Admin, Uitloggen, Error, Navs} from '../index';
+import { createHashHistory } from 'history';
+import { Uitloggen, Error, Navs} from '../index';
+import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+
+const history = createHashHistory();
 
 class Dashboard extends Component {
   componentDidMount() {
@@ -18,9 +22,14 @@ class Dashboard extends Component {
             <Navs navs={navs} onSelect={onSelect} />
             <div className="col-9 col-s-12 main-window">
               <Switch>
+<<<<<<< HEAD
+                <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onRedirect={onRedirect} />} />
+                { navs.filter(nav => (nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+=======
                 <Route path="/dashboard/Admin" component={Admin} />
                 <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onRedirect={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+>>>>>>> e8daf7ec30210ea8bae3832255172f5a8a8cf465
                 <Route component={Error} />
               </Switch>
             </div>
@@ -33,5 +42,29 @@ class Dashboard extends Component {
     }
   }
 }
-
 export default Dashboard;
+//   render() {
+//     const {navs, loggedin, onSelect, onRedirect, onRender} = this.props;
+//     onRender();
+
+//     if(loggedin.value === true) {
+//       return (
+//         <div className="container-fluid">
+//           <div className="row">
+//             <Navs navs={navs} onSelect={onSelect} />
+//             <div className="col-9 col-s-12 main-window">
+//               <Switch>
+//                 { navs.map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
+//                 <Route component={Error} />
+//               </Switch>
+//             </div>
+//           </div>
+//         </div>
+//       );
+//     } else {
+//       onRedirect('/');
+//       return (<div></div>);
+//     }
+//   }
+// }
+

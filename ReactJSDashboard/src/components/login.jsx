@@ -58,6 +58,7 @@ class Login extends Component {
 
   render() {
     const {onRedirect, loggedin} = this.props;
+    console.log(this.props);
 
     if(loggedin.value === false) {
       return (

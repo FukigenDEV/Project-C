@@ -18,9 +18,9 @@ namespace Webserver.Threads {
 				using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
 					socket.Connect("8.8.8.8", 65530);
 					IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-					address = endPoint.Address.ToString();
-					Addresses.Add(address + ":80");
-					Program.CORSAddresses.Add("http://"+address+":80");
+					address = endPoint.Address.ToString() +":"+ Config.GetValue("ConnectionSettings.AutoDetectPort");
+					Addresses.Add(address);
+					Program.CORSAddresses.Add("http://"+address+"/");
 				}
 				Log.Info("Detected IPv4 address to be " + address);
 			}
@@ -29,7 +29,15 @@ namespace Webserver.Threads {
 			using HttpListener Listener = new HttpListener();
 			Utils.ParseAddresses(Addresses).ForEach(Listener.Prefixes.Add);
 
-			Listener.Start();
+			try {
+				Listener.Start();
+			} catch(HttpListenerException e) {
+				Log.Fatal("An exception occured. The server did not start.");
+				Log.Fatal(e.GetType().Name + ": " + e.Message);
+				Console.ReadKey();
+				Environment.Exit(-1);
+			}
+			
 			Log.Info("Now listening!");
 			while (true) {
 				Queue.Add(Listener.GetContext());
