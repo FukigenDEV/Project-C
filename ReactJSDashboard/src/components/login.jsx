@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NONAME } from 'dns';
+import { returnStatement } from '@babel/types';
 
 class Login extends Component {
   constructor(props) {
@@ -60,22 +60,23 @@ class Login extends Component {
     const {onRedirect, loggedin} = this.props;
     console.log(this.props);
 
-    if(loggedin.value) {
-      onRedirect('/dashboard');
-    }
-
-    return (
-      <div className="container mx-auto vertical-center">
-        <div className="mx-auto vertical-center">
-          <form className="login-form" onSubmit={this.handleSubmit.bind(this)}>
-            <div className={this.getBadgeClasses()}>{(this.state.alert.type === 401) ? "Wrong e-mail and/or password!" : this.state.alert.value}</div>
-            <input onChange={this.handleChange} type="text" className="form-control m-3" placeholder="E-mail" name="Email" autoComplete="username" />
-            <input onChange={this.handleChange} type="password" className="form-control m-3" placeholder="Password" name="Password" autoComplete="current-password" />
-            <button className="btn btn-primary btn-lg mr-3 ml-3">Login</button>
-          </form>
+    if(loggedin.value === false) {
+      return (
+        <div className="container mx-auto vertical-center">
+          <div className="mx-auto vertical-center">
+            <form className="login-form" onSubmit={this.handleSubmit.bind(this)}>
+              <div className={this.getBadgeClasses()}>{(this.state.alert.type === 401) ? "Wrong e-mail and/or password!" : this.state.alert.value}</div>
+              <input onChange={this.handleChange} type="text" className="form-control m-3" placeholder="E-mail" name="Email" autoComplete="username" />
+              <input onChange={this.handleChange} type="password" className="form-control m-3" placeholder="Password" name="Password" autoComplete="current-password" />
+              <button className="btn btn-primary btn-lg mr-3 ml-3">Login</button>
+            </form>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      onRedirect('/dashboard');
+      return (<div></div>);
+    }
   }
 }
 

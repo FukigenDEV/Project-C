@@ -4,6 +4,12 @@ import './index.css';
 import App from "./components/app/App";
 import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
+
+import Admin from './components/pages/admin/Admin';
+import Users from './components/pages/admin/Users';
+import Departments from './components/pages/admin/Departments';
+import Company from './components/pages/admin/Company'
+
 import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
 import GegevensBekijken from './components/pages/GegevensBekijken';
@@ -26,6 +32,10 @@ export {
     Dashboard,
     Navs,
     Home,
+    Admin,
+    Users,
+    Departments,
+    Company,
     GegevensRegistreren,
     GegevensBekijken,
     Notities,
