@@ -19,20 +19,23 @@ class Uitloggen extends Component {
     xhr.open("DELETE", "/login", true);
     console.log("HandleLogout")
     xhr.onreadystatechange = () => {
-      console.log('onreadystatechange %i', xhr.readyState)
+      // console.log('onreadystatechange %i', xhr.readyState)
       if(xhr.readyState === 4) {
-        console.log("Response")
+        // console.log("Response")
         const alert = {...this.state.alert};
         alert.type = xhr.status;
         alert.value = xhr.responseText;
         this.setState({alert});
+        if(xhr.status === 200) {
+          this.props.onRedirect('/');
+        }
         // this.props.history.push('/index.html#')
         this.props.loggedin.value = false;
       }
     }
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send("{}"); 
-    console.log('piep')
+    // console.log(this.state.alert);
   }
 
   getBadgeClasses = () => {
