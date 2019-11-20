@@ -55,7 +55,7 @@ class Notities extends Component {
 			<label>Tekst:</label><br/>
 			<input id="note_text" type="text" name="note_text" style={{width: "50%", height: "225px"}}/><br/>
 			<br/>
-			<input type="submit" value="Toevoegen" style={{width: "200px"}}/><br/>
+			<input type="submit" value="Toevoegen" style={{width: "200px"}}/><br/><br/>
 
 			<p id="message"></p>
 		</form>

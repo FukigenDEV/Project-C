@@ -30,7 +30,7 @@ class AdminWizard extends Component {
 					$("#add_company").hide(250);
 					$("#add_department").show(250);
 				} else {
-					$("#message").html(xhr.responseText);
+					$("#company_message").html(xhr.responseText);
 				}
 			}
 		}
@@ -52,17 +52,19 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					$("#add_department").hide(250);
-					$("#add_user").show(250);
-				} else {
-					$("#message").html(xhr.responseText);
-				}
+				$("#department_message").html(xhr.responseText);
+				$('#department_message').css({"display": "block"});
+				$('#department_message').delay(2000).fadeOut(300);
 			}
 		}
 		
 		var data = JSON.stringify({"name": name, "description": description});
 		xhr.send(data);
+	});
+
+	$("#department_next_form").on("submit", function(event) {
+		$("#add_department").hide(250);
+		$("#add_user").show(250);
 	});
 
 	$("#add_user_form").on("submit", function(event) {
@@ -90,17 +92,19 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					$("#add_user").hide(250);
-					$("#finished").show(250);
-				} else {
-					$("#message").html(xhr.responseText);
-				}
+				$("#user_message").html(xhr.responseText);
+				$('#user_message').css({"display": "block"});
+				$('#user_message').delay(2000).fadeOut(300);
 			}
 		}
 		
 		var data = JSON.stringify({"Email": email, "Password": password, "AccountType": accountType, "MemberOf": department });
 		xhr.send(data);
+	});
+
+	$("#user_next_form").on("submit", function(event) {
+		$("#add_user").hide(250);
+		$("#finished").show(250);
 	});
 
 	var xhr = new XMLHttpRequest();
@@ -146,9 +150,9 @@ class AdminWizard extends Component {
 				Phone number: <input id="company_phone_number" type="text" name="company_phone_number"/><br/>
 				Email: <input id="company_email" type="email" name="company_email"/><br/>
 				<br/>
-				<input type="submit" value="Next"/><br/>
+				<input type="submit" value="Add"/><br/>
 
-				<p id="message"></p>
+				<p id="company_message"></p>
 			</form>
 		</div>
 
@@ -160,7 +164,13 @@ class AdminWizard extends Component {
 				<br/>
 				<input type="submit" value="Add"/><br/>
 
-				<p id="message"></p>
+				<p id="department_message"></p>
+			</form>
+
+			<hr/>
+
+			<form id="department_next_form">
+				<input type="submit" value="Next"/><br/>
 			</form>
 		</div>
 
@@ -193,9 +203,15 @@ class AdminWizard extends Component {
 				</div>
 
 				<br/>
-				<input type="submit" value="Next"/><br/>
+				<input type="submit" value="Add"/><br/>
 
-				<p id="message"></p>
+				<p id="user_message"></p>
+			</form>
+
+			<hr/>
+
+			<form id="user_next_form">
+				<input type="submit" value="Next"/><br/>
 			</form>
 		</div>
 
