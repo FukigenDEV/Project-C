@@ -51,6 +51,12 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
+			//Check if password is an empty string, and send a 400 Bad Request if it is.
+			if (((string)Password).Length == 0) {
+				Send("Empty password", HttpStatusCode.BadRequest);
+				return;
+			}
+
 			//Check password. If its invalid, return a 401 Unauthorized
 			if (Account.PasswordHash != User.CreateHash((string)Password, (string)Email)) {
 				Send(StatusCode: HttpStatusCode.Unauthorized);
