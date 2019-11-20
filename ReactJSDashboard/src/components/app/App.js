@@ -18,7 +18,7 @@ class App extends Component {
       loggedin: { value: null },
       navs: [
         { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
-        { id: 1, heading: 'Admin', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'admin' },
+        { id: 1, heading: 'Admin', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
         { id: 2, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
         { id: 3, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
         { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
