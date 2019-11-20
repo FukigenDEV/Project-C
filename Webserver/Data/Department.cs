@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -47,5 +48,14 @@ namespace Webserver.Data {
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public static Department GetDepartmentByName(SQLiteConnection Connection, string name) => Connection.QueryFirstOrDefault<Department>("SELECT * FROM Departments WHERE Name = @Name", new { name });
+
+		/// <summary>
+		/// Returns true if the specified department exists, otherwise false.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public static bool Exists(SQLiteConnection Connection, string name) => GetDepartmentByName(Connection, name) != null;
+		public static bool Exists(SQLiteConnection Connection, int ID) => Connection.Get<Department>(ID) != null;
 	}
 }

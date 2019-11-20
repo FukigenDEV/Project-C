@@ -103,6 +103,10 @@ namespace Webserver {
 			if(AdministratorDept == null) {
 				Connection.Insert(new Department("Administrators", "Department for Administrators"));
 			}
+			Department UncategorizedDept = Connection.Get<Department>(2);
+			if(UncategorizedDept == null) {
+				Connection.Insert(new Department("All Users", "Default Department"));
+			}
 
 			//Set the Administrator account password. Create the Administrator account first if it doesn't exist already.
 			User Administrator = Connection.Get<User>(1);
