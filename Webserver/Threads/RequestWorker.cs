@@ -108,12 +108,15 @@ namespace Webserver.Threads {
 				if(CT.ContentType == "application/json") {
 					//Try to parse the JSON. If that failed for some reason, check if the response body is actually necessary.
 					//Return null if it isn't, return a 400 Bad Request if it is.
+					using StreamReader Reader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+					string JSONText = Reader.ReadToEnd();
 					try {
-						using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-						Endpoint.JSON = JObject.Parse(streamReader.ReadToEnd());
+						Endpoint.JSON = JObject.Parse(JSONText);
 					} catch (JsonReaderException e) {
 						if (Method.GetCustomAttribute<RequireBody>() != null) {
 							Log.Warning("Refused request for endpoint " + T.Name + ": Could not parse JSON");
+							Log.Debug("Message: " + e.Message);
+							Log.Debug("Received JSON: "+JSONText);
 							Utils.Send(Response, "Invalid JSON: " + e.Message, HttpStatusCode.BadRequest);
 							return;
 						}

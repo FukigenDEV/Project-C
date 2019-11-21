@@ -60,6 +60,9 @@ namespace Webserver.Data {
 			if(Columns.Keys.Intersect(ReservedColumns).Count() > 0) {
 				throw new ArgumentException("Cannot use reserved column names");
 			}
+			foreach (var _ in Columns.Keys.Where(Column => !Regex.IsMatch(Column, "[0-9A-Za-z_]")).Select(Column => new { })) {
+				throw new ArgumentException("Invalid column name. Column name must only contain letters, numbers, and underscores");
+			}
 			if (!Data.Department.Exists(Connection, DepartmentID) && DepartmentID != 2) {
 				throw new ArgumentException("Missing or invalid Department ID");
 			}
@@ -71,7 +74,7 @@ namespace Webserver.Data {
 			//Set fields
 			this.Connection = Connection;
 			this.Name = Name;
-			this.Department = Department;
+			this.Department = DepartmentID;
 			this.ReqValidation = RequireValidation;
 
 			//Add Validated column if necessary
@@ -88,7 +91,7 @@ namespace Webserver.Data {
 			SQL += string.Join(',', SQLColumns) + ")";
 
 			Connection.Execute(SQL);
-			Connection.Execute("INSERT INTO GenericTableConfigurations (Name, ReqValidation, Department) VALUES ('" + Name + "', " + (RequireValidation ? 1 : 0) + ", " + this.Department + ")");
+			Connection.Execute("INSERT INTO GenericTableConfigurations (Name, ReqValidation, Department) VALUES ('" + Name + "', " + (RequireValidation ? 1 : 0) + ", " + DepartmentID + ")");
 		}
 				
 		/// <summary>
