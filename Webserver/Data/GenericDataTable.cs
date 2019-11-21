@@ -393,23 +393,28 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
-		/// Returns true if a table exists with the specified name.
+		/// Returns true if the specified table exists.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Name"></param>
 		/// <returns></returns>
-		public static bool Exists(SQLiteConnection Connection, string Name) {
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT name FROM sqlite_master", Connection);
+		public static bool Exists(SQLiteConnection Connection, string Name) => Exists(Connection, new List<string>() { Name });
+		
+		/// <summary>
+		/// Returns true if all specified tables exist.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Name"></param>
+		/// <returns></returns>
+		public static bool Exists(SQLiteConnection Connection, List<string> Names) {
+			using SQLiteCommand CMD = new SQLiteCommand("SELECT name FROM GenericTableConfigurations", Connection);
 			using SQLiteDataReader Reader = CMD.ExecuteReader();
+			List<string> Columns = new List<string>();
 			while (Reader.Read()) {
 				NameValueCollection Row = Reader.GetValues();
-				foreach (string Column in new List<string>(Row.AllKeys)) {
-					if (Row[Column] == Name) {
-						return true;
-					}
-				}
+				Columns.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
 			}
-			return false;
+			return Names.Intersect(Columns).Count() == Names.Count();
 		}
 
 		/// <summary>
