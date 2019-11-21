@@ -2,11 +2,15 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using Webserver.Data;
+using static Dapper.SqlMapper;
 
 namespace Webserver {
 	static class Database {
@@ -86,13 +90,14 @@ namespace Webserver {
 				"FOREIGN KEY(User)	REFERENCES Users(ID) ON DELETE CASCADE" +
 			")");
 
-			Connection.Execute("CREATE TABLE IF NOT EXISTS GenericTableConfiguration (" +
-				"TableName			STRING PRIMARY KEY," +
+			Connection.Execute("CREATE TABLE IF NOT EXISTS GenericTableConfigurations (" +
+				"Name				STRING PRIMARY KEY," +
 				"ReqValidation		INTEGER," +
 				"Department			INTEGER NOT NULL," +
 				"FOREIGN KEY(Department) REFERENCES Departments(ID) ON UPDATE CASCADE" +
 			")");
 
+			//Check if all built-in system departments exist
 			Department AdministratorDept = Connection.Get<Department>(1);
 			if(AdministratorDept == null) {
 				Connection.Insert(new Department("Administrators", "Department for Administrators"));
