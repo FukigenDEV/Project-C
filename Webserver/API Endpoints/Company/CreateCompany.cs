@@ -13,6 +13,7 @@ namespace Webserver.API_Endpoints
     {
 		[RequireContentType("application/json")]
 		[RequireBody]
+		[PermissionLevel(PermLevel.Manager)]
 		public override void POST()
         {
 			// Get all required values
