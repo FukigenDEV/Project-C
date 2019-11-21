@@ -28,7 +28,7 @@ namespace Webserver.API_Endpoints {
 			JObject JSON;
 			if (RequestParams.ContainsKey("department")) {
 				//Get department. If no department is found, return a 404
-				Department Dept = Department.GetDepartmentByName(Connection, RequestParams["department"][0]);
+				Department Dept = Department.GetByName(Connection, RequestParams["department"][0]);
 				if(Dept == null) {
 					Send("No such department", HttpStatusCode.NotFound);
 					return;

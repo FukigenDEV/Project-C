@@ -154,7 +154,7 @@ namespace Webserver.Threads {
 				}
 
 				//Get department. If none was found, send 400 Bad Request
-				Department Dept = Department.GetDepartmentByName(Connection, DepartmentName);
+				Department Dept = Department.GetByName(Connection, DepartmentName);
 				if (Dept == null) {
 					Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
 					return;

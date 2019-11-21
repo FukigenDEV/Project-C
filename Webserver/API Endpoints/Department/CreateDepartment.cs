@@ -23,7 +23,7 @@ namespace Webserver.API_Endpoints
             }
 
 			//Check if the specified department exists. If it doesn't, send a 404 Not Found
-			Department department = Department.GetDepartmentByName(Connection, (string)name);
+			Department department = Department.GetByName(Connection, (string)name);
 			if (department != null) {
 				Send("Department already exists", HttpStatusCode.BadRequest);
 				return;
