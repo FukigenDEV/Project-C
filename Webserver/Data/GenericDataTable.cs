@@ -409,12 +409,26 @@ namespace Webserver.Data {
 		public static bool Exists(SQLiteConnection Connection, List<string> Names) {
 			using SQLiteCommand CMD = new SQLiteCommand("SELECT name FROM GenericTableConfigurations", Connection);
 			using SQLiteDataReader Reader = CMD.ExecuteReader();
-			List<string> Columns = new List<string>();
+			List<string> Rows = new List<string>();
 			while (Reader.Read()) {
 				NameValueCollection Row = Reader.GetValues();
-				Columns.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
+				Rows.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
 			}
-			return Names.Intersect(Columns).Count() == Names.Count();
+			return Names.Intersect(Rows).Count() == Names.Count();
+		}
+
+		public bool RowExists(SQLiteConnection Connection, string ID) => RowExists(Connection, new List<string>() { ID });
+		public bool RowExists(SQLiteConnection Connection, List<string> IDs) {
+#pragma warning disable CA2100
+			using SQLiteCommand CMD = new SQLiteCommand("SELECT rowid FROM "+this.Name, Connection);
+#pragma warning restore CA2100
+			using SQLiteDataReader Reader = CMD.ExecuteReader();
+			List<string> Rows = new List<string>();
+			while (Reader.Read()) {
+				NameValueCollection Row = Reader.GetValues();
+				Rows.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
+			}
+			return IDs.Intersect(Rows).Count() == IDs.Count();
 		}
 
 		/// <summary>
