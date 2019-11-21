@@ -39,7 +39,7 @@ namespace Webserver.API_Endpoints
 
             // Build and send response
             JObject JSON = JObject.FromObject(department);
-            Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
+            Send(JSON, HttpStatusCode.OK);
         }
     }
 }

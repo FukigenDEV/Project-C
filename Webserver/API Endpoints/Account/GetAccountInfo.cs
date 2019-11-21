@@ -45,7 +45,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Send response
-			Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
+			Send(JSON, HttpStatusCode.OK);
 		}
 	}
 }
