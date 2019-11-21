@@ -34,8 +34,8 @@ namespace Webserver.API_Endpoints
             // Store department to database
             Connection.Insert(newDepartment);
 
-            // Send success message
-            Send("Department successfully created", HttpStatusCode.OK);
-        }
-    }
+			// Send success message
+			Send(StatusCode: HttpStatusCode.Created);
+		}
+	}
 }

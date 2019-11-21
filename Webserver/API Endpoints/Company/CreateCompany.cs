@@ -34,8 +34,8 @@ namespace Webserver.API_Endpoints
             // Store companty to database
             Connection.Insert(company);
 
-            // Send success message
-            Send("Company successfully created", HttpStatusCode.OK);
-        }
-    }
+			// Send success message
+			Send(StatusCode: HttpStatusCode.Created);
+		}
+	}
 }
