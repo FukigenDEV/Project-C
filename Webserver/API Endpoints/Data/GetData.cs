@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using Webserver.Data;
 
-namespace Webserver.API_Endpoints.DataTable {
+namespace Webserver.API_Endpoints {
 	[EndpointURL("/data")]
 	partial class Data : APIEndpoint {
 
@@ -14,7 +14,7 @@ namespace Webserver.API_Endpoints.DataTable {
 		public override void GET() {
 			//Get required fields
 			if (!RequestParams.ContainsKey("table")) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 			int Begin = 0;

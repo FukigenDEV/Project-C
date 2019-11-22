@@ -12,13 +12,13 @@ namespace Webserver.API_Endpoints.DataTable {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void DELETE() {
 			// Get all required values
-			if (!JSON.TryGetValue<string>("Name", out JToken name)) {
+			if (!RequestParams.ContainsKey("table")) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//If table exists, delete it
-			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, (string)name);
+			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, RequestParams["table"][0]);
 			if(Table == null) {
 				Send("No such table", HttpStatusCode.BadRequest);
 				return;
