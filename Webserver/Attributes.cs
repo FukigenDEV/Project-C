@@ -29,12 +29,14 @@ namespace Webserver {
 	/// <summary>
 	/// If used on an endpoint method, any calls to this method will automatically be rejected with a 400 Bad Request if the request body is empty.
 	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
 	public sealed class RequireBody : Attribute { }
 
 	/// <summary>
 	/// If used on an endpoint method, any requests to it will only be accepted if the content type matches.
 	/// Will also be used to set the content type for the response sent using APIEndpoint.Send, unless manually overriden.
 	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
 	public sealed class RequireContentType : Attribute {
 		public string ContentType;
 		public RequireContentType(string ContentType) {

@@ -44,7 +44,7 @@
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
 				if (xhr.status === 200) {
-					window.location.href = "add_department.html";
+					window.location.href = "/admin_wizard/add_department.html";
 				} else {
 					$("#message").html(xhr.responseText);
 				}

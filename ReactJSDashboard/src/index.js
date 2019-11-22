@@ -24,6 +24,7 @@ import Notities from './components/pages/Notities';
 import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedenis';
 import Backup from './components/pages/Backup';
 import Uitloggen from './components/pages/Uitloggen';
+import AdminWizard from './components/pages/AdminWizard';
 import Error from './components/pages/Error';
 
 import * as serviceWorker from './serviceWorker';
@@ -53,5 +54,6 @@ export {
     Activiteitengeschiedenis,
     Backup,
     Uitloggen,
-    Error
+    Error,
+	AdminWizard
 }

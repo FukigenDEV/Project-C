@@ -1,7 +1,9 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Data.SQLite;
 
 namespace Webserver.Data
 {
@@ -74,5 +76,20 @@ namespace Webserver.Data
             this.PhoneNumber = PhoneNumber;
             this.Email = Email;
         }
+
+        /// <summary>
+        /// Lists all companies.
+        /// </summary>
+        /// <param name="Connection"></param>
+        /// <returns></returns>
+        public static List<Company> GetAllCompanies(SQLiteConnection Connection) => Connection.Query<Company>("SELECT * FROM Companies").AsList();
+
+        /// <summary>
+        /// Get a company's information using its name. Returns null if the company doesn't exist.
+        /// </summary>
+        /// <param name="Connection"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Company GetCompanyByName(SQLiteConnection Connection, string name) => Connection.QueryFirstOrDefault<Company>("SELECT * FROM Companies WHERE Name = @Name", new { name });
     }
 }

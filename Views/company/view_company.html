@@ -1,0 +1,39 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>View Company</title>
+</head>
+
+<body>
+	<p>View Company</p>
+
+	<form id="view_company_form" method="GET">
+		Company name: <input id="company_name" type="text" name="company_name"><br/>
+		<br/>
+		<input type="submit" value="View"><br/>
+
+		<p id="result"></p>
+	</form>
+
+	<script>
+	$("#view_company_form").on("submit", function(event) {
+		event.preventDefault();
+		
+		var name = $("#company_name").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("GET", "/company?name=" + name, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#result").html(xhr.responseText);
+			}
+		}
+
+		xhr.send();
+	});
+	</script>
+</body>

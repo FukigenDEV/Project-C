@@ -38,7 +38,7 @@ namespace Webserver.API_Endpoints {
 
 			//Check if the password is valid. If it isn't, send a 400 Bad Request.
 			Regex PasswordRx = new Regex((string)Config.GetValue("AuthenticationSettings.PasswordRegex"));
-			if (!PasswordRx.IsMatch((string)Password)) {
+			if (!PasswordRx.IsMatch((string)Password) || ((string)Password).Length == 0) {
 				Send("Password does not meet requirements", HttpStatusCode.BadRequest);
 				return;
 			}
