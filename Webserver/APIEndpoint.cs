@@ -109,6 +109,7 @@ namespace Webserver {
 		/// </summary>
 		public virtual void PATCH() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
 
+		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, null, StatusCode, null);
 		/// <summary>
 		/// Send JSON data to the client, answering the request.
 		/// </summary>
@@ -121,7 +122,7 @@ namespace Webserver {
 		/// <param name="Data">The data to send.</param>
 		/// <param name="StatusCode"></param>
 		/// <param name="ContentType"></param>,
-		public void Send(object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/html") => Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
+		public void Send(object Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/html") => Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
 
 		/// <summary>
 		/// Send a cookie to the client.
