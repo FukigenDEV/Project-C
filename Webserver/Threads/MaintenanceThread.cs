@@ -12,6 +12,7 @@ namespace Webserver.Threads {
 		public Logger Log;
 		public void Run(object _) {
 			Log.Debug("Executing maintenance tasks.");
+			DateTime Started = DateTime.Now;
 			SQLiteConnection Connection = Database.createConnection();
 
 			//Session cleanup
@@ -29,7 +30,8 @@ namespace Webserver.Threads {
 			Log.Debug("Cleaned up " + ToClean.Count + " sessions.");
 
 			Connection.Close();
-			Log.Debug("Maintenance complete.");
+			int TimeSpent = (int)(DateTime.Now - Started).TotalMilliseconds;
+			Log.Debug("Maintenance complete. Took "+TimeSpent+"ms");
 		}
 	}
 }
