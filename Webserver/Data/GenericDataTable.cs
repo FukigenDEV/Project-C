@@ -310,11 +310,24 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Data">A dictionary containing row IDs and dictionaries that contain keys (column names) and data</param>	
 		public void Update(Dictionary<int, Dictionary<string, dynamic>> Data) {
+			if (Data == null || Data.Count == 0) throw new ArgumentNullException(nameof(Data));
+
+			//Type-checking
+			Dictionary<string, DataType> Columns = GetColumns();
+			foreach(Dictionary<string, dynamic> Row in Data.Values) {
+				if (Row.Count == 0) throw new ArgumentException("No updates specified");
+				foreach(string Column in Row.Keys) {
+					if (!Columns.ContainsKey(Column)) throw new ArgumentException("Invalid column: "+Column);
+					if (Columns[Column] == DataType.Integer && Row[Column].GetType() != typeof(int)) throw new ArgumentException("Column " + Column + " can only contain integers");
+				}
+			}
+
+			//Build and execute SQL
 			string QueryList = "";
 			foreach(int Row in Data.Keys) {
 				List<string> ColumnUpdates = new List<string>();
 				foreach(string Column in Data[Row].Keys) {
-					ColumnUpdates.Add(Column + " = '" + Data[Row][Column]+"'");
+					ColumnUpdates.Add(Column + " = '" + Data[Row][Column].ToString()+"'");
 				}
 
 				QueryList += "UPDATE " + this.Name + " SET " + string.Join(',', ColumnUpdates) + " WHERE rowid = " + Row + ";\n";
@@ -343,18 +356,30 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Data">A list of dictionaries containing keys (column names) and data</param>
 		public void Insert(List<Dictionary<string, dynamic>> Data) {
+			if (Data == null || Data.Count == 0) throw new ArgumentNullException(nameof(Data));
+
+			//Type-checking
+			Dictionary<string, DataType> Columns = GetColumns();
+			foreach (Dictionary<string, dynamic> Row in Data) {
+				if (Row.Count == 0) throw new ArgumentException("No updates specified");
+				foreach (string Column in Row.Keys) {
+					if (!Columns.ContainsKey(Column)) throw new ArgumentException("Invalid column: " + Column);
+					if (Columns[Column] == DataType.Integer && Row[Column].GetType() != typeof(int)) throw new ArgumentException("Column " + Column + " can only contain integers");
+				}
+			}
+
 			//Check columns
-			List<string> Columns = GetColumns().Keys.ToList();
-			foreach (var Key in Data.SelectMany(Row => Row.Keys.Where(Key => !Columns.Contains(Key)).Select(Key => Key))) {
+			List<string> ColumNames = Columns.Keys.ToList();
+			foreach (var Key in Data.SelectMany(Row => Row.Keys.Where(Key => !ColumNames.Contains(Key)).Select(Key => Key))) {
 				throw new ArgumentException("No such column: " + Key);
 			}
-			Columns.Remove("rowid");
+			ColumNames.Remove("rowid");
 
 			//Create query
 			List<string> Values = new List<string>();
 			foreach(Dictionary<string, dynamic> Row in Data) {
 				List<string> Value = new List<string>();
-				foreach (string Column in Columns) {
+				foreach (string Column in ColumNames) {
 					if (Row.ContainsKey(Column)) {
 						Value.Add("'"+Row[Column]+"'");
 					} else {
@@ -363,7 +388,7 @@ namespace Webserver.Data {
 				}
 				Values.Add("(" + string.Join(',', Value) + ")");
 			}
-			string SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', Columns) + ") VALUES " + string.Join(',', Values);
+			string SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumNames) + ") VALUES " + string.Join(',', Values);
 			Connection.Execute(SQL);
 		}
 
