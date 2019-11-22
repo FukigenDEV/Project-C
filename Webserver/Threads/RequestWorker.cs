@@ -199,7 +199,14 @@ namespace Webserver.Threads {
 			//Switch to the request's HTTP method
 			switch (Request.HttpMethod) {
 				case "GET":
-					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
+					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch {
+						".css" => "text/css",
+						".png" => "image/png",
+						".js" => "text/javascript",
+						".jpg" => "image/jpeg",
+						".jpeg" => "image/jpeg",
+						_ => "text/html"
+					});
 					return;
 
 				case "HEAD":
