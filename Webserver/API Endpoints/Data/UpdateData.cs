@@ -9,6 +9,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	partial class Data : APIEndpoint {
 
+		[RequireBody]
 		[RequireContentType("application/json")]
 		public override void PATCH() {
 			//Get required fields

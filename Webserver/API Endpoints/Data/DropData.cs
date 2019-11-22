@@ -1,20 +1,24 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using Webserver.Data;
+using System.Linq;
 
 namespace Webserver.API_Endpoints {
 	partial class Data : APIEndpoint {
 
 		[RequireBody]
 		[RequireContentType("application/json")]
-		public override void POST() {
+		public override void DELETE() {
 			//Get required fields
 			if (!RequestParams.ContainsKey("table")) {
 				Send("Missing params", HttpStatusCode.BadRequest);
+				return;
+			}
+			if(!JSON.TryGetValue<JArray>("RowIDs", out JToken RowIDs)) {
+				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
@@ -25,20 +29,9 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
-			//Build insertion dict
-			List<string> Columns = Table.GetColumns().Keys.ToList();
-			Dictionary<string, dynamic> Dict = new Dictionary<string, dynamic>();
-			foreach(KeyValuePair<string, JToken> Entry in JSON) {
-				if (!Columns.Contains(Entry.Key)) {
-					Send("No such column: " + Entry.Key);
-					return;
-				}
-				Dict.Add(Entry.Key, Entry.Value);
-			}
-
-			//Insert data and return response
-			Table.Insert(Dict);
-			Send(HttpStatusCode.Created);
+			List<int> IDs = (((JArray)RowIDs).Where(ID => ID.Type == JTokenType.Integer).Select(ID => (int)ID)).ToList();
+			Table.Delete(IDs);
+			Send(HttpStatusCode.OK);
 		}
 	}
 }
