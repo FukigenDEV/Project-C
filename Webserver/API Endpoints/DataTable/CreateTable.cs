@@ -11,6 +11,7 @@ namespace Webserver.API_Endpoints.DataTable {
 	partial class DataTable : APIEndpoint {
 		[RequireBody]
 		[RequireContentType("application/json")]
+		[PermissionLevel(PermLevel.Manager)]
 		public override void POST() {
 			//Get all required fields
 			if (

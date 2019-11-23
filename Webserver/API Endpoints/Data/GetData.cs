@@ -11,6 +11,7 @@ namespace Webserver.API_Endpoints {
 	partial class Data : APIEndpoint {
 
 		[RequireContentType("application/json")]
+		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
 			if (!RequestParams.ContainsKey("table")) {

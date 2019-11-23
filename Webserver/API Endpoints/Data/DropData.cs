@@ -11,6 +11,7 @@ namespace Webserver.API_Endpoints {
 
 		[RequireBody]
 		[RequireContentType("application/json")]
+		[PermissionLevel(PermLevel.User)]
 		public override void DELETE() {
 			//Get required fields
 			if (!RequestParams.ContainsKey("table")) {
