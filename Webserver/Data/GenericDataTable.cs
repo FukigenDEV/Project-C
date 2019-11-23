@@ -22,6 +22,8 @@ namespace Webserver.Data {
 		public bool ReqValidation { get; set; }
 		public int Department { get; set; }
 
+		public const string RX = "[A-z]{1}[0-9A-Za-z_]*";
+
 		/// <summary>
 		/// List of reserved table names
 		/// </summary>
@@ -51,7 +53,7 @@ namespace Webserver.Data {
 		/// <param name="RequireValidation">Whether or not entries in the table must be validated by a manager. If true, a hidden "Validated" column will be added.</param>
 		public GenericDataTable(SQLiteConnection Connection, string Name, Dictionary<string, DataType> Columns, int DepartmentID = 2, bool RequireValidation = false){
 			//Validate args
-			if (!Regex.IsMatch(Name, "[0-9A-Za-z_]") || ReservedTables.Contains(Name)) {
+			if (!Regex.IsMatch(Name, RX) || ReservedTables.Contains(Name)) {
 				throw new ArgumentException("Invalid table name. Table names can only contain letters, numbers, and underscores. Also note that some names are reserved.");
 			}
 			if(Columns.Count == 0) {
@@ -60,7 +62,7 @@ namespace Webserver.Data {
 			if(Columns.Keys.Intersect(ReservedColumns).Count() > 0) {
 				throw new ArgumentException("Cannot use reserved column names");
 			}
-			foreach (var _ in Columns.Keys.Where(Column => !Regex.IsMatch(Column, "[0-9A-Za-z_]")).Select(Column => new { })) {
+			foreach (var _ in Columns.Keys.Where(Column => !Regex.IsMatch(Column, RX)).Select(Column => new { })) {
 				throw new ArgumentException("Invalid column name. Column name must only contain letters, numbers, and underscores");
 			}
 			if (!Data.Department.Exists(Connection, DepartmentID) && DepartmentID != 2) {
@@ -122,7 +124,7 @@ namespace Webserver.Data {
 		/// <param name="Name"></param>
 		/// <param name="DT"></param>
 		public void AddColumn(string Name, DataType DT = DataType.String) {
-			if(!Regex.IsMatch(Name, "[0-9A-Za-z_]")) {
+			if(!Regex.IsMatch(Name, RX)) {
 				throw new ArgumentException("Invalid column name. Column name must only contain letters, numbers, and underscores");
 			}
 			if (ReservedColumns.Contains(Name)) {
@@ -141,6 +143,16 @@ namespace Webserver.Data {
 			this.ReqValidation = true;
 			Connection.Update<GenericDataTable>(this);
 			Connection.Execute("ALTER TABLE " + this.Name + " ADD COLUMN Validated Integer DEFAULT 0");
+		}
+
+		/// <summary>
+		/// Rename multiple columns from the table.
+		/// </summary>
+		/// <param name="Columns"></param>
+		public void RenameColumn(Dictionary<string, string> Columns) {
+			foreach(var Entry in Columns) {
+				RenameColumn(Entry.Key, Entry.Value);
+			}
 		}
 
 		/// <summary>
@@ -173,26 +185,28 @@ namespace Webserver.Data {
 			SQL += string.Join(',', SQLColumns) + ")";
 			Connection.Execute(SQL);
 
-			//Restore all data
-			List<string> ColumnNames = Columns.Keys.AsList();
-			SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumnNames) + ") VALUES ";
-			List<string> Values = new List<string>();
-			foreach (IDictionary<string, object> Row in Data) {
-				List<string> Cells = new List<string>();
-				foreach (string Key in Row.Keys) {
-					Cells.Add("'"+Row[Key].ToString()+"'");
+			//Restore all data if necessary
+			if(Data.Count > 0){
+				List<string> ColumnNames = Columns.Keys.AsList();
+				SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumnNames) + ") VALUES ";
+				List<string> Values = new List<string>();
+				foreach (IDictionary<string, object> Row in Data) {
+					List<string> Cells = new List<string>();
+					foreach (string Key in Row.Keys) {
+						Cells.Add("'" + Row[Key].ToString() + "'");
+					}
+					Values.Add("(" + string.Join(',', Cells) + ")");
 				}
-				Values.Add("(" + string.Join(',', Cells) + ")");
+				SQL += string.Join(',', Values);
+				Connection.Execute(SQL);
 			}
-			SQL += string.Join(',', Values);
-			Connection.Execute(SQL);
 		}
 
 		/// <summary>
 		/// Remove multiple columns from the table.
 		/// </summary>
 		/// <param name="Columns"></param>
-		public void DropColumns(List<string> Columns) => Columns.ForEach(DropColumn);
+		public void DropColumn(List<string> Columns) => Columns.ForEach(DropColumn);
 
 		/// <summary>
 		/// Remove a column from the table
