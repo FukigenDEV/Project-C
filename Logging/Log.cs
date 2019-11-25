@@ -102,6 +102,8 @@ namespace Logging {
 		/// </summary>
 		private void AdvanceFile() {
 			DateTime CreationDate = File.GetCreationTime("Logs\\latest.log");
+			File.SetCreationTime("Logs\\latest.log", DateTime.Now);
+			File.SetCreationTime("Logs\\latest_err.log", DateTime.Now);
 
 			//Close stdout and stderr streams if they exist.
 			stderr?.Close();
@@ -126,7 +128,7 @@ namespace Logging {
 			//Delete temp folder
 			Directory.Delete("Logs\\temp", true);
 
-			//Create new log files
+			//Create new log files	
 			stdout = File.CreateText("Logs\\latest.log");
 			stderr = File.CreateText("Logs\\latest_err.log");
 		}
