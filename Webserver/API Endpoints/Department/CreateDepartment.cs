@@ -14,11 +14,20 @@ namespace Webserver.API_Endpoints
 		[RequireBody]
 		public override void POST()
         {
-            // Get all required values
-            if (!JSON.TryGetValue<string>("name", out JToken name) ||
-                !JSON.TryGetValue<string>("description", out JToken description))
+            // Check if values can be cast to a string
+            if (JSON.TryGetValue<string>("name", out JToken name) &&
+                JSON.TryGetValue<string>("description", out JToken description))
             {
-                Send("Missing fields", HttpStatusCode.BadRequest);
+                //Check if values are at least 1 character
+                if (((string)name).Length < 1 || ((string)description).Length < 1)
+                {
+                    Send("Please fill in all fields", HttpStatusCode.BadRequest);
+                    return;
+                }
+            }
+            else
+            {
+                Send("Expected a string", HttpStatusCode.BadRequest);
                 return;
             }
 
