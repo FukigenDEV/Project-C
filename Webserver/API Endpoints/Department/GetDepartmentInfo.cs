@@ -11,7 +11,6 @@ namespace Webserver.API_Endpoints
     [EndpointURL("/department")]
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-		[RequireContentType("application/json")]
 		public override void GET()
         {
             // Get required fields

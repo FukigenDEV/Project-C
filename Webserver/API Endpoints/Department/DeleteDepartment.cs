@@ -10,8 +10,6 @@ namespace Webserver.API_Endpoints
 {
     internal partial class DepartmentEndPoint : APIEndpoint
     {
-		[RequireContentType("application/json")]
-		[RequireBody]
 		public override void DELETE()
         {
 			// Get required fields
