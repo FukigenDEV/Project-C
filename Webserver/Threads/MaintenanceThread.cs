@@ -13,7 +13,7 @@ namespace Webserver.Threads {
 		public void Run(object _) {
 			Log.Debug("Executing maintenance tasks.");
 			DateTime Started = DateTime.Now;
-			SQLiteConnection Connection = Database.createConnection();
+			SQLiteConnection Connection = Database.CreateConnection();
 
 			//Session cleanup
 			Log.Debug("Cleaning up expired user sessions...");
@@ -29,9 +29,11 @@ namespace Webserver.Threads {
 			}
 			Log.Debug("Cleaned up " + ToClean.Count + " sessions.");
 
+			//Create backup
+			BackupManager.CreateBackup();
+
 			Connection.Close();
-			int TimeSpent = (int)(DateTime.Now - Started).TotalMilliseconds;
-			Log.Debug("Maintenance complete. Took "+TimeSpent+"ms");
+			this.Log.Debug("Maintenance complete. Took "+ (int)(DateTime.Now - Started).TotalMilliseconds + "ms");
 		}
 	}
 }

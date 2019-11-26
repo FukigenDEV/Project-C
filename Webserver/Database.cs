@@ -14,7 +14,6 @@ using static Dapper.SqlMapper;
 
 namespace Webserver {
 	static class Database {
-		public const string ConnectionString = "Data Source=Database.db;foreign keys=true";
 		private static readonly Logger Log = Program.Log;
 
 		/// <summary>
@@ -30,7 +29,7 @@ namespace Webserver {
 			}
 
 			//Connect to it
-			using SQLiteConnection Connection = createConnection();
+			using SQLiteConnection Connection = CreateConnection();
 
 			//Create tables if they don't already exist.
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Functions (" +
@@ -119,8 +118,8 @@ namespace Webserver {
 			}
 		}
 
-		public static SQLiteConnection createConnection() {
-			SQLiteConnection Connection = new SQLiteConnection(ConnectionString);
+		public static SQLiteConnection CreateConnection() {
+			SQLiteConnection Connection = new SQLiteConnection("Data Source=Database.db;foreign keys=true");
 			Connection.Open();
 			return (Connection);
 		}

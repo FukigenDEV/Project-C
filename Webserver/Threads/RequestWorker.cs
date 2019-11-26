@@ -23,7 +23,7 @@ namespace Webserver.Threads {
 		public RequestWorker(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
 			this.Log = Log;
 			this.Queue = Queue;
-			this.Connection = Database.createConnection();
+			this.Connection = Database.CreateConnection();
 		}
 
 		public void Run() {
