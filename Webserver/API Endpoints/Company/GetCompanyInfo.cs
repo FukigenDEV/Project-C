@@ -10,8 +10,6 @@ namespace Webserver.API_Endpoints
 {
     internal partial class CompanyEndpoint : APIEndpoint
     {
-        [RequireContentType("application/json")]
-		[RequireBody]
         public override void GET()
         {
             // Get required fields
