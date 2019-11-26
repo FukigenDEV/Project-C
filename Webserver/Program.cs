@@ -77,7 +77,7 @@ namespace Webserver {
 			MaintenanceThread MT = new MaintenanceThread {
 				Log = Log
 			};
-			Timer Maintenance = new Timer(MT.Run, null, 0, 60 * 60 * 1000);
+			Timer Maintenance = new Timer(MT.Run, null, 0, 3600 * 1000);
 
 			Log.Info("Type 'Exit' to exit.");
 			while(Console.ReadLine().ToLower() != "exit");
