@@ -16,7 +16,7 @@ namespace Webserver.API_Endpoints
         public override void PATCH()
         {
             // Get required fields
-            if (!Content.TryGetValue<string>("title", out JToken title))
+            if (!JSON.TryGetValue<string>("title", out JToken title))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
@@ -31,13 +31,13 @@ namespace Webserver.API_Endpoints
             }
 
             // Change title if necessary
-            if (Content.TryGetValue<string>("newTitle", out JToken newTitle))
+            if (JSON.TryGetValue<string>("newTitle", out JToken newTitle))
             {
                 note.Title = (string)newTitle;
             }
 
             // Change text if necessary
-            if (Content.TryGetValue<string>("newText", out JToken newText))
+            if (JSON.TryGetValue<string>("newText", out JToken newText))
             {
                 note.Text = (string)newText;
             }

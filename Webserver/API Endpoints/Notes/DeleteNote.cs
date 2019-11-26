@@ -14,7 +14,7 @@ namespace Webserver.API_Endpoints
         public override void DELETE()
         {
             // Get required fields
-            if (!Content.TryGetValue<string>("title", out JToken title))
+            if (!JSON.TryGetValue<string>("title", out JToken title))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
