@@ -10,17 +10,44 @@ class manDepartments extends Component {
         type: 0,
         value: ''
       },
-      data: []
+      data: [],
+      delete: ''
     }
   }
 
   componentDidMount() {
+    this.getDepartments();
+  }
+
+  componentDidUpdate(prevState) {
+    if(prevState.delete !== this.state.delete) {
+      this.getDepartments();
+    }
+  }
+
+  getDepartments = () => {
     fetch('/department?name=')
     .then(departments => {
       return departments.json();
     }).then(data => {
       this.setState({data});
     })
+  }
+
+  handleDelete = name => {
+    const obj = {name: name};
+    const data = JSON.stringify(obj);
+
+    fetch(`/department`, {
+      method: 'DELETE',
+      body: data,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+
+    this.setState({delete: name});
+    console.log(this.state);
   }
 
   render() {
@@ -43,7 +70,7 @@ class manDepartments extends Component {
               <td>{department.Name}</td>
               <td>{department.Description}</td>
               <td><Link>Edit</Link></td>
-              <td><Link>Delete</Link></td>
+              <td><a href onClick={() => this.handleDelete(department.Name)}>Delete</a></td>
             </tr>
           ))}
           </tbody>

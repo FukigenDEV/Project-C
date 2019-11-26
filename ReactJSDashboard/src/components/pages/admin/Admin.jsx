@@ -15,6 +15,7 @@ class Admin extends Component {
         </div>
 
         <div className="shadow-sm p-3 mb-5 bg-white rounded">
+          <Route exact path="/dashboard/Admin" component={Users} />
           <Route path="/dashboard/Admin/users" component={Users} />
           <Route path="/dashboard/Admin/departments" component={Departments} />
           <Route path="/dashboard/Admin/company" component={Company} />
