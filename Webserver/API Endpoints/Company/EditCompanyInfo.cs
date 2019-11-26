@@ -17,7 +17,7 @@ namespace Webserver.API_Endpoints
         public override void PATCH()
         {
 			// Get required fields
-			if (RequestParams.ContainsKey("name")) {
+			if (!RequestParams.ContainsKey("name")) {
 				Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}

@@ -13,7 +13,7 @@ namespace Webserver.API_Endpoints
         public override void DELETE()
         {
             // Get required fields
-            if (RequestParams.ContainsKey("name"))
+            if (!RequestParams.ContainsKey("name"))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
