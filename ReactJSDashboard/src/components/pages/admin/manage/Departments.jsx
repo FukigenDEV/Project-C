@@ -19,12 +19,6 @@ class manDepartments extends Component {
     this.getDepartments();
   }
 
-  componentDidUpdate(prevState) {
-    if(prevState.delete !== this.state.delete) {
-      this.getDepartments();
-    }
-  }
-
   getDepartments = () => {
     fetch('/department?name=')
     .then(departments => {
@@ -35,17 +29,7 @@ class manDepartments extends Component {
   }
 
   handleDelete = name => {
-    const obj = {name: name};
-    const data = JSON.stringify(obj);
-
-    fetch(`/department`, {
-      method: 'DELETE',
-      body: data,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    });
-
+    fetch(`/department?name=${name}`, {method: 'DELETE'});
     this.setState({delete: name});
     console.log(this.state);
   }
@@ -53,6 +37,7 @@ class manDepartments extends Component {
   render() {
     return (
       <React.Fragment>
+        <div className="d-none">{this.state.delete}</div>
         <table className="table table-striped table-dark">
         <thead>
           <tr>
