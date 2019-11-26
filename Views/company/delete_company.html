@@ -1,0 +1,40 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Delete Company</title>
+</head>
+
+<body>
+	<p>Delete a Company</p>
+
+	<form id="delete_company_form" method="DELETE">
+		Company name: <input id="company_name" type="text" name="company_name"><br/>
+		<br/>
+		<input type="submit" value="Delete"><br/>
+
+		<p id="result"></p>
+	</form>
+
+	<script>
+	$("#delete_company_form").on("submit", function(event) {
+		event.preventDefault();
+
+		var name = $("#company_name").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("DELETE", "/company", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#result").html(xhr.responseText);
+			}
+		}
+		
+		var data = JSON.stringify({"name": name});
+		xhr.send(data);
+	});
+	</script>
+</body>

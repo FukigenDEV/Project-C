@@ -1,0 +1,40 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Delete Department</title>
+</head>
+
+<body>
+	<p>Delete a Department</p>
+
+	<form id="delete_department_form" method="DELETE">
+		Department name: <input id="department_name" type="text" name="department_name"><br/>
+		<br/>
+		<input type="submit" value="Delete"><br/>
+
+		<p id="result"></p>
+	</form>
+
+	<script>
+	$("#delete_department_form").on("submit", function(event) {
+		event.preventDefault();
+
+		var name = $("#department_name").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("DELETE", "/department", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#result").html(xhr.responseText);
+			}
+		}
+		
+		var data = JSON.stringify({"name": name});
+		xhr.send(data);
+	});
+	</script>
+</body>
