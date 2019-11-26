@@ -11,7 +11,6 @@ namespace Webserver.API_Endpoints {
 	class BackupEndpoint : APIEndpoint {
 		private readonly string BackupDir = (string)Config.GetValue("BackupSettings.BackupFolder");
 		[PermissionLevel(PermLevel.Administrator)]
-		[RequireContentType("application/json")]
 		public override void GET() {
 			if (RequestParams.ContainsKey("name")) {
 				string Name = RequestParams["name"][0];

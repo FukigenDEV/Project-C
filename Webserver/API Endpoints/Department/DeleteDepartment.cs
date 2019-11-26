@@ -14,21 +14,21 @@ namespace Webserver.API_Endpoints
 		[RequireBody]
 		public override void DELETE()
         {
-            // Get required fields
-            if (!JSON.TryGetValue<string>("name", out JToken name))
-            {
-                Send("Missing fields", HttpStatusCode.BadRequest);
-                return;
-            }
+			// Get required fields
+			if (!RequestParams.ContainsKey("name")) {
+				Send("Missing params", HttpStatusCode.BadRequest);
+				return;
+			}
+			string Name = RequestParams["name"][0];
 
 			//Don't allow users to delete the Administrators and All Users departments.
-			if((string) name == "Administrators" || (string)name == "All Users") {
+			if (Name == "Administrators" || Name == "All Users") {
 				Send("Cannot delete system department", HttpStatusCode.Forbidden);
 				return;
 			}
 
             //Check if the specified department exists. If it doesn't, send a 404 Not Found
-            Department department = Department.GetByName(Connection, (string)name);
+            Department department = Department.GetByName(Connection, Name);
             if (department == null)
             {
                 Send("No such department", HttpStatusCode.NotFound);

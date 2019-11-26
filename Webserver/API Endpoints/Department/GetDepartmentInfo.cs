@@ -17,11 +17,11 @@ namespace Webserver.API_Endpoints
             // Get required fields
             if (!RequestParams.ContainsKey("name"))
             {
-                Send("Missing fields", HttpStatusCode.BadRequest);
+                Send("Missing params", HttpStatusCode.BadRequest);
                 return;
             }
 
-            if (RequestParams["name"][0] == "")
+            if (RequestParams["name"][0].Length == 0)
             {
                 List<Department> departments = Department.GetAllDepartments(Connection);
                 Send(JsonConvert.SerializeObject(departments), HttpStatusCode.OK);
