@@ -8,7 +8,7 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    internal partial class CompanyEndPoint : APIEndpoint
+    internal partial class CompanyEndpoint : APIEndpoint
     {
         public override void DELETE()
         {

@@ -9,7 +9,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints
 {
     [EndpointURL("/company")]
-    internal partial class CompanyEndPoint : APIEndpoint
+    internal partial class CompanyEndpoint : APIEndpoint
     {
         [RequireContentType("application/json")]
         public override void GET()
@@ -21,7 +21,7 @@ namespace Webserver.API_Endpoints
                 return;
             }
 
-            if (RequestParams["name"][0] == "")
+            if (string.IsNullOrEmpty(RequestParams["name"][0]))
             {
                 List<Company> companies = Company.GetAllCompanies(Connection);
                 Send(JsonConvert.SerializeObject(companies), HttpStatusCode.OK);
