@@ -17,7 +17,7 @@ namespace Webserver.API_Endpoints
             // Get required fields
             if (!RequestParams.ContainsKey("title"))
             {
-                Send("Missing fields", HttpStatusCode.BadRequest);
+                Send("Missing params", HttpStatusCode.BadRequest);
                 return;
             }
 

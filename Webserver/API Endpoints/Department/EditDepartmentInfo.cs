@@ -16,15 +16,14 @@ namespace Webserver.API_Endpoints
 		[RequireBody]
 		public override void PATCH()
         {
-            // Get required fields
-            if (!JSON.TryGetValue<string>("name", out JToken name))
-            {
-                Send("Missing fields", HttpStatusCode.BadRequest);
-                return;
-            }
+			// Get required fields
+			if (!RequestParams.ContainsKey("name")) {
+				Send("Missing params", HttpStatusCode.BadRequest);
+				return;
+			}
 
-            // Check if the specified department exists. If it doesn't, send a 404 Not Found
-            Department department = Department.GetByName(Connection, (string)name);
+			// Check if the specified department exists. If it doesn't, send a 404 Not Found
+			Department department = Department.GetByName(Connection, RequestParams["name"][0]);
             if (department == null)
             {
                 Send("No such department", HttpStatusCode.NotFound);
