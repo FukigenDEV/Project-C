@@ -7,8 +7,6 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints.DataTable {
 	partial class DataTable : APIEndpoint {
-		[RequireBody]
-		[RequireContentType("application/json")]
 		[PermissionLevel(PermLevel.Manager)]
 		public override void DELETE() {
 			// Get all required values
