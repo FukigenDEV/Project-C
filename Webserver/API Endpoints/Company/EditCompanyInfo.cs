@@ -12,25 +12,25 @@ namespace Webserver.API_Endpoints
 {
     internal partial class CompanyEndpoint : APIEndpoint
     {
+		[RequireBody]
+		[RequireContentType("application/json")]
         public override void PATCH()
         {
-            // Get required fields
-            if (!JSON.TryGetValue<string>("name", out JToken name))
-            {
-                Send("Missing fields", HttpStatusCode.BadRequest);
-                return;
-            }
+			// Get required fields
+			if (RequestParams.ContainsKey("name")) {
+				Send("Missing fields", HttpStatusCode.BadRequest);
+				return;
+			}
 
-            // Check if the specified company exists. If it doesn't, send a 404 Not Found
-            Company company = Company.GetCompanyByName(Connection, (string)name);
-            if (company == null)
-            {
-                Send("No such company", HttpStatusCode.NotFound);
-                return;
-            }
+			//Check if the specified company exists. If it doesn't, send a 404 Not Found
+			Company company = Company.GetCompanyByName(Connection, RequestParams["name"][0]);
+			if (company == null) {
+				Send("No such company", HttpStatusCode.NotFound);
+				return;
+			}
 
-            // Change necessary fields
-            if (JSON.TryGetValue<string>("newName", out JToken newName))
+			// Change necessary fields
+			if (JSON.TryGetValue<string>("newName", out JToken newName))
                 company.Name = (string)newName;
             if (JSON.TryGetValue<string>("newStreet", out JToken newStreet))
                 company.Street = (string)newStreet;

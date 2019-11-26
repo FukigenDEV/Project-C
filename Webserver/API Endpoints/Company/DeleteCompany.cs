@@ -13,14 +13,14 @@ namespace Webserver.API_Endpoints
         public override void DELETE()
         {
             // Get required fields
-            if (!JSON.TryGetValue<string>("name", out JToken name))
+            if (RequestParams.ContainsKey("name"))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
             }
 
             //Check if the specified company exists. If it doesn't, send a 404 Not Found
-            Company company = Company.GetCompanyByName(Connection, (string)name);
+            Company company = Company.GetCompanyByName(Connection, RequestParams["name"][0]);
             if (company == null)
             {
                 Send("No such company", HttpStatusCode.NotFound);
