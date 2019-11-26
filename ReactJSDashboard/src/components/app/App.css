@@ -60,13 +60,25 @@ th, td {
 }
 
 .nav-icon {
-  font-size: 2em;
+  font-size: 1em;
   display: inline;
-  padding-left: 5px;
+  padding: 0 5px 0 5px;
 }
 
 .navvv {
   background-color: purple;
+}
+
+.logout-button {
+  background: #3d85c6;
+  background: linear-gradient(#3d85c6, #073763);
+  border-radius: 5px;
+  padding: 20px 40px;
+  color: #ffffff;
+  display: block;
+  font: normal bold 24px/1 "Calibri", sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px #000000;
 }
 
 @media only screen and (min-width: 768px) {
@@ -86,14 +98,61 @@ th, td {
   width: auto;
 }
 
-.login-form input,button {
+.login-form input, button {
   width: 350px;
 }
 
 .vertical-center {
-  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-  min-height: 100vh; /* These two lines are counted as one :-)       */
-
+  min-height: 100%;
+  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh;
+  /* These two lines are counted as one :-)       */
   display: flex;
   align-items: center;
+}
+
+/* Admin nav */
+
+.nav ul {
+  list-style: none;
+  background-color: #444;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+.nav li {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+  line-height: 40px;
+  height: 40px;
+  border-bottom: 1px solid #888;
+  display: inline-block;
+  margin-right: -4px;
+}
+ 
+.nav a {
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  transition: .3s background-color;
+}
+ 
+.nav a:hover {
+  background-color: #005f5f;
+}
+ 
+.nav a.active {
+  background-color: #fff;
+  color: #444;
+  cursor: default;
+}
+
+@media screen and (min-width: 600px) {
+  .nav li {
+    width: 120px;
+    border-bottom: none;
+    height: 50px;
+    line-height: 50px;
+    font-size: 1.4em;
+  }
 }

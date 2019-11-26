@@ -55,6 +55,12 @@ namespace Webserver {
             "Description        STRING" +
             ")");
 
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Notes (" +
+            "ID                 INTEGER PRIMARY KEY," +
+            "Title              STRING NOT NULL," +
+            "Text               STRING" +
+            ")");
+
             Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
 				"User				INTEGER NOT NULL," +
 				"Permission			INTEGER NOT NULL," +

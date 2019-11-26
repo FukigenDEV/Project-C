@@ -1,0 +1,45 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Edit Note</title>
+</head>
+
+<body>
+	<p>Edit Note</p>
+
+	<form id="edit_note_form" method="GET">
+		Note title: <input id="note_title" type="text" name="note_title"><br/>
+		<br/>
+		New note title: <input id="new_note_title" type="text" name="new_note_title"><br/>
+		New note text: <input id="new_note_text" type="text" name="new_note_text"><br/>
+		<br/>
+		<input type="submit" value="Edit"><br/>
+
+		<p id="result"></p>
+	</form>
+
+	<script>
+	$("#edit_note_form").on("submit", function(event) {
+		event.preventDefault();
+		
+		var title = $("#note_title").val();
+		var newTitle = $("#new_note_title").val();
+		var newText = $("#new_text_title").val();
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("PATCH", "/note", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#result").html(xhr.responseText);
+			}
+		}
+
+		var data = JSON.stringify({"title": title, "newTitle": newTitle, "newText": newText});
+		xhr.send(data);
+	});
+	</script>
+</body>
