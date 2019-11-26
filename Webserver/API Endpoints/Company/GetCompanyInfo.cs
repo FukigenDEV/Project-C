@@ -8,7 +8,6 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints
 {
-    [EndpointURL("/company")]
     internal partial class CompanyEndpoint : APIEndpoint
     {
         [RequireContentType("application/json")]
