@@ -30,7 +30,7 @@ namespace Webserver.Threads {
 			Log.Debug("Cleaned up " + ToClean.Count + " sessions.");
 
 			//Create backup
-			BackupManager.CreateBackup();
+			//BackupManager.CreateBackup();
 
 			Connection.Close();
 			this.Log.Debug("Maintenance complete. Took "+ (int)(DateTime.Now - Started).TotalMilliseconds + "ms");
