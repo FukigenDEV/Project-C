@@ -66,7 +66,6 @@ namespace Webserver {
 					}
 					Result.Add(Code, Item.Replace('\\', '/').ToLower());
 				}
-
 			}
 
 			return Result;

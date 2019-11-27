@@ -34,8 +34,10 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length-1);
+
 				if (URL == null) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.LocalPath.ToLower());
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.RawUrl.ToLower());
 					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
@@ -98,6 +100,20 @@ namespace Webserver.Threads {
 			foreach (string key in Request.QueryString) {
 				Endpoint.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 			}
+
+			//Set access control headers
+			List<string> AllowedMethods = new List<string>();
+			foreach ( MethodInfo M in T.GetMethods() ) {
+				if ( M.DeclaringType == GetType() ) {
+					AllowedMethods.Add(M.Name);
+				}
+			}
+			string Origin = Request.Headers.Get("Origin");
+			if ( Program.CORSAddresses.Contains(Origin + '/') ) {
+				Response.Headers.Add("Access-Control-Allow-Origin", Origin);
+			}
+			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
+			Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
 			// Get the method
 			MethodInfo Method = Endpoint.GetType().GetMethod(Request.HttpMethod);
