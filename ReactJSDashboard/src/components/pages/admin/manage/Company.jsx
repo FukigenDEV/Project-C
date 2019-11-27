@@ -11,19 +11,12 @@ class manCompany extends Component {
         value: ''
       },
       data: [],
-      entrydel: ''
     }
   }
 
   componentDidMount() {
     this.getCompanies();
   }
-
-  // componentDidUpdate(prevState) {
-  //   if(this.state.entrydel !== prevState.entrydel ) {
-  //     this.getCompanies();
-  //   }
-  // }
 
   getCompanies = () => {
     fetch('/company?name=')
@@ -37,7 +30,10 @@ class manCompany extends Component {
 
   handleDelete = name => {
     fetch(`/company?name=${name}`, {method: 'DELETE',});
-    this.setState({entrydel: name});
+    const obj = this.state.data;
+    const data = obj.filter(newdata => (newdata.Name !== name));
+    this.setState({data});
+    console.log(this.state);
   }
 
   render() {
@@ -63,7 +59,6 @@ class manCompany extends Component {
 
     return (
       <React.Fragment>
-        <div className="d-none">{this.state.entrydel}</div>
         <table className="table table-striped table-dark">
         <thead>
           <tr>

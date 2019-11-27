@@ -11,7 +11,6 @@ class manDepartments extends Component {
         value: ''
       },
       data: [],
-      delete: ''
     }
   }
 
@@ -30,14 +29,15 @@ class manDepartments extends Component {
 
   handleDelete = name => {
     fetch(`/department?name=${name}`, {method: 'DELETE'});
-    this.setState({delete: name});
+    const obj = this.state.data;
+    const data = obj.filter(newdata => (newdata.Name !== name));
+    this.setState({data});
     console.log(this.state);
   }
 
   render() {
     return (
       <React.Fragment>
-        <div className="d-none">{this.state.delete}</div>
         <table className="table table-striped table-dark">
         <thead>
           <tr>
