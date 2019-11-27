@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 namespace Webserver.Data {
 	[Table("GenericTableConfigurations")]
-	class GenericDataTable {
+	public class GenericDataTable {
 		private SQLiteConnection Connection;
 
 		[Key]
