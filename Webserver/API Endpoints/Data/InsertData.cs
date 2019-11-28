@@ -29,10 +29,10 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Build insertion dict
-			List<string> Columns = Table.GetColumns().Keys.ToList();
+			Dictionary<string, DataType> Columns = Table.GetColumns();
 			Dictionary<string, dynamic> Dict = new Dictionary<string, dynamic>();
 			foreach(KeyValuePair<string, JToken> Entry in JSON) {
-				if (!Columns.Contains(Entry.Key)) {
+				if (!Columns.ContainsKey(Entry.Key)) {
 					Send("No such column: " + Entry.Key);
 					return;
 				}
@@ -40,7 +40,7 @@ namespace Webserver.API_Endpoints {
 					Send("Can't set row ID", HttpStatusCode.BadRequest);
 					return;
 				}
-				Dict.Add(Entry.Key, Entry.Value);
+				Dict.Add(Entry.Key, Columns[Entry.Key] == DataType.Integer ? (int)Entry.Value : (dynamic)Entry.Value);
 			}
 
 			//Insert data and return response
