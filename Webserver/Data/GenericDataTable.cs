@@ -136,6 +136,9 @@ namespace Webserver.Data {
 			Connection.Execute("ALTER TABLE " + this.Name + " ADD COLUMN " + Name + " " + DT.ToString());
 		}
 
+		/// <summary>
+		/// Add a new validation column to the table.
+		/// </summary>
 		public void AddValidatedColumn() {
 			if (GetColumns().Keys.Contains(Name)) {
 				throw new ArgumentException("Column already exists");
@@ -266,7 +269,7 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
-		/// Returns a JArray containing JObjects that represent a table's rows.
+		/// Returns a JObject containing JObjects that represent a table's rows.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Table"></param>
@@ -279,6 +282,12 @@ namespace Webserver.Data {
 			return RowsToJObject(Rows, Columns);
 		}
 
+		/// <summary>
+		/// Returns a JObject containing JObjects that represent a table's rows.
+		/// </summary>
+		/// <param name="Begin"></param>
+		/// <param name="End"></param>
+		/// <returns></returns>
 		public JObject GetUnvalidatedRows(int Begin = 0, int End = 25) {
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
 			if (!Columns.ContainsKey("Validated")) {
@@ -438,25 +447,28 @@ namespace Webserver.Data {
 		/// <param name="Name"></param>
 		/// <returns></returns>
 		public static bool Exists(SQLiteConnection Connection, string Name) => Exists(Connection, new List<string>() { Name });
-		
+
 		/// <summary>
 		/// Returns true if all specified tables exist.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="Name"></param>
 		/// <returns></returns>
-		public static bool Exists(SQLiteConnection Connection, List<string> Names) {
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT name FROM GenericTableConfigurations", Connection);
-			using SQLiteDataReader Reader = CMD.ExecuteReader();
-			List<string> Rows = new List<string>();
-			while (Reader.Read()) {
-				NameValueCollection Row = Reader.GetValues();
-				Rows.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
-			}
-			return Names.Intersect(Rows).Count() == Names.Count();
-		}
+		public static bool Exists(SQLiteConnection Connection, List<string> Names) => Names.Intersect(GetTableNames(Connection)).Count() == Names.Count();
 
+		/// <summary>
+		/// Returns true if the specified row exists
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="ID"></param>
+		/// <returns></returns>
 		public bool RowExists(SQLiteConnection Connection, string ID) => RowExists(Connection, new List<string>() { ID });
+		/// <summary>
+		/// Returns true if the specified row exists.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="IDs"></param>
+		/// <returns></returns>
 		public bool RowExists(SQLiteConnection Connection, List<string> IDs) {
 #pragma warning disable CA2100
 			using SQLiteCommand CMD = new SQLiteCommand("SELECT rowid FROM "+this.Name, Connection);
@@ -480,6 +492,18 @@ namespace Webserver.Data {
 			GenericDataTable Table = Connection.QueryFirstOrDefault<GenericDataTable>("SELECT * FROM GenericTableConfigurations WHERE Name = @Name", new { Name });
 			Table.Connection = Connection;
 			return Table;
+		}
+
+		public static List<string> GetTableNames(SQLiteConnection Connection, int Department = 0) {
+			using SQLiteCommand CMD = new SQLiteCommand("SELECT Name, Department FROM GenericTableConfigurations", Connection);
+			using SQLiteDataReader Reader = CMD.ExecuteReader();
+			List<string> Rows = new List<string>();
+			while ( Reader.Read() ) {
+				NameValueCollection Row = Reader.GetValues();
+				if ( Department != 0 && Department != int.Parse(Row["Department"])) continue;
+				Rows.Add(Row["Name"]);
+			}
+			return Rows;
 		}
 	}
 
