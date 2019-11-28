@@ -9,11 +9,16 @@ namespace Webserver {
 		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		private static readonly Logger Log = Program.Log;
 
+		/// <summary>
+		///	Initialize the redirect system.
+		/// </summary>
 		public static void Init() {
 			string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
-
+			
+			//If no Redirects file exists yet, create a default one.
 			if (!File.Exists("Redirects.config")) {
 				using StreamWriter RedirectsFile = File.CreateText("Redirects.config");
+				//If wwwroot contains an index.html file, add it to redirects.
 				if (File.Exists(wwwroot + "/index.html")) {
 					RedirectsFile.WriteLine("/ => /index.html");
 				}
@@ -23,7 +28,7 @@ namespace Webserver {
 		}
 
 		/// <summary>
-		/// Given a path, returns the path that it redirects to. If the path doesn't redirect anywhere, the same path is returned.
+		/// Given a URL, returns the URL that it redirects to. If the path doesn't redirect anywhere, the same path is returned.
 		/// Returns null if the path redirects in a way that would cause a loop.
 		/// </summary>
 		/// <param name="Path"></param>
@@ -42,7 +47,7 @@ namespace Webserver {
 		}
 
 		/// <summary>
-		/// Parses a redirection file.
+		/// Parses a redirection file at the specified path.
 		/// </summary>
 		/// <param name="Path"></param>
 		public static void ParseRedirectFile(string Path) {
@@ -67,11 +72,13 @@ namespace Webserver {
 				Regex ex = new Regex("(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}");
 				if (!ex.IsMatch(LineContents[0]) && LineContents[0] != "/") {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URI");
+					continue;
 				}
 
 				//Check if the destination is valid
 				if (!ex.IsMatch(LineContents[1]) && LineContents[1] != "/") {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URI");
+					continue;
 				}
 
 				//Add to dict

@@ -43,8 +43,12 @@ namespace Webserver.API_Endpoints.DataTable {
 			if (FoundAdd) {
 				JObject Add = (JObject)AddValue;
 				foreach(KeyValuePair<string, JToken> Entry in Add) {
-					if(Entry.Value.Type != JTokenType.String || Columns.ContainsKey((string)Entry.Value) || !Regex.IsMatch((string)Entry.Value, GenericDataTable.RX)) {
-						Send("Invalid entry in Add", HttpStatusCode.BadRequest);
+					if((string)Entry.Key == "Validated" ) {
+						Table.AddValidatedColumn();
+						continue;
+					}
+					if(Columns.ContainsKey(Entry.Key) || !Regex.IsMatch(Entry.Key, GenericDataTable.RX)) {
+						Send("Invalid entry in Add ("+Entry.Key+")", HttpStatusCode.BadRequest);
 						return;
 					}
 					if(!Enum.TryParse((string)Entry.Value, out DataType DT)) {
@@ -60,7 +64,7 @@ namespace Webserver.API_Endpoints.DataTable {
 				JArray Delete = (JArray)DeleteValue;
 				foreach(JToken Entry in Delete) {
 					if(Entry.Type != JTokenType.String || !Columns.ContainsKey((string)Entry)) {
-						Send("Invalid entry in Delete", HttpStatusCode.BadRequest);
+						Send("Invalid entry in Delete (" + Entry + ")", HttpStatusCode.BadRequest);
 						return;
 					}
 					ToDelete.Add((string)Entry);
@@ -72,7 +76,7 @@ namespace Webserver.API_Endpoints.DataTable {
 				JObject Rename = (JObject)RenameValue;
 				foreach (KeyValuePair<string, JToken> Entry in Rename) {
 					if (Entry.Value.Type != JTokenType.String || Columns.ContainsKey((string)Entry.Value) || !Columns.ContainsKey(Entry.Key) || !Regex.IsMatch((string)Entry.Value, GenericDataTable.RX)) {
-						Send("Invalid entry in Rename", HttpStatusCode.BadRequest);
+						Send("Invalid entry in Rename (" + Entry.Key + ")", HttpStatusCode.BadRequest);
 						return;
 					}
 					ToRename.Add(Entry.Key, (string)Entry.Value);

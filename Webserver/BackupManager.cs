@@ -16,6 +16,9 @@ namespace Webserver {
 		private const string Format = "yyyy-MM-dd_HH-mm";
 		private static readonly Logger Log = Program.Log;
 
+		/// <summary>
+		/// Creates a new backup if a backup hasn't been created recently. Otherwise, this function does nothing.
+		/// </summary>
 		public static void CreateScheduledBackup() {
 			string BackupDir = (string)Config.GetValue("BackupSettings.BackupFolder");
 			Directory.CreateDirectory(BackupDir);
@@ -28,7 +31,7 @@ namespace Webserver {
 		}
 
 		/// <summary>
-		/// Creates a new backup.
+		/// Creates a new backup and stores it in the backup folder specified in the server configuration file.
 		/// </summary>
 		/// <returns>A string containing the newly created backup file</returns>
 		public static string CreateManualBackup() {
@@ -65,6 +68,10 @@ namespace Webserver {
 			return BackupDir + "\\Backup_" + Timestamp + "_" + FileCount + ".zip";
 		}
 
+		/// <summary>
+		/// SQLiteBackupCallback that will be called by the BackupDatabase function when creating a backup of the database.
+		/// </summary>
+		/// <returns></returns>
 		private static bool BackupLog(SQLiteConnection source, string sourceName, SQLiteConnection destination, string destinationName, int pages, int remainingPages, int totalPages, bool retry) {
 			Log.Debug("Copying " + totalPages + " pages at a rate of " + pages + " per step. " + remainingPages + " pages remaining");
 			return true;

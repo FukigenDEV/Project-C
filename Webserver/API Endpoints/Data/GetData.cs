@@ -18,6 +18,8 @@ namespace Webserver.API_Endpoints {
 				Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
+
+			//If any optional parameters were given, overwrite the default values with those specified by the parameters
 			int Begin = 0;
 			if (RequestParams.ContainsKey("begin")) {
 				int.TryParse(RequestParams["begin"][0], out Begin);

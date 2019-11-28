@@ -105,6 +105,10 @@ namespace Webserver {
 		/// </summary>
 		public virtual void PATCH() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
 
+		/// <summary>
+		/// Send only a status code to the client, answering the request.
+		/// </summary>
+		/// <param name="StatusCode"></param>
 		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, null, StatusCode, null);
 		/// <summary>
 		/// Send JSON data to the client, answering the request.
@@ -147,6 +151,9 @@ namespace Webserver {
 			}
 			CookieVal += "; Max-Age=" + Expire;
 
+			//We manually set the cookie header instead of setting Response.Cookies because some twat decided that HTTPListener should use folded cookies, which every
+			//major browser has no support for. Using folded cookies, we would be limited to only 1 cookie per response, because browsers would otherwise incorrectly
+			//interpret the 2nd cookie's key and value to be part of the 1st cookie's value.
 			Response.AppendHeader("Set-Cookie", CookieVal);
 		}
 	}

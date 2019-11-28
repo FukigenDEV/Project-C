@@ -9,6 +9,9 @@ using System.Linq;
 namespace Webserver.API_Endpoints {
 	partial class Data : APIEndpoint {
 
+		/// <summary>
+		/// Deletes data from the specified table.
+		/// </summary>
 		[RequireBody]
 		[RequireContentType("application/json")]
 		[PermissionLevel(PermLevel.User)]

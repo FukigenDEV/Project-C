@@ -11,6 +11,9 @@ namespace Webserver.API_Endpoints
     [EndpointURL("/note")]
     internal partial class NoteEndPoint : APIEndpoint
     {
+		/// <summary>
+		/// Endpoint for retrieving user notes
+		/// </summary>
         public override void GET()
         {
             // Get required fields
@@ -20,11 +23,11 @@ namespace Webserver.API_Endpoints
                 return;
             }
 
-            if (RequestParams["title"][0] == "")
+			//Check if the title parameter exists. If it doesn't, return all notes.
+            if (RequestParams["title"][0].Length == 0)
             {
                 List<Note> notes = Note.GetAllNotes(Connection);
-                Send(JsonConvert.SerializeObject(notes), HttpStatusCode.OK);
-
+				Send(JsonConvert.SerializeObject(notes), HttpStatusCode.OK);
                 return;
             }
 

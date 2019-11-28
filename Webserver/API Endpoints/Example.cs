@@ -6,6 +6,7 @@ namespace Webserver.API_Endpoints {
 
 	/// <summary>
 	/// API endpoint example. Simply create a new class, inherit APIEndpoint, give it the right constructor, and override the HTTP methods you need.
+	/// Also used for testing purposes.
 	/// </summary>
 	[EndpointURL("/example")]
 	class Example : APIEndpoint {
