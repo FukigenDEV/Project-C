@@ -304,20 +304,26 @@ namespace Webserver.Data {
 		/// <param name="Columns">A column dictionary, as provided by GetColumns</param>
 		/// <returns></returns>
 		private static JObject RowsToJObject(List<dynamic> Rows, Dictionary<string, DataType> Columns) {
-			List<IDictionary<string, object>> Data = (Rows.Select(Row => (IDictionary<string, object>)Row)).ToList();
-			JObject Result = new JObject();
-			foreach (IDictionary<string, object> Row in Data) {
-				JObject JSONRow = new JObject();
-				foreach (string Key in Row.Keys) {
-					if (Key == "rowid") {
-						continue;
-					}
-					JSONRow.Add(Key, CastValue(Row[Key], Columns[Key]));
-				}
-				Result.Add(Row["rowid"].ToString(), JSONRow);
+			//Create Columns list
+			JObject JColumns = new JObject();
+			foreach(KeyValuePair<string, DataType> Entry in Columns ) {
+				JColumns.Add(Entry.Key, Entry.Value.ToString());
 			}
 
-			return Result;
+			//Create Rows list
+			JArray JRows = new JArray();
+			foreach(IDictionary<string, object> Row in Rows ) {
+				JArray Entry = new JArray();
+				foreach(string Key in Row.Keys ) {
+					Entry.Add(Row[Key]);
+				}
+				JRows.Add(Entry);
+			}
+
+			return new JObject {
+				{ "Columns", JColumns },
+				{ "Rows", JRows }
+			}; ;
 		}
 
 		private static dynamic CastValue(object Value, DataType DT) => DT == DataType.Integer ? (int)(long)Value : (dynamic)(string)Value;
