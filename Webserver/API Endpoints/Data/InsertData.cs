@@ -36,6 +36,10 @@ namespace Webserver.API_Endpoints {
 					Send("No such column: " + Entry.Key);
 					return;
 				}
+				if(Entry.Key == "rowid" ) {
+					Send("Can't set row ID", HttpStatusCode.BadRequest);
+					return;
+				}
 				Dict.Add(Entry.Key, Entry.Value);
 			}
 
