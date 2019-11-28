@@ -23,8 +23,8 @@ namespace Webserver.API_Endpoints {
 				int.TryParse(RequestParams["begin"][0], out Begin);
 			}
 			int End = 25;
-			if (RequestParams.ContainsKey("begin")) {
-				int.TryParse(RequestParams["begin"][0], out End);
+			if (RequestParams.ContainsKey("end")) {
+				int.TryParse(RequestParams["end"][0], out End);
 			}
 			bool isUnvalidated = false;
 			if (RequestParams.ContainsKey("isvalidated")){
