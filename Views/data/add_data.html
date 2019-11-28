@@ -1,0 +1,142 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Add Data</title>
+</head>
+
+<body>
+	<p><b>Add Data</b></p>
+
+	<form id="add_gdt_form" method="POST">
+		Name:<br/>
+		<input id="gdt_name" type="text" name="gdt_name"><br/>
+		
+		<br/>
+
+		Columns:<br/>
+
+		<template id="column_template">
+			<div>
+				<select>
+					<option value="integer">Integer</option>
+					<option value="string">String</option>
+					<option value="real">Real</option>
+					<option value="blob">Blob</option>
+				</select>
+				<input id="gdt_column_name" type="text" name="gdt_column_name">
+				<button id="remove_column" onclick="removeColumn(this);">-</button>
+			</div>
+		</template>
+		
+		<div id="columns">
+			<div>
+				<select>
+					<option value="integer">Integer</option>
+					<option value="string">String</option>
+					<option value="real">Real</option>
+					<option value="blob">Blob</option>
+				</select>
+				<input id="gdt_column_name" type="text" name="gdt_column_name">
+			</div>
+		</div>
+
+		<button id="add_column">+</button><br/>
+
+		<br/>
+
+		Department:<br/>
+		<div id="departments_dropdown">
+			<select>
+			</select>
+		</div>
+		
+		<br/>
+
+		Require validation: <input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"><br/>
+
+		<br/>
+		<input type="submit" value="Add"><br/>
+
+		<p id="message"></p>
+	</form>
+
+	<script>
+	$(window).load(function(event) {
+		var xhr = new XMLHttpRequest();
+		var url = "/department?name=";
+		xhr.open("GET", url, true);
+
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var departments = JSON.parse(xhr.responseText);
+
+				for (var i = 0; i < departments.length; i++) {
+					$("#departments_dropdown select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
+				}
+			}
+		}
+
+		xhr.send();
+	});
+
+	$("#add_column").on("click", function(event) {
+		event.preventDefault();
+
+		var template = document.getElementById("column_template");
+		var clone = template.content.cloneNode(true);
+
+		document.getElementById("columns").appendChild(clone);
+	});
+
+	function removeColumn(element) {
+		event.preventDefault();
+
+		element.parentElement.remove();
+	}
+
+	$("#add_gdt_form").on("submit", function(event) {
+		event.preventDefault();
+
+		var name = $("#gdt_name").val();
+		var columns = $("#gdt_columns").val();
+		var department = $("#departments_dropdown option:selected").text();
+		var requireValidation = $("#gdt_require_validation").val() == "on" ? true : false;
+
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("POST", "/datatable", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#message").html(xhr.responseText);
+			}
+		}
+
+		var testJSON = JSON.parse('{ "ID":"Integer", "FirstName":"String", "LastName":"String"}');
+
+		var jsonString = '{ ';
+		$("#columns").find("div").each(function(){
+			var innerDiv = $(this);
+
+			var name = innerDiv.children("input").val();
+			var dataType = innerDiv.children("select").find(":selected").text();
+
+			var pair = '"' + name + '":"' + dataType + '"';
+			jsonString += pair;
+
+			// If the last element is not reached yet, add a comma.
+			if (innerDiv.index() != $("#columns").find("div").length - 1) {
+				jsonString += ', '
+			}
+		});
+		jsonString += '}';
+		
+		var data = JSON.stringify({"Name": name, "Columns": JSON.parse(jsonString), "Department": department, "RequireValidation": requireValidation });
+		xhr.send(data);
+	});
+	</script>
+</body>

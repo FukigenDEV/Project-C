@@ -56,7 +56,7 @@ namespace Webserver.API_Endpoints.DataTable {
 			}
 
 			new GenericDataTable(Connection, (string)Name, ColumnDict, Dept, (bool)RequireValidation);
-			Send(StatusCode: HttpStatusCode.Created);
+			Send("Table successfully created", HttpStatusCode.Created);
 		}
 	}
 }
