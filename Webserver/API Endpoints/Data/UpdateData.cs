@@ -9,6 +9,9 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	partial class Data : APIEndpoint {
 
+		/// <summary>
+		/// Updates data in the specified table.
+		/// </summary>
 		[RequireBody]
 		[RequireContentType("application/json")]
 		public override void PATCH() {

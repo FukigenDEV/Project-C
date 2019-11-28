@@ -7,9 +7,18 @@ using System.Net;
 
 namespace Webserver.API_Endpoints {
 
+	/// <summary>
+	/// Endpoint for managing backups
+	/// </summary>
 	[EndpointURL("/backup")]
 	class BackupEndpoint : APIEndpoint {
 		private readonly string BackupDir = (string)Config.GetValue("BackupSettings.BackupFolder");
+
+		/// <summary>
+		/// List and send backup files.
+		/// If "name" parameter is given, the specified backup file will be offered as a download.
+		/// If no parameter is given, a list of available backup files will be given.
+		/// </summary>
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void GET() {
 			if (RequestParams.ContainsKey("name")) {
@@ -35,6 +44,10 @@ namespace Webserver.API_Endpoints {
 			}
 		}
 
+		/// <summary>
+		/// Initiate a manual backup. Requires no additional data.
+		/// </summary>
+		[PermissionLevel(PermLevel.Administrator)]
 		public override void POST() {
 			BackupManager.CreateManualBackup();
 			Send(HttpStatusCode.OK);

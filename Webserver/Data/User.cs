@@ -6,7 +6,13 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace Webserver.Data {
+	/// <summary>
+	/// Objects representing a user.
+	/// </summary>
 	public class User {
+		/// <summary>
+		/// The user's unique ID
+		/// </summary>
 		public int ID { get; set; }
 		public string Email { get; set; }
 		public string PasswordHash { get; set; }
@@ -32,7 +38,7 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
-		/// Constructor for deserializing database rows into User objects
+		/// Dapper-only constructor for deserializing database rows into user objects. Do not use.
 		/// </summary>
 		public User(
 			long ID,
@@ -102,9 +108,6 @@ namespace Webserver.Data {
 		/// <param name="Level"></param>
 		/// <param name="Department"></param>
 		public void SetPermissionLevel(SQLiteConnection Connection, PermLevel Level, int Department) => Connection.Execute("INSERT OR REPLACE INTO Permissions (User, Permission, Department) VALUES (@User, @Permission, @Department)", new { user = this.ID, Permission = Level, Department });
-
-
-		/// ########################################### Static Methods
 
 		/// <summary>
 		/// Given a password and salt, returns a salted SHA512 hash.

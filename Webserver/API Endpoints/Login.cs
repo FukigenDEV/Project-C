@@ -12,6 +12,14 @@ namespace Webserver.API_Endpoints {
 	/// </summary>
 	[EndpointURL("/login")]
 	class Login : APIEndpoint {
+		/// <summary>
+		/// Login method. Requires JSON input in the form of;
+		/// {
+		///		"Email":		The user's email address
+		///		"Password":		The user's password
+		///		"RememberMe":	Whether the RememberMe checkbox was ticked during login.
+		/// }
+		/// </summary>
 		[RequireBody]
 		[RequireContentType("application/json")]
 		public override void POST() {
@@ -72,8 +80,10 @@ namespace Webserver.API_Endpoints {
 			Send(StatusCode: HttpStatusCode.NoContent);
 		}
 
+		/// <summary>
+		/// Logout method. Requires no JSON or parameters.
+		/// </summary>
 		[PermissionLevel(PermLevel.User)]
-		[RequireContentType("application/json")]
 		public override void DELETE() {
 			Connection.Delete(UserSession);
 			AddCookie("SessionID", "", 0);

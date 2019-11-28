@@ -500,6 +500,12 @@ namespace Webserver.Data {
 			return Table;
 		}
 
+		/// <summary>
+		/// Returns a list of all generic data table names.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Department"></param>
+		/// <returns></returns>
 		public static List<string> GetTableNames(SQLiteConnection Connection, int Department = 0) {
 			using SQLiteCommand CMD = new SQLiteCommand("SELECT Name, Department FROM GenericTableConfigurations", Connection);
 			using SQLiteDataReader Reader = CMD.ExecuteReader();

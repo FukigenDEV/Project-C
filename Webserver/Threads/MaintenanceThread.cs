@@ -10,6 +10,10 @@ using Webserver.Data;
 namespace Webserver.Threads {
 	class MaintenanceThread {
 		public Logger Log;
+		/// <summary>
+		/// Run all maintenance tasks
+		/// </summary>
+		/// <param name="_"></param>
 		public void Run(object _) {
 			Log.Debug("Executing maintenance tasks.");
 			DateTime Started = DateTime.Now;
@@ -32,8 +36,10 @@ namespace Webserver.Threads {
 			//Create backup
 			BackupManager.CreateScheduledBackup();
 
+			//Close the database connection
 			Connection.Close();
-			this.Log.Debug("Maintenance complete. Took "+ (int)(DateTime.Now - Started).TotalMilliseconds + "ms");
+
+			Log.Debug("Maintenance complete. Took "+ (int)(DateTime.Now - Started).TotalMilliseconds + "ms");
 		}
 	}
 }

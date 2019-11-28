@@ -17,14 +17,18 @@ namespace Webserver {
 		public static List<string> CORSAddresses = new List<string>();
 
 		public static void Main() {
+			//Initialize logger
 			Logger.Init();
 			Log = new Logger();
 			Utils.Log = Log;
 			Log.Info("Server is starting!");
 
+			//Create default config
 			Log.Info("Loading configuration files...");
 			Config.AddConfig(new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Webserver.DefaultConfig.json")));
 			Config.SaveDefaultConfig();
+
+			//Load the configuration file
 			Dictionary<string, List<string>> Missing = Config.LoadConfig();
 
 			//Display all missing and/or invalid config settings, if any.
@@ -63,10 +67,12 @@ namespace Webserver {
 				}
 			}
 
-			//Create Queue and launch all threads
+			//Create Queue and launch listener
 			using BlockingCollection<HttpListenerContext> Queue = new BlockingCollection<HttpListenerContext>();
 			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
 			ListenerThread.Start();
+
+			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for (int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++) {
 				RequestWorker Worker = new RequestWorker(Log, Queue);
@@ -74,11 +80,11 @@ namespace Webserver {
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);
 			}
-			MaintenanceThread MT = new MaintenanceThread {
-				Log = Log
-			};
-			Timer Maintenance = new Timer(MT.Run, null, 0, 3600 * 1000);
 
+			//Launch maintenance thread
+			Timer Maintenance = new Timer(new MaintenanceThread { Log = Log }.Run, null, 0, 3600 * 1000);
+
+			//Wait for an exit command, then exit.
 			Log.Info("Type 'Exit' to exit.");
 			while(Console.ReadLine().ToLower() != "exit");
 			Environment.Exit(0);

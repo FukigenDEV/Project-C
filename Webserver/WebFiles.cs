@@ -12,14 +12,16 @@ namespace Webserver {
 		public static Dictionary<int, string> ErrorPages;
 		private static readonly Logger Log = Program.Log;
 
+		/// <summary>
+		/// Crawls through the wwwroot and errorpages folders to recursively find all available web pages and other files.
+		/// </summary>
 		public static void Init() {
-			//Perform initial crawl
 			WebPages = CrawlWebFolder((string)Config.GetValue("WebserverSettings.wwwroot"));
 			ErrorPages = CrawlErrorFolder((string)Config.GetValue("WebserverSettings.errorpages"));
 		}
 
 		/// <summary>
-		/// Recursively finds all web pages
+		/// Recursively finds all files in the specified directory.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
@@ -45,7 +47,7 @@ namespace Webserver {
 		}
 
 		/// <summary>
-		/// Recursively finds all error pages
+		/// Recursively finds all error pages in the specified directory
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>

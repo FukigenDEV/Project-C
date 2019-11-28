@@ -15,17 +15,28 @@ using System.Reflection;
 using Webserver.Data;
 
 namespace Webserver.Threads {
+	/// <summary>
+	/// Request handlers. Meant to run in a separate thread.
+	/// </summary>
 	class RequestWorker {
 		private readonly Logger Log;
 		private readonly BlockingCollection<HttpListenerContext> Queue;
 		private readonly SQLiteConnection Connection;
 
+		/// <summary>
+		/// Create a new RequestWorker, which processes incoming HttpListener requests. Meant to run in a separate thread.
+		/// </summary>
+		/// <param name="Log">A Logger object</param>
+		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
 		public RequestWorker(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
 			this.Log = Log;
 			this.Queue = Queue;
 			this.Connection = Database.CreateConnection();
 		}
 
+		/// <summary>
+		/// Start this RequestWorker. Meant to run in a separate thread.
+		/// </summary>
 		public void Run() {
 			while (true) {
 				HttpListenerContext Context = Queue.Take();
@@ -67,6 +78,11 @@ namespace Webserver.Threads {
 			}
 		}
 
+		/// <summary>
+		/// Find the API endpoint that this request is directed to. Returns null if none is found.
+		/// </summary>
+		/// <param name="Request"></param>
+		/// <returns></returns>
 		public Type FindEndpoint(HttpListenerRequest Request) {
 			//Search through endpoints
 			foreach (Type T in Program.Endpoints) {
@@ -85,11 +101,17 @@ namespace Webserver.Threads {
 			return null;
 		}
 
+		/// <summary>
+		/// Calls the given API endpoint.
+		/// </summary>
+		/// <param name="T"></param>
+		/// <param name="Context"></param>
 		[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
 		public void ProcessEndpoint(Type T, HttpListenerContext Context) {
 			HttpListenerRequest Request = Context.Request;
 			HttpListenerResponse Response = Context.Response;
 
+			//Create an instance of the specified endpoint and set the required values.
 			APIEndpoint Endpoint = (APIEndpoint)Activator.CreateInstance(T);
 			Endpoint.Connection = Connection;
 			Endpoint.Context = Context;
@@ -101,7 +123,7 @@ namespace Webserver.Threads {
 				Endpoint.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 			}
 
-			//Set access control headers
+			//Set access control headers for CORS support.
 			List<string> AllowedMethods = new List<string>();
 			foreach ( MethodInfo M in T.GetMethods() ) {
 				if ( M.DeclaringType == GetType() ) {
@@ -115,7 +137,7 @@ namespace Webserver.Threads {
 			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
 			Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
-			// Get the method
+			// Get the endpoint method
 			MethodInfo Method = Endpoint.GetType().GetMethod(Request.HttpMethod);
 
 			//Check this method's required content type, if any.
@@ -141,6 +163,7 @@ namespace Webserver.Threads {
 				}
 			}
 
+			//Check whether the user is allowed to use this endpoint method, if necessary.
 			#region PermissionLevel Attribute
 			PermissionLevel Attr = Method.GetCustomAttribute<PermissionLevel>();
 			if (Attr != null) {
@@ -193,6 +216,7 @@ namespace Webserver.Threads {
 			}
 			#endregion
 
+			//Attempt to invoke the API endpoint method. If this fails, send a 500 Internal Server Error to the client.
 			try {
 				Method.Invoke(Endpoint, null);
 			} catch (Exception e) {
@@ -201,6 +225,11 @@ namespace Webserver.Threads {
 			}
 		}
 
+		/// <summary>
+		/// Process a request for a resource.
+		/// </summary>
+		/// <param name="Target">The URL the resource is located at.</param>
+		/// <param name="Context"></param>
 		public void ProcessResource(string Target, HttpListenerContext Context) {
 			HttpListenerRequest Request = Context.Request;
 			HttpListenerResponse Response = Context.Response;
@@ -215,6 +244,7 @@ namespace Webserver.Threads {
 			//Switch to the request's HTTP method
 			switch (Request.HttpMethod) {
 				case "GET":
+					//Send the resource to the client. Content type will be set according to the resource's file extension.
 					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch {
 						".css" => "text/css",
 						".png" => "image/png",
@@ -226,10 +256,12 @@ namespace Webserver.Threads {
 					return;
 
 				case "HEAD":
+					//A HEAD request is the same as GET, except without the body. Since the resource exists, we can just send back a 200 OK and call it a day.
 					Utils.Send(Response, null, HttpStatusCode.OK);
 					return;
 
 				case "OPTIONS":
+					//Return a list of allowed HTTP methods for this resource (which is always the same), along with access-control headers for CORS support.
 					Response.Headers.Add("Allow", "GET, HEAD, OPTIONS");
 					if (Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString())) {
 						Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
@@ -238,6 +270,7 @@ namespace Webserver.Threads {
 					return;
 
 				default:
+					//Resources only support the three methods defined above, so send back a 405 Method Not Allowed.
 					Log.Warning("Refused request for resource " + Target + ": Method Not Allowed (" + Request.HttpMethod + ")");
 					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed);
 					return;

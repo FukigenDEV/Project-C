@@ -50,12 +50,18 @@ namespace Webserver.Data {
 		public static Department GetByName(SQLiteConnection Connection, string name) => Connection.QueryFirstOrDefault<Department>("SELECT * FROM Departments WHERE Name = @Name", new { name });
 
 		/// <summary>
-		/// Returns true if the specified department exists, otherwise false.
+		/// Returns true if the specified department exists.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public static bool Exists(SQLiteConnection Connection, string name) => GetByName(Connection, name) != null;
+		/// <summary>
+		/// Returns true if the specified department exists.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="ID"></param>
+		/// <returns></returns>
 		public static bool Exists(SQLiteConnection Connection, int ID) => Connection.Get<Department>(ID) != null;
 	}
 }

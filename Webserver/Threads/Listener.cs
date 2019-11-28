@@ -7,7 +7,15 @@ using System.Net;
 using System.Net.Sockets;
 
 namespace Webserver.Threads {
+	/// <summary>
+	/// Listener object that will create a new HTTPListener and wait for incoming requests
+	/// </summary>
 	class Listener {
+		/// <summary>
+		/// Start a Listener. Incoming requests will be inserted in the given BlockingCollection, which can then be processed using RequestWorkers
+		/// </summary>
+		/// <param name="Log"></param>
+		/// <param name="Queue"></param>
 		public static void Run(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
 			Log.Info("Starting ListenerThread");
 
@@ -29,6 +37,7 @@ namespace Webserver.Threads {
 			using HttpListener Listener = new HttpListener();
 			Utils.ParseAddresses(Addresses).ForEach(Listener.Prefixes.Add);
 
+			//Attempt to start the HTTPListener.
 			try {
 				Listener.Start();
 			} catch(HttpListenerException e) {
@@ -38,6 +47,7 @@ namespace Webserver.Threads {
 				Environment.Exit(-1);
 			}
 			
+			//Listen for incoming requests and add them to the queue.
 			Log.Info("Now listening!");
 			while (true) {
 				Queue.Add(Listener.GetContext());
