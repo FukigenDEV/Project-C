@@ -26,7 +26,7 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
+				if (xhr.status >= 200 && xhr.status < 300) {
 					$("#add_company").hide(250);
 					$("#add_department").show(250);
 				} else {
@@ -114,7 +114,7 @@ class AdminWizard extends Component {
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status === 200) {
+		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 			var departments = JSON.parse(xhr.responseText);
 
 			for (var i = 0; i < departments.length; i++) {
