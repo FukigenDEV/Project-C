@@ -14,16 +14,25 @@ namespace Webserver.API_Endpoints
 		[RequireBody]
 		public override void POST()
         {
-            // Get all required values
-            if (!JSON.TryGetValue<string>("name", out JToken name) ||
-                !JSON.TryGetValue<string>("description", out JToken description))
+            // Check if values can be cast to a string
+            if (JSON.TryGetValue<string>("name", out JToken name) &&
+                JSON.TryGetValue<string>("description", out JToken description))
             {
-                Send("Missing fields", HttpStatusCode.BadRequest);
+                //Check if values are at least 1 character
+                if (((string)name).Length < 1 || ((string)description).Length < 1)
+                {
+                    Send("Please fill in all fields", HttpStatusCode.BadRequest);
+                    return;
+                }
+            }
+            else
+            {
+                Send("Expected a string", HttpStatusCode.BadRequest);
                 return;
             }
 
 			//Check if the specified department exists. If it doesn't, send a 404 Not Found
-			Department department = Department.GetDepartmentByName(Connection, (string)name);
+			Department department = Department.GetByName(Connection, (string)name);
 			if (department != null) {
 				Send("Department already exists", HttpStatusCode.BadRequest);
 				return;
@@ -34,8 +43,8 @@ namespace Webserver.API_Endpoints
             // Store department to database
             Connection.Insert(newDepartment);
 
-            // Send success message
-            Send("Department successfully created", HttpStatusCode.OK);
-        }
-    }
+			// Send success message
+			Send(StatusCode: HttpStatusCode.Created);
+		}
+	}
 }

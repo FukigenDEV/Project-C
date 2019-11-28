@@ -55,7 +55,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Check if the department is valid
-			Department Dept = Department.GetDepartmentByName(Connection, (string)MemberDept);
+			Department Dept = Department.GetByName(Connection, (string)MemberDept);
 			if (Dept == null) {
 				Send("No such department", HttpStatusCode.BadRequest);
 				return;
@@ -83,7 +83,7 @@ namespace Webserver.API_Endpoints {
 			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
 
 			//Send OK
-			Send(StatusCode: HttpStatusCode.OK);
+			Send(StatusCode: HttpStatusCode.Created);
 		}
 	}
 }

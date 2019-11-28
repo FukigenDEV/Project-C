@@ -74,8 +74,14 @@ namespace Webserver {
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);
 			}
+			MaintenanceThread MT = new MaintenanceThread {
+				Log = Log
+			};
+			Timer Maintenance = new Timer(MT.Run, null, 0, 3600 * 1000);
 
-			Console.ReadLine();
+			Log.Info("Type 'Exit' to exit.");
+			while(Console.ReadLine().ToLower() != "exit");
+			Environment.Exit(0);
 		}
 	}
 }

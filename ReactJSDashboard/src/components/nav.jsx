@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faTools, faFileSignature, faFile, faClipboard, faHistory, faDownload, faSignOutAlt, fas } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faTools, faFileSignature, faFile, faClipboard, faHistory, faDownload, faSignOutAlt, fas, faUserShield, faMagic } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(
   fas,

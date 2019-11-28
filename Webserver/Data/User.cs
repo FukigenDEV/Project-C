@@ -131,8 +131,6 @@ namespace Webserver.Data {
 		/// <param name="Connection">The database connection</param>
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
-		public static User GetUserByEmail(SQLiteConnection Connection, string Email) {
-			return Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
-		}
+		public static User GetUserByEmail(SQLiteConnection Connection, string Email) => Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
 	}
 }

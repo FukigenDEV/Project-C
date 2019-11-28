@@ -32,7 +32,7 @@
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
 				if (xhr.status === 200) {
-					window.location.href = "add_user.html";
+					window.location.href = "/admin_wizard/add_user.html";
 				} else {
 					$("#message").html(xhr.responseText);
 				}

@@ -50,6 +50,13 @@ class addDepartments extends Component {
     xhr.send(data);
   }
 
+  getBadgeClasses = () => {
+    let classes = 'alert mr-3 ml-3 ';
+    classes += (this.state.alert.type === 200) ? "alert-success" : "alert-danger";
+    classes += (this.state.alert.type === 0) ? " d-none" : " d-block";
+    return classes;
+  }
+
   render() {
     console.log(this.state.form);
     console.log(this.state.alert);
@@ -65,6 +72,8 @@ class addDepartments extends Component {
             <label for="description">Description</label>
             <input onChange={this.handleChange} type="text" name="description" class="form-control" id="description" placeholder="Enter description" />
           </div>
+
+          <div className={this.getBadgeClasses()}>{this.state.alert.value}</div>
 
           <button type="submit" class="btn btn-primary">Add department</button>
         </form>

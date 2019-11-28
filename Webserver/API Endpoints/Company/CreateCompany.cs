@@ -13,6 +13,7 @@ namespace Webserver.API_Endpoints
     {
 		[RequireContentType("application/json")]
 		[RequireBody]
+		[PermissionLevel(PermLevel.Manager)]
 		public override void POST()
         {
 			// Get all required values
@@ -34,8 +35,8 @@ namespace Webserver.API_Endpoints
             // Store companty to database
             Connection.Insert(company);
 
-            // Send success message
-            Send("Company successfully created", HttpStatusCode.OK);
-        }
-    }
+			// Send success message
+			Send(StatusCode: HttpStatusCode.Created);
+		}
+	}
 }

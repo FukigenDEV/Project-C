@@ -2,15 +2,18 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using Webserver.Data;
+using static Dapper.SqlMapper;
 
 namespace Webserver {
 	static class Database {
-		public const string ConnectionString = "Data Source=Database.db;foreign keys=true";
 		private static readonly Logger Log = Program.Log;
 
 		/// <summary>
@@ -26,7 +29,7 @@ namespace Webserver {
 			}
 
 			//Connect to it
-			using SQLiteConnection Connection = createConnection();
+			using SQLiteConnection Connection = CreateConnection();
 
 			//Create tables if they don't already exist.
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Functions (" +
@@ -49,6 +52,12 @@ namespace Webserver {
             "ID					INTEGER PRIMARY KEY," +
             "Name				STRING NOT NULL," +
             "Description        STRING" +
+            ")");
+
+            Connection.Execute("CREATE TABLE IF NOT EXISTS Notes (" +
+            "ID                 INTEGER PRIMARY KEY," +
+            "Title              STRING NOT NULL," +
+            "Text               STRING" +
             ")");
 
             Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
@@ -86,13 +95,14 @@ namespace Webserver {
 				"FOREIGN KEY(User)	REFERENCES Users(ID) ON DELETE CASCADE" +
 			")");
 
-			Connection.Execute("CREATE TABLE IF NOT EXISTS GenericTableConfiguration (" +
-				"TableName			STRING PRIMARY KEY," +
+			Connection.Execute("CREATE TABLE IF NOT EXISTS GenericTableConfigurations (" +
+				"Name				STRING PRIMARY KEY," +
 				"ReqValidation		INTEGER," +
 				"Department			INTEGER NOT NULL," +
 				"FOREIGN KEY(Department) REFERENCES Departments(ID) ON UPDATE CASCADE" +
 			")");
 
+			//Check if all built-in system departments exist
 			Department AdministratorDept = Connection.Get<Department>(1);
 			if(AdministratorDept == null) {
 				Connection.Insert(new Department("Administrators", "Department for Administrators"));
@@ -114,8 +124,8 @@ namespace Webserver {
 			}
 		}
 
-		public static SQLiteConnection createConnection() {
-			SQLiteConnection Connection = new SQLiteConnection(ConnectionString);
+		public static SQLiteConnection CreateConnection() {
+			SQLiteConnection Connection = new SQLiteConnection("Data Source=Database.db;foreign keys=true");
 			Connection.Open();
 			return (Connection);
 		}

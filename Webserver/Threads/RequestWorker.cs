@@ -23,7 +23,7 @@ namespace Webserver.Threads {
 		public RequestWorker(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
 			this.Log = Log;
 			this.Queue = Queue;
-			this.Connection = Database.createConnection();
+			this.Connection = Database.CreateConnection();
 		}
 
 		public void Run() {
@@ -34,8 +34,10 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length-1);
+
 				if (URL == null) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.LocalPath.ToLower());
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.RawUrl.ToLower());
 					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
 				} else if (URL != Request.RawUrl.ToLower()) {
@@ -99,6 +101,20 @@ namespace Webserver.Threads {
 				Endpoint.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 			}
 
+			//Set access control headers
+			List<string> AllowedMethods = new List<string>();
+			foreach ( MethodInfo M in T.GetMethods() ) {
+				if ( M.DeclaringType == GetType() ) {
+					AllowedMethods.Add(M.Name);
+				}
+			}
+			string Origin = Request.Headers.Get("Origin");
+			if ( Program.CORSAddresses.Contains(Origin + '/') ) {
+				Response.Headers.Add("Access-Control-Allow-Origin", Origin);
+			}
+			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
+			Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+
 			// Get the method
 			MethodInfo Method = Endpoint.GetType().GetMethod(Request.HttpMethod);
 
@@ -108,12 +124,15 @@ namespace Webserver.Threads {
 				if(CT.ContentType == "application/json") {
 					//Try to parse the JSON. If that failed for some reason, check if the response body is actually necessary.
 					//Return null if it isn't, return a 400 Bad Request if it is.
+					using StreamReader Reader = new StreamReader(Request.InputStream, Request.ContentEncoding);
+					string JSONText = Reader.ReadToEnd();
 					try {
-						using StreamReader streamReader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-						Endpoint.JSON = JObject.Parse(streamReader.ReadToEnd());
+						Endpoint.JSON = JObject.Parse(JSONText);
 					} catch (JsonReaderException e) {
 						if (Method.GetCustomAttribute<RequireBody>() != null) {
 							Log.Warning("Refused request for endpoint " + T.Name + ": Could not parse JSON");
+							Log.Debug("Message: " + e.Message);
+							Log.Debug("Received JSON: "+JSONText);
 							Utils.Send(Response, "Invalid JSON: " + e.Message, HttpStatusCode.BadRequest);
 							return;
 						}
@@ -154,7 +173,7 @@ namespace Webserver.Threads {
 				}
 
 				//Get department. If none was found, send 400 Bad Request
-				Department Dept = Department.GetDepartmentByName(Connection, DepartmentName);
+				Department Dept = Department.GetByName(Connection, DepartmentName);
 				if (Dept == null) {
 					Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
 					return;
@@ -196,7 +215,14 @@ namespace Webserver.Threads {
 			//Switch to the request's HTTP method
 			switch (Request.HttpMethod) {
 				case "GET":
-					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK);
+					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch {
+						".css" => "text/css",
+						".png" => "image/png",
+						".js" => "text/javascript",
+						".jpg" => "image/jpeg",
+						".jpeg" => "image/jpeg",
+						_ => "text/html"
+					});
 					return;
 
 				case "HEAD":
