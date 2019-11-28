@@ -12,9 +12,13 @@
 		Department name: <input id="department_name" type="text" name="department_name"><br/>
 		Department description: <input id="department_description" type="text" name="department_description"><br/>
 		<br/>
-		<input type="submit" value="Add"><br/>
+		<input type="submit" value="Add">
 
 		<p id="message"></p>
+	</form>
+
+	<form id="to_next_form">
+		<input type="submit" value="Next"><br/>
 	</form>
 	
 	<script>
@@ -31,16 +35,18 @@
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					window.location.href = "/admin_wizard/add_user.html";
-				} else {
-					$("#message").html(xhr.responseText);
-				}
+				$("#message").html(xhr.responseText);
 			}
 		}
 		
 		var data = JSON.stringify({"name": name, "description": description});
 		xhr.send(data);
+	});
+
+	$("#to_next_form").on("submit", function(event) {
+		window.location.href = "/admin_wizard/add_user.html";
+
+		return false;
 	});
 	</script>
 </body>

@@ -57,7 +57,9 @@ namespace Webserver {
             Connection.Execute("CREATE TABLE IF NOT EXISTS Notes (" +
             "ID                 INTEGER PRIMARY KEY," +
             "Title              STRING NOT NULL," +
-            "Text               STRING" +
+            "Text               STRING," +
+            "Author             INTEGER NOT NULL," +
+            "FOREIGN KEY(Author) REFERENCES Users(ID) ON DELETE CASCADE" +
             ")");
 
             Connection.Execute("CREATE TABLE IF NOT EXISTS Permissions (" +
