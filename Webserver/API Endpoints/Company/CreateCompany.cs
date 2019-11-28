@@ -36,7 +36,7 @@ namespace Webserver.API_Endpoints
             Connection.Insert(company);
 
 			// Send success message
-			Send(StatusCode: HttpStatusCode.Created);
+			Send("Company successfully created", HttpStatusCode.Created);
 		}
 	}
 }

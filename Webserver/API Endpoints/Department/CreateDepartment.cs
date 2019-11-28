@@ -44,7 +44,7 @@ namespace Webserver.API_Endpoints
             Connection.Insert(newDepartment);
 
 			// Send success message
-			Send(StatusCode: HttpStatusCode.Created);
+			Send("Department successfully created", HttpStatusCode.Created);
 		}
 	}
 }

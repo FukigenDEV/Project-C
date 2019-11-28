@@ -83,7 +83,7 @@ namespace Webserver.API_Endpoints {
 			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
 
 			//Send OK
-			Send(StatusCode: HttpStatusCode.Created);
+			Send("Account successfully created", HttpStatusCode.Created);
 		}
 	}
 }

@@ -55,6 +55,10 @@ class AdminWizard extends Component {
 				$("#department_message").html(xhr.responseText);
 				$('#department_message').css({"display": "block"});
 				$('#department_message').delay(2000).fadeOut(300);
+
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#add_department_form").trigger("reset");
+				}
 			}
 		}
 		
@@ -95,6 +99,10 @@ class AdminWizard extends Component {
 				$("#user_message").html(xhr.responseText);
 				$('#user_message').css({"display": "block"});
 				$('#user_message').delay(2000).fadeOut(300);
+
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#add_user_form").trigger("reset");
+				}
 			}
 		}
 		
