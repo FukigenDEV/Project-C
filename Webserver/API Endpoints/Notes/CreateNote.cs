@@ -13,9 +13,9 @@ namespace Webserver.API_Endpoints
         public override void POST()
         {
             // Get all required values
-            if (!Content.TryGetValue<string>("title", out JToken title) ||
-                !Content.TryGetValue<string>("text", out JToken text) ||
-                !Content.TryGetValue<string>("author", out JToken author))
+            if (!JSON.TryGetValue<string>("title", out JToken title) ||
+                !JSON.TryGetValue<string>("text", out JToken text) ||
+                !JSON.TryGetValue<string>("author", out JToken author))
             {
                 Send("Missing fields", HttpStatusCode.BadRequest);
                 return;
