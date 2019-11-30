@@ -40,6 +40,7 @@ namespace Webserver.Threads {
 		public void Run() {
 			while (true) {
 				HttpListenerContext Context = Queue.Take();
+				DateTime Started = DateTime.Now;
 				HttpListenerRequest Request = Context.Request;
 				HttpListenerResponse Response = Context.Response;
 
@@ -59,21 +60,25 @@ namespace Webserver.Threads {
 
 				//Find this request's target
 				Type T = FindEndpoint(Request);
-				if(T != null) {
+				if ( T != null ) {
 					ProcessEndpoint(T, Context);
-					continue;
-				}
-
-				//No endpoint was found, so see if a resource exists at this address instead.
-				//Add wwwroot to URL
-				string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
-
-				if (WebFiles.WebPages.Contains(Target) && File.Exists(Target)) {
-					ProcessResource(Target, Context);
 				} else {
-					//No endpoint or resource was found, so send a 404.
-					Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
-					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
+					//No endpoint was found, so see if a resource exists at this address instead.
+					//Add wwwroot to URL
+					string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
+
+					if ( WebFiles.WebPages.Contains(Target) && File.Exists(Target) ) {
+						ProcessResource(Target, Context);
+					} else {
+						//No endpoint or resource was found, so send a 404.
+						Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
+						Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
+					}
+				}
+				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
+				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
+				if(TimeSpent >= 250 ) {
+					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			}
 		}

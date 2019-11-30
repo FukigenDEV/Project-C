@@ -62,8 +62,10 @@ namespace Webserver.Data {
 			if(Columns.Keys.Intersect(ReservedColumns).Count() > 0) {
 				throw new ArgumentException("Cannot use reserved column names");
 			}
-			foreach (var _ in Columns.Keys.Where(Column => !Regex.IsMatch(Column, RX)).Select(Column => new { })) {
-				throw new ArgumentException("Invalid column name. Column name must only contain letters, numbers, and underscores");
+			foreach(string Key in Columns.Keys ) {
+				if ( !Regex.IsMatch(Key, RX) ) {
+					throw new ArgumentException("Invalid column name.");
+				}
 			}
 			if (!Data.Department.Exists(Connection, DepartmentID) && DepartmentID != 2) {
 				throw new ArgumentException("Missing or invalid Department ID");
@@ -85,10 +87,10 @@ namespace Webserver.Data {
 			}
 
 			//Create table
-			string SQL = "CREATE TABLE " + Name + " (rowid Integer PRIMARY KEY,";
+			string SQL = "CREATE TABLE `" + Name + "` (rowid Integer PRIMARY KEY,";
 			List<string> SQLColumns = new List<string>();
 			foreach(string Key in Columns.Keys) {
-				SQLColumns.Add(Key + " " + Columns[Key]);
+				SQLColumns.Add("`"+Key + "` " + Columns[Key]);
 			}
 			SQL += string.Join(',', SQLColumns) + ")";
 
@@ -133,7 +135,7 @@ namespace Webserver.Data {
 			if (GetColumns().Keys.Contains(Name)) {
 				throw new ArgumentException("Column already exists");
 			}
-			Connection.Execute("ALTER TABLE " + this.Name + " ADD COLUMN " + Name + " " + DT.ToString());
+			Connection.Execute("ALTER TABLE `" + this.Name + "` ADD COLUMN `" + Name + "` " + DT.ToString());
 		}
 
 		/// <summary>
@@ -145,7 +147,7 @@ namespace Webserver.Data {
 			}
 			this.ReqValidation = true;
 			Connection.Update<GenericDataTable>(this);
-			Connection.Execute("ALTER TABLE " + this.Name + " ADD COLUMN Validated Integer DEFAULT 0");
+			Connection.Execute("ALTER TABLE `" + this.Name + "` ADD COLUMN Validated Integer DEFAULT 0");
 		}
 
 		/// <summary>
@@ -170,7 +172,7 @@ namespace Webserver.Data {
 			}
 
 			//Retrieve all data from the table.
-			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM " + this.Name).ToList();
+			List<dynamic> Rows = Connection.Query("SELECT `" + string.Join(',', Columns.Keys) + "` FROM `" + this.Name+"`").ToList();
 			List<IDictionary<string, object>> Data = (Rows.Select(Row => (IDictionary<string, object>)Row)).ToList();
 
 			//Update columns list
@@ -179,11 +181,11 @@ namespace Webserver.Data {
 			Columns.Add(NewName, DT);
 
 			//Recreate the table.
-			Connection.Execute("DROP TABLE " + this.Name);
-			string SQL = "CREATE TABLE " + this.Name + " (";
+			Connection.Execute("DROP TABLE `" + this.Name+"`");
+			string SQL = "CREATE TABLE `" + this.Name + "` (";
 			List<string> SQLColumns = new List<string>();
 			foreach (string Key in Columns.Keys) {
-				SQLColumns.Add(Key + " " + Columns[Key]);
+				SQLColumns.Add("`"+Key + "` " + Columns[Key]);
 			}
 			SQL += string.Join(',', SQLColumns) + ")";
 			Connection.Execute(SQL);
@@ -191,7 +193,7 @@ namespace Webserver.Data {
 			//Restore all data if necessary
 			if(Data.Count > 0){
 				List<string> ColumnNames = Columns.Keys.AsList();
-				SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumnNames) + ") VALUES ";
+				SQL = "INSERT INTO `" + this.Name + "` (" + string.Join(',', ColumnNames) + ") VALUES ";
 				List<string> Values = new List<string>();
 				foreach (IDictionary<string, object> Row in Data) {
 					List<string> Cells = new List<string>();
@@ -232,12 +234,12 @@ namespace Webserver.Data {
 			}
 
 			//Retrieve all data from the table.
-			List<dynamic> Rows = Connection.Query("SELECT "+string.Join(',', Columns.Keys)+" FROM "+this.Name).ToList();
+			List<dynamic> Rows = Connection.Query("SELECT "+string.Join(',', Columns.Keys)+" FROM `"+this.Name+"`").ToList();
 			List<IDictionary<string, object>> Data = (Rows.Select(Row => (IDictionary<string, object>)Row)).ToList();
 
 			//Recreate the table.
-			Connection.Execute("DROP TABLE " + this.Name);
-			string SQL = "CREATE TABLE " + this.Name + " (";
+			Connection.Execute("DROP TABLE `" + this.Name+"`");
+			string SQL = "CREATE TABLE `" + this.Name + "` (";
 			List<string> SQLColumns = new List<string>();
 			foreach (string Key in Columns.Keys) {
 				SQLColumns.Add(Key + " " + Columns[Key]);
@@ -247,7 +249,7 @@ namespace Webserver.Data {
 
 			//Restore all data
 			List<string> ColumnNames = Columns.Keys.AsList();
-			SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumnNames) + ") VALUES ";
+			SQL = "INSERT INTO `" + this.Name + "` (" + string.Join(',', ColumnNames) + ") VALUES ";
 			List<string> Values = new List<string>();
 			foreach(IDictionary<string, object> Row in Data) {
 				List<string> Cells = new List<string>();
@@ -264,7 +266,7 @@ namespace Webserver.Data {
 		/// Deletes the table and all the data that it contains. Note that the current GenericDataTable object will become unusable after calling this method.
 		/// </summary>
 		public void DropTable() {
-			Connection.Execute("DROP TABLE " + this.Name);
+			Connection.Execute("DROP TABLE `" + this.Name+"`");
 			Connection.Delete(this);
 		}
 
@@ -278,7 +280,7 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public JObject GetRows(int Begin = 0, int End = 25) {
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
-			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM " + this.Name + " WHERE rowid BETWEEN "+Begin+" AND "+End).ToList();
+			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE rowid BETWEEN "+Begin+" AND "+End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
 
@@ -293,7 +295,7 @@ namespace Webserver.Data {
 			if (!Columns.ContainsKey("Validated")) {
 				throw new ArgumentException("Table contains no Validated column");
 			}
-			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM " + this.Name + " WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
+			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
 
@@ -359,7 +361,7 @@ namespace Webserver.Data {
 					ColumnUpdates.Add(Column + " = '" + Data[Row][Column].ToString()+"'");
 				}
 
-				QueryList += "UPDATE " + this.Name + " SET " + string.Join(',', ColumnUpdates) + " WHERE rowid = " + Row + ";\n";
+				QueryList += "UPDATE `" + this.Name + "` SET " + string.Join(',', ColumnUpdates) + " WHERE rowid = " + Row + ";\n";
 			}
 			Connection.Execute(QueryList);
 		}
@@ -417,7 +419,7 @@ namespace Webserver.Data {
 				}
 				Values.Add("(" + string.Join(',', Value) + ")");
 			}
-			string SQL = "INSERT INTO " + this.Name + "(" + string.Join(',', ColumNames) + ") VALUES " + string.Join(',', Values);
+			string SQL = "INSERT INTO `" + this.Name + "`(" + string.Join(',', ColumNames) + ") VALUES " + string.Join(',', Values);
 			Connection.Execute(SQL);
 		}
 
@@ -440,7 +442,7 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public static Dictionary<string, DataType> GetColumns(SQLiteConnection Connection, string Name) {
 			Dictionary<string, DataType> Columns = new Dictionary<string, DataType>();
-			foreach (dynamic val in Connection.Query("PRAGMA table_info(" + Name + ")").AsList()) {
+			foreach (dynamic val in Connection.Query("PRAGMA table_info(`" + Name + "`)").AsList()) {
 				Columns.Add(val.name, Enum.Parse(typeof(DataType), val.type));
 			}
 			return Columns;
@@ -477,7 +479,7 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public bool RowExists(SQLiteConnection Connection, List<string> IDs) {
 #pragma warning disable CA2100
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT rowid FROM "+this.Name, Connection);
+			using SQLiteCommand CMD = new SQLiteCommand("SELECT rowid FROM `"+this.Name+"`", Connection);
 #pragma warning restore CA2100
 			using SQLiteDataReader Reader = CMD.ExecuteReader();
 			List<string> Rows = new List<string>();
