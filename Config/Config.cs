@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Configurator {
 	public static class Config {
@@ -14,7 +14,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="File"></param>
 		public static void SaveDefaultConfig(string Path = "Config.json", bool Overwrite = false) {
-			if (!File.Exists(Path) || Overwrite) {
+			if ( !File.Exists(Path) || Overwrite ) {
 				using StreamWriter ConfigFile = File.CreateText(Path);
 				ConfigFile.Write(DefaultConfigString);
 			}
@@ -25,7 +25,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="File">Path to the config file.</param>
 		public static Dictionary<string, List<string>> LoadConfig(string Path = "Config.json") {
-			if (!File.Exists(Path)) {
+			if ( !File.Exists(Path) ) {
 				throw new FileNotFoundException(Path + " does not exist.");
 			}
 
@@ -34,7 +34,7 @@ namespace Configurator {
 			try {
 				Config = JObject.Parse(File.ReadAllText(Path));
 #pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
-			} catch (JsonReaderException) {
+			} catch ( JsonReaderException ) {
 				return null;
 			}
 #pragma warning restore CA1031
@@ -44,12 +44,12 @@ namespace Configurator {
 			Dictionary<string, List<string>> Missing = new Dictionary<string, List<string>>();
 			Dictionary<string, Dictionary<string, object>> DefaultConfigKeys = JObject.Parse(DefaultConfigString).ToObject<Dictionary<string, Dictionary<string, object>>>();
 			Dictionary<string, Dictionary<string, object>> ConfigKeys = Config.ToObject<Dictionary<string, Dictionary<string, object>>>();
-			foreach (string Key in DefaultConfigKeys.Keys) {
-				if (!ConfigKeys.ContainsKey(Key)) {
+			foreach ( string Key in DefaultConfigKeys.Keys ) {
+				if ( !ConfigKeys.ContainsKey(Key) ) {
 					Missing.Add(Key, new List<string>(DefaultConfigKeys[Key].Keys.ToList()));
 				} else {
-					foreach (string Key2 in DefaultConfigKeys[Key].Keys) {
-						if (!ConfigKeys[Key].ContainsKey(Key2) || ConfigKeys[Key][Key2].GetType() != DefaultConfigKeys[Key][Key2].GetType()) {
+					foreach ( string Key2 in DefaultConfigKeys[Key].Keys ) {
+						if ( !ConfigKeys[Key].ContainsKey(Key2) || ConfigKeys[Key][Key2].GetType() != DefaultConfigKeys[Key][Key2].GetType() ) {
 							Missing.TryAdd(Key, new List<string>());
 							Missing[Key].Add(Key2);
 						}
@@ -59,7 +59,7 @@ namespace Configurator {
 
 			LoadedConfig = Config;
 
-			return (Missing);
+			return ( Missing );
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Configurator {
 		/// </summary>
 		/// <param name="ExtConfig"></param>
 		public static void AddConfig(StreamReader Reader) {
-			if (DefaultConfigString == null) {
+			if ( DefaultConfigString == null ) {
 				DefaultConfigString = Reader.ReadToEnd();
 			} else {
 				string NewConfig = Reader.ReadToEnd().Replace("\r\n", "\n").Remove(0, 1);
