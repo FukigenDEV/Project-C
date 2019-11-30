@@ -45,5 +45,14 @@
 		//###########################################################################
 		//The password for the built-in Administrator account.
 		"AdministratorPassword": "W@chtw00rd"
+	},
+	"BackupSettings": {
+		//The time between each automatic backup. Backups can always be manually triggered through the /backup endpoint if necessary.
+		//Do NOT place this folder within either wwwroot or errorpages. Doing so will allow users to download the backup files without requiring administrator privileges, exposing your database to the public.
+		//To restore a backup, extract the ZIP file and move its contents to the server's folder.
+		//Default is 86400, equal to 1 day. Set to 0 to disable.
+		"BackupInterval": 86400,
+		//The folder to write the backup files to.
+		"BackupFolder": "Backups"
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -108,18 +109,28 @@ namespace Webserver {
 		/// </summary>
 		public virtual void PATCH() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
 
+		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, null, StatusCode, null);
+		/// <summary>
+		/// Send JSON data to the client, answering the request.
+		/// </summary>
+		/// <param name="Data"></param>
+		/// <param name="StatusCode"></param>
+		public void Send(JObject Data, HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, Data.ToString(Formatting.None), StatusCode, "application/json");
 		/// <summary>
 		/// Sends data to the client, answering the request.
 		/// </summary>
 		/// <param name="Data">The data to send.</param>
 		/// <param name="StatusCode"></param>
 		/// <param name="ContentType"></param>,
-		public void Send(object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
-			if(ContentType == null) {
-				ContentType = new StackTrace().GetFrame(1).GetMethod().GetCustomAttribute<RequireContentType>()?.ContentType ?? "text/html";
-			}
-			Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
-		}
+		public void Send(object Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/html") => Utils.Send(Response, Data?.ToString(), StatusCode, ContentType);
+		/// <summary>
+		/// Sends a byte array to the client, answering the request.
+		/// Note that file downloads need to use the Content-disposition header in order to properly set a file name.
+		/// </summary>
+		/// <param name="Data">The data to send</param>
+		/// <param name="ContentType"></param>
+		/// <param name="StatusCode"></param>
+		public void Send(byte[] Data, string ContentType, HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, Data, StatusCode, ContentType);
 
 		/// <summary>
 		/// Send a cookie to the client.

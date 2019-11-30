@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class manCompany extends Component {
   constructor(props) {
@@ -8,55 +10,70 @@ class manCompany extends Component {
         type: 0,
         value: ''
       },
-
-      form: {
-        'name': '',
-        'description': ''
-      }
+      data: [],
     }
   }
 
-  handleChange = (event) => {
-    event.preventDefault();
-    const form = {...this.state.form};
-    form[event.target.name] = event.target.value;
-    this.setState({form});
+  componentDidMount() {
+    this.getCompanies();
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-    const obj = this.state.form;
-    const data = JSON.stringify(obj);
+  getCompanies = () => {
+    fetch('/company?name=')
+    .then(companies => {
+      return companies.json();
+    }).then(data => {
+      this.setState({data});
+      console.log(this.state.data);
+    })
+  }
 
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/department", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.readyState === 4) {
-        if(xhr.status === 200) {
-          const alert = {...this.state.alert};
-          alert.type = 200;
-          alert.value = 'Department succesfully added';
-          this.setState({alert});
-        } else {
-          const alert = {...this.state.alert};
-          alert.type = xhr.status;
-          alert.value = xhr.responseText;
-          this.setState({alert});
-        }
-      }
-    }
-  
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(data);
+  handleDelete = name => {
+    fetch(`/company?name=${name}`, {method: 'DELETE',});
+    const obj = this.state.data;
+    const data = obj.filter(newdata => (newdata.Name !== name));
+    this.setState({data});
+    console.log(this.state);
   }
 
   render() {
-    console.log(this.state.form);
-    console.log(this.state.alert);
+    const companylist = (this.state.data.length !== 0) ?
+      this.state.data.map(company => (
+        <tr>
+          <th scope="row">{company.ID}</th>
+          <td>{company.Name}</td>
+          <td><Link to={`/dashboard/Admin/company/manage/details/${company.ID}`}>Details</Link></td>
+          <td><Link to={`/dashboard/Admin/company/manage/edit/${company.ID}`}>Edit</Link></td>
+          <td><a href onClick={() => this.handleDelete(company.Name)}>Delete</a></td>
+        </tr>
+      ))
+      :
+        <tr>
+          <th scope="row">&nbsp;</th>
+          <td>Geen bedrijven beschikbaar!</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      ;
+
     return (
-      <div>
-        Company Manage
-      </div>
+      <React.Fragment>
+        <table className="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Details</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {companylist}
+          </tbody>
+        </table>
+      </React.Fragment>
     );
   }
 }

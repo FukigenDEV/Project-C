@@ -43,14 +43,12 @@ namespace Webserver.Data {
 			Connection.Update<Session>(this);
 		}
 
-		public long GetRemainingTime() {
-			long Timeout;
-			if (this.RememberMe) {
-				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutLong");
-			} else {
-				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
-			}
-			long TokenAge = Utils.GetUnixTimestamp() - this.Token;
+		public long GetRemainingTime() => GetRemainingTime(this.Token, this.RememberMe);
+		public static long GetRemainingTime(long Token, bool RememberMe) {
+			long Timeout = RememberMe
+				? (long)Config.GetValue("AuthenticationSettings.SessionTimeoutLong")
+				: (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
+			long TokenAge = Utils.GetUnixTimestamp() - Token;
 			return Timeout - TokenAge;
 		}
 
@@ -65,15 +63,7 @@ namespace Webserver.Data {
 				return null;
 			}
 
-			long Timeout;
-			if (s.RememberMe) {
-				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutLong");
-			} else {
-				Timeout = (long)Config.GetValue("AuthenticationSettings.SessionTimeoutShort");
-			}
-			long TokenAge = Utils.GetUnixTimestamp() - s.Token;
-
-			if (TokenAge > Timeout) {
+			if (GetRemainingTime(s.Token, s.RememberMe) < 0) {
 				Connection.Delete(s);
 				return null;
 			} else {

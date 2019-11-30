@@ -11,13 +11,12 @@ namespace Webserver.API_Endpoints
     [EndpointURL("/note")]
     internal partial class NoteEndPoint : APIEndpoint
     {
-        [RequireContentType("application/json")]
         public override void GET()
         {
             // Get required fields
             if (!RequestParams.ContainsKey("title"))
             {
-                Send("Missing fields", HttpStatusCode.BadRequest);
+                Send("Missing params", HttpStatusCode.BadRequest);
                 return;
             }
 

@@ -14,8 +14,10 @@ class Users extends Component {
         </div>
 
         <div className="shadow-sm p-3 mb-5 bg-white rounded">
+          <Route exact path="/dashboard/Admin/company" component={addCompany} />
           <Route exact path="/dashboard/Admin/company/add" component={addCompany} />
           <Route exact path="/dashboard/Admin/company/manage" component={manCompany} />
+          <Route path="/dashboard/Admin/company/manage/details/:id" component={manCompany} />
         </div>
       </React.Fragment>
     );

@@ -54,7 +54,7 @@ namespace Webserver.API_Endpoints {
 				JObject Perms = (JObject)MemberDepartment;
 				foreach (KeyValuePair<string, JToken> Entry in Perms) {
                     //Check if the specified department exists, skip if it doesn't.
-                    Department Dept = Department.GetDepartmentByName(Connection, Entry.Key);
+                    Department Dept = Department.GetByName(Connection, Entry.Key);
 					if (Dept == null) {
 						continue;
 					}
