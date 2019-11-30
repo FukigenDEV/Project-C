@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+
 class Notities extends Component {
   componentDidMount() {
+	$("#notitieAanmakenKnop").on("click", function(event) {
+		$("#alleNotities").hide(250);
+		$("#notitieAanmaken").show(250);
+	});
+	$("#alleNotitiesKnop").on("click", function(event) {
+		$("#notitieAanmaken").hide(250);
+		$("#alleNotities").show(250);
+	});
+
 	$("#add_note_form").on("submit", function(event) {
 		event.preventDefault();
 
@@ -45,20 +55,32 @@ class Notities extends Component {
         <h2>Notities</h2>
 		<hr/>
 
-		<p><b>Alle notities</b></p>
-		<p id="all_notes"></p>
+		<button type="button" id = "alleNotitiesKnop" class="btn btn-outline-primary" style={{display: "inline-block"}}>
+			Alle notities</button>
+			
+		<button type="button" id= "notitieAanmakenKnop" class="btn btn-outline-primary" style={{display: "inline-block"}}>
+			Notitie aanmaken</button>
 
-		<p><b>Notitie toevoegen</b></p>
-		<form id="add_note_form" method="POST">
-			<label>Titel:</label><br/>
-			<input id="note_title" type="text" name="note_title" style={{width: "50%", marginBottom: "15px"}}/><br/>
-			<label>Tekst:</label><br/>
-			<input id="note_text" type="text" name="note_text" style={{width: "50%", height: "225px"}}/><br/>
-			<br/>
-			<input type="submit" value="Toevoegen" style={{width: "200px"}}/><br/><br/>
 
-			<p id="message"></p>
-		</form>
+		<div id ="alleNotities">
+			<h5><b>Alle notities</b></h5>
+			<p id="all_notes"></p>
+		</div>
+
+		<div id="notitieAanmaken" style= {{display: "none"}}>
+			<h5><b>Notitie toevoegen</b></h5>
+			<form id="add_note_form" method="POST">
+				<label>Titel:</label><br/>
+				<input id="note_title" type="text" name="note_title" style={{width: "50%", marginBottom: "15px"}}/><br/>
+				<label>Tekst:</label><br/>
+				<input id="note_text" type="text" name="note_text" style={{width: "50%", height: "225px"}}/><br/>
+				<br/>
+				<input type="submit" value="Toevoegen" style={{width: "200px"}}/><br/><br/>
+
+				<p id="message"></p>
+			</form>
+		</div>
+
       </div>
     );
   }
