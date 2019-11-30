@@ -23,7 +23,8 @@ class Dashboard extends Component {
             <div className="col-9 col-s-12 main-window">
               <Switch>
                 <Route path="/dashboard/Admin" component={Admin} />
-                <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onRedirect={onRedirect} />} />
+                {/*dit geeft de value "loggedin" en de method "onRedirect" door aan de uitlogpagina zodat deze daar gebruikt kunnen worden*/}
+                <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onLogout={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
                 <Route component={Error} />
               </Switch>

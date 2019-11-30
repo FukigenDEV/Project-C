@@ -14,11 +14,11 @@ namespace Webserver.API_Endpoints
 		[RequireBody]
 		public override void POST()
         {
-            // Check if values can be cast to a string
+            // Checkt of de waardes omgezet kunnen worden naar een string, hij gaat alleen door als dit bij allebei zo is, ander gelijk naar de else
             if (JSON.TryGetValue<string>("name", out JToken name) &&
                 JSON.TryGetValue<string>("description", out JToken description))
             {
-                //Check if values are at least 1 character
+                //Check of allebei de ingevulde velden minstens 1 karakter lang zijn, anders is er niks ingevuld
                 if (((string)name).Length < 1 || ((string)description).Length < 1)
                 {
                     Send("Please fill in all fields", HttpStatusCode.BadRequest);

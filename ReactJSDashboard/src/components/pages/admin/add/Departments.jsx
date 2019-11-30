@@ -49,7 +49,7 @@ class addDepartments extends Component {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   }
-
+  // Zorgt weer voor de balk die een groene melding laat zien (goed) of een rode melding (error)
   getBadgeClasses = () => {
     let classes = 'alert mr-3 ml-3 ';
     classes += (this.state.alert.type === 200) ? "alert-success" : "alert-danger";
@@ -72,7 +72,7 @@ class addDepartments extends Component {
             <label for="description">Description</label>
             <input onChange={this.handleChange} type="text" name="description" class="form-control" id="description" placeholder="Enter description" />
           </div>
-
+          {/*Laat de melding zien van als het is gelukt of als er iets fout is gegaan, die komen uit backend*/}
           <div className={this.getBadgeClasses()}>{this.state.alert.value}</div>
 
           <button type="submit" class="btn btn-primary">Add department</button>
