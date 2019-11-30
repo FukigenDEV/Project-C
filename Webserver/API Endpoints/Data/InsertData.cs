@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	partial class Data : APIEndpoint {
+	internal partial class Data : APIEndpoint {
 
 		/// <summary>
 		/// Inserts data into the specified table.
@@ -16,14 +16,14 @@ namespace Webserver.API_Endpoints {
 		[RequireContentType("application/json")]
 		public override void POST() {
 			//Get required fields
-			if (!RequestParams.ContainsKey("table")) {
+			if ( !RequestParams.ContainsKey("table") ) {
 				Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if all specified table exist
 			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, RequestParams["table"][0]);
-			if (Table == null) {
+			if ( Table == null ) {
 				Send("No such table", HttpStatusCode.NotFound);
 				return;
 			}
@@ -31,12 +31,12 @@ namespace Webserver.API_Endpoints {
 			//Build insertion dict
 			Dictionary<string, DataType> Columns = Table.GetColumns();
 			Dictionary<string, dynamic> Dict = new Dictionary<string, dynamic>();
-			foreach(KeyValuePair<string, JToken> Entry in JSON) {
-				if (!Columns.ContainsKey(Entry.Key)) {
+			foreach ( KeyValuePair<string, JToken> Entry in JSON ) {
+				if ( !Columns.ContainsKey(Entry.Key) ) {
 					Send("No such column: " + Entry.Key);
 					return;
 				}
-				if(Entry.Key == "rowid" ) {
+				if ( Entry.Key == "rowid" ) {
 					Send("Can't set row ID", HttpStatusCode.BadRequest);
 					return;
 				}

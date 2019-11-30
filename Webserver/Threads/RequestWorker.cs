@@ -1,9 +1,4 @@
-﻿using Configurator;
-using Dapper.Contrib.Extensions;
-using Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -12,13 +7,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Configurator;
+using Dapper.Contrib.Extensions;
+using Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver.Threads {
 	/// <summary>
 	/// Request handlers. Meant to run in a separate thread.
 	/// </summary>
-	class RequestWorker {
+	internal class RequestWorker {
 		private readonly Logger Log;
 		private readonly BlockingCollection<HttpListenerContext> Queue;
 		private readonly SQLiteConnection Connection;
@@ -38,7 +38,7 @@ namespace Webserver.Threads {
 		/// Start this RequestWorker. Meant to run in a separate thread.
 		/// </summary>
 		public void Run() {
-			while (true) {
+			while ( true ) {
 				HttpListenerContext Context = Queue.Take();
 				DateTime Started = DateTime.Now;
 				HttpListenerRequest Request = Context.Request;
@@ -46,13 +46,13 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
-				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length-1);
+				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
 
-				if (URL == null) {
+				if ( URL == null ) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.RawUrl.ToLower());
 					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
-				} else if (URL != Request.RawUrl.ToLower()) {
+				} else if ( URL != Request.RawUrl.ToLower() ) {
 					Response.Redirect(URL);
 					Utils.Send(Response, null, HttpStatusCode.Redirect);
 					continue;
@@ -77,7 +77,7 @@ namespace Webserver.Threads {
 				}
 				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
 				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
-				if(TimeSpent >= 250 ) {
+				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			}
@@ -90,16 +90,16 @@ namespace Webserver.Threads {
 		/// <returns></returns>
 		public Type FindEndpoint(HttpListenerRequest Request) {
 			//Search through endpoints
-			foreach (Type T in Program.Endpoints) {
+			foreach ( Type T in Program.Endpoints ) {
 				//Get endpoint info attribute. If the attribute is missing, show an error in console and continue to the next.
 				EndpointURL Info = (EndpointURL)Attribute.GetCustomAttribute(T, typeof(EndpointURL));
-				if (Info == null) {
+				if ( Info == null ) {
 					Log.Error("Endpoint " + T.Name + " has no EndpointURL attribute");
 					continue;
 				}
 
 				//Check if this is the correct endpoint. If it is, execute it.
-				if (Info.URL == Request.Url.LocalPath.ToLower()) {
+				if ( Info.URL == Request.Url.LocalPath.ToLower() ) {
 					return T;
 				}
 			}
@@ -124,7 +124,7 @@ namespace Webserver.Threads {
 			Endpoint.Request = Context.Request;
 
 			//Convert query string to a Dict because NameValueCollections are trash
-			foreach (string key in Request.QueryString) {
+			foreach ( string key in Request.QueryString ) {
 				Endpoint.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
 			}
 
@@ -147,19 +147,19 @@ namespace Webserver.Threads {
 
 			//Check this method's required content type, if any.
 			RequireContentType CT = Method.GetCustomAttribute<RequireContentType>();
-			if(CT != null) {
-				if(CT.ContentType == "application/json") {
+			if ( CT != null ) {
+				if ( CT.ContentType == "application/json" ) {
 					//Try to parse the JSON. If that failed for some reason, check if the response body is actually necessary.
 					//Return null if it isn't, return a 400 Bad Request if it is.
 					using StreamReader Reader = new StreamReader(Request.InputStream, Request.ContentEncoding);
 					string JSONText = Reader.ReadToEnd();
 					try {
 						Endpoint.JSON = JObject.Parse(JSONText);
-					} catch (JsonReaderException e) {
-						if (Method.GetCustomAttribute<RequireBody>() != null) {
+					} catch ( JsonReaderException e ) {
+						if ( Method.GetCustomAttribute<RequireBody>() != null ) {
 							Log.Warning("Refused request for endpoint " + T.Name + ": Could not parse JSON");
 							Log.Debug("Message: " + e.Message);
-							Log.Debug("Received JSON: "+JSONText);
+							Log.Debug("Received JSON: " + JSONText);
 							Utils.Send(Response, "Invalid JSON: " + e.Message, HttpStatusCode.BadRequest);
 							return;
 						}
@@ -171,17 +171,17 @@ namespace Webserver.Threads {
 			//Check whether the user is allowed to use this endpoint method, if necessary.
 			#region PermissionLevel Attribute
 			PermissionLevel Attr = Method.GetCustomAttribute<PermissionLevel>();
-			if (Attr != null) {
+			if ( Attr != null ) {
 				//Check cookie. If its missing, send a 401 Unauthorized if the cookie is missing. (because a user MUST be logged in to use an endpoint with a PermissionLevel attribute)
 				Cookie SessionIDCookie = Request.Cookies["SessionID"];
-				if (SessionIDCookie == null) {
+				if ( SessionIDCookie == null ) {
 					Utils.Send(Response, "No Session", HttpStatusCode.Unauthorized);
 					return;
 				}
 
 				//Check if a session exists with the Session ID contained in the session cookie. If none is found or the session has expired, send back a 401 Unauthorized
 				Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
-				if (s == null) {
+				if ( s == null ) {
 					Utils.Send(Response, "Expired session", HttpStatusCode.Unauthorized);
 					return;
 				}
@@ -194,7 +194,7 @@ namespace Webserver.Threads {
 
 				//Get department name. If none was found, assume Administrators
 				string DepartmentName;
-				if (Endpoint.RequestParams.ContainsKey("Department")) {
+				if ( Endpoint.RequestParams.ContainsKey("Department") ) {
 					DepartmentName = Endpoint.RequestParams["Department"][0];
 				} else {
 					DepartmentName = "Administrators";
@@ -202,7 +202,7 @@ namespace Webserver.Threads {
 
 				//Get department. If none was found, send 400 Bad Request
 				Department Dept = Department.GetByName(Connection, DepartmentName);
-				if (Dept == null) {
+				if ( Dept == null ) {
 					Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
 					return;
 				}
@@ -212,7 +212,7 @@ namespace Webserver.Threads {
 				Endpoint.RequestUserLevel = Level;
 
 				//Check permission level
-				if (Level < Attr.Level) {
+				if ( Level < Attr.Level ) {
 					Log.Warning("User " + Endpoint.RequestUser.Email + " attempted to access endpoint " + T.Name + " without sufficient permissions");
 					Log.Warning("Department: '" + DepartmentName + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
 					Utils.Send(Response, null, HttpStatusCode.Forbidden);
@@ -224,7 +224,7 @@ namespace Webserver.Threads {
 			//Attempt to invoke the API endpoint method. If this fails, send a 500 Internal Server Error to the client.
 			try {
 				Method.Invoke(Endpoint, null);
-			} catch (Exception e) {
+			} catch ( Exception e ) {
 				Log.Error("Failed to fullfill request for endpoint " + T.Name + ": " + e.GetType().Name + ", " + e.Message);
 				Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
 			}
@@ -240,17 +240,18 @@ namespace Webserver.Threads {
 			HttpListenerResponse Response = Context.Response;
 
 			//Content-type header shouldn't be set for resources
-			if (Request.ContentType != null) {
+			if ( Request.ContentType != null ) {
 				Log.Warning("Refused request for resource " + Target + ": Unsupported Media Type (" + Request.ContentType + ")");
 				Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType);
 				return;
 			}
 
 			//Switch to the request's HTTP method
-			switch (Request.HttpMethod) {
+			switch ( Request.HttpMethod ) {
 				case "GET":
 					//Send the resource to the client. Content type will be set according to the resource's file extension.
-					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch {
+					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch
+					{
 						".css" => "text/css",
 						".png" => "image/png",
 						".js" => "text/javascript",
@@ -268,7 +269,7 @@ namespace Webserver.Threads {
 				case "OPTIONS":
 					//Return a list of allowed HTTP methods for this resource (which is always the same), along with access-control headers for CORS support.
 					Response.Headers.Add("Allow", "GET, HEAD, OPTIONS");
-					if (Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString())) {
+					if ( Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString()) ) {
 						Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
 					}
 					Utils.Send(Response, null, HttpStatusCode.OK);

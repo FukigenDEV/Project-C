@@ -1,9 +1,9 @@
-﻿using Dapper;
-using System;
+﻿using System;
 using System.Data.SQLite;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Dapper;
 
 namespace Webserver.Data {
 	/// <summary>
@@ -116,14 +116,14 @@ namespace Webserver.Data {
 		/// <param name="Salt"></param>
 		/// <returns></returns>
 		public static string CreateHash(string Password, string Salt) {
-			if (string.IsNullOrEmpty(Password)) {
+			if ( string.IsNullOrEmpty(Password) ) {
 				throw new ArgumentException("message", nameof(Password));
 			}
 
 			byte[] PassBytes = Encoding.UTF8.GetBytes(Password);
 			byte[] SaltBytes = Encoding.UTF8.GetBytes(Salt);
 			using SHA512 sha = SHA512.Create();
-			return String.Concat(sha
+			return string.Concat(sha
 				.ComputeHash(PassBytes.Concat(SaltBytes).ToArray())
 				.Select(item => item.ToString("x2")));
 		}

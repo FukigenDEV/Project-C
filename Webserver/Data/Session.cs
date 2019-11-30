@@ -1,8 +1,8 @@
-﻿using Configurator;
+﻿using System;
+using System.Data.SQLite;
+using Configurator;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using System;
-using System.Data.SQLite;
 
 namespace Webserver.Data {
 	/// <summary>
@@ -35,7 +35,7 @@ namespace Webserver.Data {
 			this.User = (int)User;
 			this.Token = Token;
 			this.SessionID = SessionID;
-			this.RememberMe = ((int)RememberMe == 1) ? true : false;
+			this.RememberMe = ( (int)RememberMe == 1 ) ? true : false;
 		}
 
 		/// <summary>
@@ -72,12 +72,12 @@ namespace Webserver.Data {
 		public static Session GetUserSession(SQLiteConnection Connection, string SessionID) {
 			//Get the session
 			Session s = Connection.QueryFirstOrDefault<Session>("SELECT * FROM Sessions WHERE SessionID = @SessionID", new { SessionID });
-			if (s == null) {
+			if ( s == null ) {
 				return null;
 			}
 
 			//Check if this session is still valid. If it isn't, delete it and return null.
-			if (GetRemainingTime(s.Token, s.RememberMe) < 0) {
+			if ( GetRemainingTime(s.Token, s.RememberMe) < 0 ) {
 				Connection.Delete(s);
 				return null;
 			} else {

@@ -1,11 +1,11 @@
-﻿using Configurator;
-using Logging;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Configurator;
+using Logging;
 
 namespace Webserver {
-	static class Redirect {
+	internal static class Redirect {
 		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		private static readonly Logger Log = Program.Log;
 
@@ -14,12 +14,12 @@ namespace Webserver {
 		/// </summary>
 		public static void Init() {
 			string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
-			
+
 			//If no Redirects file exists yet, create a default one.
-			if (!File.Exists("Redirects.config")) {
+			if ( !File.Exists("Redirects.config") ) {
 				using StreamWriter RedirectsFile = File.CreateText("Redirects.config");
 				//If wwwroot contains an index.html file, add it to redirects.
-				if (File.Exists(wwwroot + "/index.html")) {
+				if ( File.Exists(wwwroot + "/index.html") ) {
 					RedirectsFile.WriteLine("/ => /index.html");
 				}
 			}
@@ -35,8 +35,8 @@ namespace Webserver {
 		/// <returns></returns>
 		public static string Resolve(string Path) {
 			Stack<string> ResolveStack = new Stack<string>();
-			while (RedirectionDict.ContainsKey(Path)) {
-				if (ResolveStack.Contains(Path)) {
+			while ( RedirectionDict.ContainsKey(Path) ) {
+				if ( ResolveStack.Contains(Path) ) {
 					return null;
 				}
 
@@ -53,30 +53,30 @@ namespace Webserver {
 		public static void ParseRedirectFile(string Path) {
 			string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
 
-			if (!File.Exists(Path)) {
+			if ( !File.Exists(Path) ) {
 				throw new FileNotFoundException();
 			}
 			using StreamReader Reader = File.OpenText(Path);
 			string Line;
 			int LineCount = 1;
-			while ((Line = Reader.ReadLine()) != null) {
+			while ( ( Line = Reader.ReadLine() ) != null ) {
 				string[] LineContents = Line.Split(" => ");
 
 				//Check if the line is valid
-				if (LineContents.Length != 2) {
+				if ( LineContents.Length != 2 ) {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Invalid format");
 					continue;
 				}
 
 				//Check if the source URI is valid
 				Regex ex = new Regex("(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}");
-				if (!ex.IsMatch(LineContents[0]) && LineContents[0] != "/") {
+				if ( !ex.IsMatch(LineContents[0]) && LineContents[0] != "/" ) {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URI");
 					continue;
 				}
 
 				//Check if the destination is valid
-				if (!ex.IsMatch(LineContents[1]) && LineContents[1] != "/") {
+				if ( !ex.IsMatch(LineContents[1]) && LineContents[1] != "/" ) {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URI");
 					continue;
 				}

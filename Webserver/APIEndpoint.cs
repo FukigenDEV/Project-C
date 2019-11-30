@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
@@ -8,6 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver {
@@ -85,8 +85,8 @@ namespace Webserver {
 		/// </summary>
 		public void OPTIONS() {
 			List<string> AllowedMethods = new List<string>();
-			foreach(MethodInfo Method in GetType().GetMethods()) {
-				if(Method.DeclaringType == GetType()) {
+			foreach ( MethodInfo Method in GetType().GetMethods() ) {
+				if ( Method.DeclaringType == GetType() ) {
 					AllowedMethods.Add(Method.Name);
 				}
 			}
@@ -146,7 +146,7 @@ namespace Webserver {
 		public void AddCookie(string name, string value, long Expire) {
 			string CookieVal = name + "=" + value;
 
-			if(Expire < 0) {
+			if ( Expire < 0 ) {
 				throw new ArgumentOutOfRangeException("Negative cookie expiration");
 			}
 			CookieVal += "; Max-Age=" + Expire;
