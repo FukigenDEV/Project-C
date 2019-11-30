@@ -40,8 +40,10 @@
 				<input id="gdt_column_name" type="text" name="gdt_column_name">
 			</div>
 		</div>
-
-		<button id="add_column">+</button><br/>
+		
+		<br/>
+		
+		<button id="add_column">+ Add column</button><br/>
 
 		<br/>
 
@@ -85,18 +87,26 @@
 	$("#add_column").on("click", function(event) {
 		event.preventDefault();
 
-		var template = document.getElementById("column_template");
-		var clone = template.content.cloneNode(true);
+		var childString = "<div>" +
+			"<select>" +
+				"<option value=\"integer\">Integer</option>" +
+				"<option value=\"string\">String</option>" +
+				"<option value=\"real\">Real</option>" +
+				"<option value=\"blob\">Blob</option>" +
+			"</select>" +
+			"<input id=\"gdt_column_name\" type=\"text\" name=\"gdt_column_name\">" +
+			"<button class=\"remove_column\" style=\"width: 30px;\">-</button>"
+		"</div>";
 
-		document.getElementById("columns").appendChild(clone);
+		$("#columns").append(childString);
+
+		$(".remove_column").on("click", function(event) {
+			event.preventDefault();
+
+			$(this).parent().remove();
+		});
 	});
-
-	function removeColumn(element) {
-		event.preventDefault();
-
-		element.parentElement.remove();
-	}
-
+	
 	$("#add_gdt_form").on("submit", function(event) {
 		event.preventDefault();
 
@@ -116,8 +126,6 @@
 			}
 		}
 
-		var testJSON = JSON.parse('{ "ID":"Integer", "FirstName":"String", "LastName":"String"}');
-
 		var jsonString = '{ ';
 		$("#columns").find("div").each(function(){
 			var innerDiv = $(this);
@@ -130,7 +138,7 @@
 
 			// If the last element is not reached yet, add a comma.
 			if (innerDiv.index() != $("#columns").find("div").length - 1) {
-				jsonString += ', '
+				jsonString += ', ';
 			}
 		});
 		jsonString += '}';
