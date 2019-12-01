@@ -18,6 +18,11 @@ class manCompany extends Component {
     this.getCompanies();
   }
 
+  handleDelete = async (name) => {
+    await fetch(`/company?name=${name}`, {method: 'DELETE',});
+    this.getCompanies();
+  }
+
   getCompanies = () => {
     fetch('/company?name=')
     .then(companies => {
@@ -28,14 +33,6 @@ class manCompany extends Component {
     })
   }
 
-  handleDelete = name => {
-    fetch(`/company?name=${name}`, {method: 'DELETE',});
-    const obj = this.state.data;
-    const data = obj.filter(newdata => (newdata.Name !== name));
-    this.setState({data});
-    console.log(this.state);
-  }
-
   render() {
     const companylist = (this.state.data.length !== 0) ?
       this.state.data.map(company => (
@@ -43,7 +40,7 @@ class manCompany extends Component {
           <th scope="row">{company.ID}</th>
           <td>{company.Name}</td>
           <td><Link to={`/dashboard/Admin/company/manage/details/${company.ID}`}>Details</Link></td>
-          <td><Link to={`/dashboard/Admin/company/manage/edit/${company.ID}`}>Edit</Link></td>
+          <td><Link to={`/dashboard/Admin/company/manage/edit/${company.Name}`}>Edit</Link></td>
           <td><a href onClick={() => this.handleDelete(company.Name)}>Delete</a></td>
         </tr>
       ))

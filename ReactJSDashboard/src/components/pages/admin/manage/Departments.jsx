@@ -18,6 +18,11 @@ class manDepartments extends Component {
     this.getDepartments();
   }
 
+  handleDelete = async (name) => {
+    await fetch(`/department?name=${name}`, {method: 'DELETE',});
+    this.getDepartments();
+  }
+
   getDepartments = () => {
     fetch('/department?name=')
     .then(departments => {
@@ -25,14 +30,6 @@ class manDepartments extends Component {
     }).then(data => {
       this.setState({data});
     })
-  }
-
-  handleDelete = name => {
-    fetch(`/department?name=${name}`, {method: 'DELETE'});
-    const obj = this.state.data;
-    const data = obj.filter(newdata => (newdata.Name !== name));
-    this.setState({data});
-    console.log(this.state);
   }
 
   render() {
@@ -54,7 +51,7 @@ class manDepartments extends Component {
               <th scope="row">{department.ID}</th>
               <td>{department.Name}</td>
               <td>{department.Description}</td>
-              <td><Link>Edit</Link></td>
+              <td><Link to={`/dashboard/Admin/departments/manage/edit/${department.Name}`}>Edit</Link></td>
               <td><a href onClick={() => this.handleDelete(department.Name)}>Delete</a></td>
             </tr>
           ))}
