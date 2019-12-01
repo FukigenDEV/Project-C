@@ -23,7 +23,6 @@ class AdminWizard extends Component {
 		var email = $("#company_email").val();
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/company", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -56,7 +55,6 @@ class AdminWizard extends Component {
 		var description = $("#department_description").val();
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/department", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -106,7 +104,6 @@ class AdminWizard extends Component {
 		var department = $("#departments_dropdown option:selected").text();
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/account", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -141,12 +138,10 @@ class AdminWizard extends Component {
 		event.preventDefault();
 
 		var name = $("#gdt_name").val();
-		var columns = $("#gdt_columns").val();
 		var department = $("#departments_dropdown option:selected").text();
-		var requireValidation = $("#gdt_require_validation").val() == "on" ? true : false;
+		var requireValidation = $("#gdt_require_validation").val() === "on" ? true : false;
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/datatable", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -167,7 +162,7 @@ class AdminWizard extends Component {
 			jsonString += pair;
 
 			// If the last element is not reached yet, add a comma.
-			if (innerDiv.index() != $("#columns").find("div").length - 1) {
+			if (innerDiv.index() !== $("#columns").find("div").length - 1) {
 				jsonString += ', ';
 			}
 		});
@@ -227,8 +222,8 @@ class AdminWizard extends Component {
 	//////////////////////////////// End of Generic data table code ///////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
 
-	var xhr = new XMLHttpRequest();
-	var url = "/department?name=";
+	xhr = new XMLHttpRequest();
+	url = "/department?name=";
 	xhr.open("GET", url, true);
 
 	xhr.setRequestHeader("Content-Type", "application/json");
@@ -250,16 +245,25 @@ class AdminWizard extends Component {
     return (
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
         <h2>Admin wizard</h2>
+
 		<hr/>
 
-		<div id="intro" style={{display: "none"}}>
-			<p><b>The admin wizard will walk you through the most import things in the application.</b></p>
+		<div id="intro" style={{display: "block"}}>
+			<p><strong>The admin wizard will walk you through the following steps:</strong><br/>
+			- Adding a Company<br/>
+			- Adding Departments<br/>
+			- Adding Users<br/>
+			- Adding Generic data tables</p>
+
+			<p>The admin wizard will take a few minutes. You can immediately start using the application after finishing.</p>
 
 			<button id="begin_button">Begin</button>
 		</div>
 		
 		<div id="add_company" style={{display: "none"}}>
-			<p><b>Company data</b></p>
+			<p><b>Step 1: Add a Company</b><br/>
+			Add your company to the application. You can only add 1 company.</p>
+
 			<form id="add_company_form" method="POST">
 				Name: <input id="company_name" type="text" name="company_name"/><br/>
 				Street: <input id="company_street" type="text" name="company_street"/><br/>
@@ -277,7 +281,9 @@ class AdminWizard extends Component {
 		</div>
 
 		<div id="add_department" style={{display: "none"}}>
-			<p><b>Add a Department</b></p>
+			<p><b>Step 2: Add Departments</b><br/>
+			Add some departments to your company.</p>
+
 			<form id="add_department_form" method="POST">
 				Department name: <input id="department_name" type="text" name="department_name"/><br/>
 				Department description: <input id="department_description" type="text" name="department_description"/><br/>
@@ -295,7 +301,9 @@ class AdminWizard extends Component {
 		</div>
 
 		<div id="add_user" style={{display: "none"}}>
-			<p><b>Add a User</b></p>
+			<p><b>Step 3: Add Users</b><br/>
+			Add some users to your company.</p>
+
 			<form id="add_user_form" method="POST">
 				Email: <input id="user_email" type="email" name="user_email"/><br/>
 				Password: <input id="user_password" type="password" name="user_password"/><br/>
@@ -335,8 +343,10 @@ class AdminWizard extends Component {
 			</form>
 		</div>
 
-		<div id="add_gdt" style={{display: "block"}}>
-			<p><b>Add a Generic data table</b></p>
+		<div id="add_gdt" style={{display: "none"}}>
+			<p><b>Step 4: Add Generic data tables</b><br/>
+			By adding generic data tables, you can save and keep track of data in your application.</p>
+
 			<form id="add_gdt_form" method="POST">
 				Name: <input id="gdt_name" type="text" name="gdt_name"/><br/>
 

@@ -95,7 +95,7 @@
 				"<option value=\"blob\">Blob</option>" +
 			"</select>" +
 			"<input id=\"gdt_column_name\" type=\"text\" name=\"gdt_column_name\">" +
-			"<button class=\"remove_column\" style=\"width: 30px;\">-</button>"
+			"<button class=\"remove_column\" style=\"width: 30px;\">-</button>" +
 		"</div>";
 
 		$("#columns").append(childString);
@@ -113,10 +113,9 @@
 		var name = $("#gdt_name").val();
 		var columns = $("#gdt_columns").val();
 		var department = $("#departments_dropdown option:selected").text();
-		var requireValidation = $("#gdt_require_validation").val() == "on" ? true : false;
+		var requireValidation = $("#gdt_require_validation").val() === "on" ? true : false;
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/datatable", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -137,7 +136,7 @@
 			jsonString += pair;
 
 			// If the last element is not reached yet, add a comma.
-			if (innerDiv.index() != $("#columns").find("div").length - 1) {
+			if (innerDiv.index() !== $("#columns").find("div").length - 1) {
 				jsonString += ', ';
 			}
 		});

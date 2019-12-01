@@ -42,6 +42,8 @@
 				for (var i = 0; i < tables.length; i++) {
 					$("#tables_dropdown select").append("<option value=" + i + ">" + tables[i].Name + "</option>");
 				}
+
+				$("#tables_dropdown").change();
 			}
 		}
 
@@ -52,18 +54,21 @@
 		var tableName = $(this).find(":selected").text();
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("GET", "/data?table=" + tableName, true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
 				$("#rows").empty();
-				$("#message").html(xhr.responseText);
 
 				var json = JSON.parse(xhr.responseText);
-
 				var columns = json[tableName]["Columns"];
+
+				if (json[tableName]["Rows"].length === 0) {
+					$("#message").html("Table <em>" + tableName + "</em> doesn't contain any rows.");
+				} else {
+					$("#message").html(xhr.responseText);
+				}
 
 				for (var key in columns) {
 					var dataType = columns[key];
@@ -93,7 +98,6 @@
 		var table = $("#tables_dropdown option:selected").text();
 
 		var xhr = new XMLHttpRequest();
-		
 		xhr.open("POST", "/data?table=" + table, true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -113,7 +117,7 @@
 			jsonString += '"' + key + '": "' + value + '"';
 
 			// If the last element is not reached yet, add a comma.
-			if ($(this).index("input") != $("#rows").find("input").length - 1) {
+			if ($(this).index("input") !== $("#rows").find("input").length - 1) {
 				jsonString += ', '
 			}
 		});
