@@ -12,10 +12,12 @@ import Users from './components/pages/admin/add/Users';
 import Departments from './components/pages/admin/Departments';
 import addDepartments from './components/pages/admin/add/Departments';
 import manDepartments from './components/pages/admin/manage/Departments';
+import EditDepartments from './components/pages/admin/manage/edit/Departments';
 
-import Company from './components/pages/admin/Company'
-import addCompany from './components/pages/admin/add/Company'
-import manCompany from './components/pages/admin/manage/Company'
+import Company from './components/pages/admin/Company';
+import addCompany from './components/pages/admin/add/Company';
+import manCompany from './components/pages/admin/manage/Company';
+import EditCompany from './components/pages/admin/manage/edit/Company';
 
 import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
@@ -45,9 +47,11 @@ export {
     Departments,
     addDepartments,
     manDepartments,
+    EditDepartments,
     Company,
     addCompany,
     manCompany,
+    EditCompany,
     GegevensRegistreren,
     GegevensBekijken,
     Notities,

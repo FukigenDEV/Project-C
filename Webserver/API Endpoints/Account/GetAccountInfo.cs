@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
@@ -11,7 +11,7 @@ namespace Webserver.API_Endpoints {
 		public override void GET() {
 			//Get required fields
 			string Email;
-			if (RequestParams.ContainsKey("email")) {
+			if ( RequestParams.ContainsKey("email") ) {
 				Email = RequestParams["email"][0];
 			} else {
 				Email = RequestUser.Email;
@@ -19,17 +19,17 @@ namespace Webserver.API_Endpoints {
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
 			User Acc = User.GetUserByEmail(Connection, Email);
-			if (Acc == null) {
+			if ( Acc == null ) {
 				Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}
 
 			//If a department was specified, only return permission level and department
 			JObject JSON;
-			if (RequestParams.ContainsKey("department")) {
+			if ( RequestParams.ContainsKey("department") ) {
 				//Get department. If no department is found, return a 404
 				Department Dept = Department.GetByName(Connection, RequestParams["department"][0]);
-				if(Dept == null) {
+				if ( Dept == null ) {
 					Send("No such department", HttpStatusCode.NotFound);
 					return;
 				}

@@ -51,7 +51,7 @@ class addCompany extends Component {
         }
       }
     }
-  
+
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   }
