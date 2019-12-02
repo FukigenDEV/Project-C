@@ -68,11 +68,11 @@ class Notities extends Component {
 
 
 				<div id="alleNotities">
-					<h5><b>Alle notities</b></h5>
+					<h5><b>Een overzicht van alle notities:</b></h5>
 					<div className="all_notes">
 						{this.state.allNotes.map((Note, index) => {
 							return <div className="full_note">
-								<h4>{Note.Title}</h4>
+								<h6>{Note.Title}</h6>
 								<p>
 									{Note.Text}
 								</p>
@@ -83,7 +83,7 @@ class Notities extends Component {
 				</div>
 
 				<div id="notitieAanmaken" style={{ display: "none" }}>
-					<h5><b>Notitie toevoegen</b></h5>
+					<h5><b>Notitie toevoegen:</b></h5>
 					<form id="add_note_form" method="POST">
 						<label>Titel:</label><br />
 						<input id="note_title" type="text" name="note_title" style={{ width: "50%", marginBottom: "15px" }} /><br />
