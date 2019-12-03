@@ -19,7 +19,13 @@ class ManUsers extends Component {
   }
 
   handleDelete = async (name) => {
-    await fetch(`/account?name=${name}`, {method: 'DELETE',});
+    await fetch(`/account`, {
+      method: 'DELETE',
+      body: JSON.stringify({Email: name}),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     this.getUsers();
   }
 
@@ -29,21 +35,20 @@ class ManUsers extends Component {
       return users.json();
     }).then(data => {
       this.setState({data});
-      console.log(this.state.data);
     })
   }
 
   render() {
-    // const userlist =
-    //   this.state.data.map(user => (
-    //     <tr>
-    //       <th scope="row">{user.ID}</th>
-    //       <td>{user}</td>
-    //       <td><Link to={`/dashboard/Admin/users/manage/details/${user.ID}`}>Details</Link></td>
-    //       <td><Link to={`/dashboard/Admin/users/manage/edit/${user}`}>Edit</Link></td>
-    //       <td><a href onClick={() => this.handleDelete(user)}>Delete</a></td>
-    //     </tr>
-    //   ));
+    const userlist =
+      this.state.data.map(user => (
+        <tr>
+          <th scope="row">{user.ID}</th>
+          <td>{user.Email}</td>
+          <td><Link to={`/dashboard/Admin/users/manage/details/${user.Email}`}>Details</Link></td>
+          <td><Link to={`/dashboard/Admin/users/manage/edit/${user.Email}`}>Edit</Link></td>
+          <td><a href onClick={() => this.handleDelete(user.Email)}>Delete</a></td>
+        </tr>
+      ));
 
     return (
       <React.Fragment>
@@ -58,7 +63,7 @@ class ManUsers extends Component {
           </tr>
         </thead>
         <tbody>
-          {/* {userlist} */}
+          {userlist}
           </tbody>
         </table>
       </React.Fragment>

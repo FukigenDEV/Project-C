@@ -15,6 +15,7 @@ class Users extends Component {
         </div>
 
         <div className="shadow-sm p-3 mb-5 bg-white rounded">
+          <Route exact path="/dashboard/Admin" component={AddUsers} />
           <Route exact path="/dashboard/Admin/users" component={AddUsers} />
           <Route exact path="/dashboard/Admin/users/add" component={AddUsers} />
           <Route exact path="/dashboard/Admin/users/manage" component={ManUsers} />
