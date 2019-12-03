@@ -27,7 +27,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//If a department was specified, only return permission level and department
-			JObject JSON = new JObject();
+			JArray JSON = new JArray();
 			if ( RequestParams.ContainsKey("department") ) {
 				//Get department. If no department is found, return a 404
 				Department Dept = Department.GetByName(Connection, RequestParams["department"][0]);
@@ -37,15 +37,16 @@ namespace Webserver.API_Endpoints {
 				}
 
 				foreach(User Acc in Users ) {
-					JSON.Add(Acc.Email, Acc.GetPermissionLevel(Connection, Dept).ToString());
+
+					JSON.Add(new JObject() { { "Email", Acc.Email }, { "Level", Acc.GetPermissionLevel(Connection, Dept).ToString() } });
 				}
 
 			} else {
 				//Convert user objects to JSON
 				foreach ( User Acc in Users ) {
-					JSON.Add(Acc.Email, JObject.FromObject(Acc));
-					((JObject)JSON[Acc.Email]).Remove("PasswordHash"); //Security
-					( (JObject)JSON[Acc.Email] ).Remove("Email"); //Already exists as key
+					JObject UserObject = JObject.FromObject(Acc);
+					UserObject.Remove("PasswordHash"); //Security
+					JSON.Add(UserObject);
 				}
 			}
 
