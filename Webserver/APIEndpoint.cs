@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
@@ -8,6 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver {
@@ -85,8 +85,8 @@ namespace Webserver {
 		/// </summary>
 		public void OPTIONS() {
 			List<string> AllowedMethods = new List<string>();
-			foreach(MethodInfo Method in GetType().GetMethods()) {
-				if(Method.DeclaringType == GetType()) {
+			foreach ( MethodInfo Method in GetType().GetMethods() ) {
+				if ( Method.DeclaringType == GetType() ) {
 					AllowedMethods.Add(Method.Name);
 				}
 			}
@@ -105,6 +105,10 @@ namespace Webserver {
 		/// </summary>
 		public virtual void PATCH() => Utils.Send(Response, null, HttpStatusCode.MethodNotAllowed);
 
+		/// <summary>
+		/// Send only a status code to the client, answering the request.
+		/// </summary>
+		/// <param name="StatusCode"></param>
 		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Utils.Send(Response, null, StatusCode, null);
 		/// <summary>
 		/// Send JSON data to the client, answering the request.
@@ -142,11 +146,14 @@ namespace Webserver {
 		public void AddCookie(string name, string value, long Expire) {
 			string CookieVal = name + "=" + value;
 
-			if(Expire < 0) {
+			if ( Expire < 0 ) {
 				throw new ArgumentOutOfRangeException("Negative cookie expiration");
 			}
 			CookieVal += "; Max-Age=" + Expire;
 
+			//We manually set the cookie header instead of setting Response.Cookies because some twat decided that HTTPListener should use folded cookies, which every
+			//major browser has no support for. Using folded cookies, we would be limited to only 1 cookie per response, because browsers would otherwise incorrectly
+			//interpret the 2nd cookie's key and value to be part of the 1st cookie's value.
 			Response.AppendHeader("Set-Cookie", CookieVal);
 		}
 	}

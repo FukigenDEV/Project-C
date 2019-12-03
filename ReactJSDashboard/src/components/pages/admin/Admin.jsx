@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Switch, Route, Link } from "react-router-dom";
+import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
 import { Users, Departments, Company } from '../../../index';
 
 class Admin extends Component {
   render() {
+    const {onRedirect} = this.props;
     return (
       <React.Fragment>
         <div class="nav">
@@ -17,8 +18,8 @@ class Admin extends Component {
         <div className="shadow-sm p-3 mb-5 bg-white rounded">
           <Route exact path="/dashboard/Admin" component={Users} />
           <Route path="/dashboard/Admin/users" component={Users} />
-          <Route path="/dashboard/Admin/departments" component={Departments} />
-          <Route path="/dashboard/Admin/company" component={Company} />
+          <Route path="/dashboard/Admin/departments" render={() => <Departments onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/company" render={() => <Company onRedirect={onRedirect} />} />
         </div>
       </React.Fragment>
     );

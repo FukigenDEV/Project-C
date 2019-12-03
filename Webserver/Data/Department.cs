@@ -1,7 +1,7 @@
-﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace Webserver.Data {
 	public class Department {
@@ -10,7 +10,7 @@ namespace Webserver.Data {
 		public string Name { get; set; }
 		public string Description { get; set; }
 
-        public Department() { }
+		public Department() { }
 
 		/// <summary>
 		/// Dapper constructor. Do not use.
@@ -29,17 +29,17 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Name"></param>
 		/// <param name="Description"></param>
-        public Department(string Name, string Description = null) {
-            this.Name = Name;
-            this.Description = Description;
-        }
+		public Department(string Name, string Description = null) {
+			this.Name = Name;
+			this.Description = Description;
+		}
 
 		/// <summary>
 		/// Lists all departments.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <returns></returns>
-        public static List<Department> GetAllDepartments(SQLiteConnection Connection) => Connection.Query<Department>("SELECT * FROM Departments").AsList();
+		public static List<Department> GetAllDepartments(SQLiteConnection Connection) => Connection.Query<Department>("SELECT * FROM Departments").AsList();
 
 		/// <summary>
 		/// Get a department's information using its name. Returns null if the department doesn't exist.
@@ -50,12 +50,18 @@ namespace Webserver.Data {
 		public static Department GetByName(SQLiteConnection Connection, string name) => Connection.QueryFirstOrDefault<Department>("SELECT * FROM Departments WHERE Name = @Name", new { name });
 
 		/// <summary>
-		/// Returns true if the specified department exists, otherwise false.
+		/// Returns true if the specified department exists.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public static bool Exists(SQLiteConnection Connection, string name) => GetByName(Connection, name) != null;
+		/// <summary>
+		/// Returns true if the specified department exists.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="ID"></param>
+		/// <returns></returns>
 		public static bool Exists(SQLiteConnection Connection, int ID) => Connection.Get<Department>(ID) != null;
 	}
 }
