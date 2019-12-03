@@ -7,7 +7,9 @@ import Home from './components/pages/Home'
 
 import Admin from './components/pages/admin/Admin';
 
-import Users from './components/pages/admin/add/Users';
+import Users from './components/pages/admin/Users';
+import AddUsers from './components/pages/admin/add/Users';
+import ManUsers from './components/pages/admin/manage/Users';
 
 import Departments from './components/pages/admin/Departments';
 import addDepartments from './components/pages/admin/add/Departments';
@@ -44,6 +46,8 @@ export {
     Home,
     Admin,
     Users,
+    AddUsers,
+    ManUsers,
     Departments,
     addDepartments,
     manDepartments,

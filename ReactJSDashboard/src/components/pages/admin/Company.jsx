@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Switch, Route, Link } from "react-router-dom";
 import { EditCompany, manCompany, addCompany } from '../../../index';
 
-class Users extends Component {
+class Company extends Component {
   render() {
     const {onRedirect} = this.props;
     return (
@@ -26,4 +26,4 @@ class Users extends Component {
   }
 }
 
-export default Users;
+export default Company;
