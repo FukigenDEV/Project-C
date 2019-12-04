@@ -1,17 +1,17 @@
-﻿using Logging;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using Logging;
+using Newtonsoft.Json.Linq;
 
 namespace Webserver {
 	/// <summary>
 	/// Static class containing methods that aren't big enough to warrant their own files, and are unique enough that they can't be grouped with anything else.
 	/// </summary>
-	static class Utils {
+	internal static class Utils {
 		public static Logger Log;
 
 		/// <summary>
@@ -22,12 +22,12 @@ namespace Webserver {
 		/// <returns></returns>
 		public static string GetErrorPage(HttpStatusCode StatusCode, string Message = "An error occured, and the request couldn't be processed. Please try again.") {
 			///Check if a custom error page exists
-			if (!WebFiles.ErrorPages.ContainsKey((int)StatusCode)) {
+			if ( !WebFiles.ErrorPages.ContainsKey((int)StatusCode) ) {
 				//No custom page exists. Return the built-in page
 				using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Webserver.DefaultErrorPage.html"));
 				return reader.ReadToEnd()
 					.Replace("{ERRORTEXT}", StatusCode.ToString())
-					.Replace("{STATUSCODE}", ((int)StatusCode).ToString())
+					.Replace("{STATUSCODE}", ( (int)StatusCode ).ToString())
 					.Replace("{MSG}", Message);
 			} else {
 				//Return the custom page
@@ -43,7 +43,7 @@ namespace Webserver {
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/html") {
-			if (Data == null) {
+			if ( Data == null ) {
 				Data = Array.Empty<byte>();
 			}
 
@@ -52,7 +52,7 @@ namespace Webserver {
 				Response.ContentType = ContentType;
 				Response.OutputStream.Write(Data, 0, Data.Length);
 				Response.OutputStream.Close();
-			} catch (HttpListenerException e) {
+			} catch ( HttpListenerException e ) {
 				Log.Error("Failed to send data to host: " + e.Message);
 			}
 
@@ -65,7 +65,7 @@ namespace Webserver {
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 
 		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
-			if (Data == null) {
+			if ( Data == null ) {
 				Data = "";
 			}
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
@@ -85,20 +85,20 @@ namespace Webserver {
 		/// <returns></returns>
 		public static List<string> ParseAddresses(List<string> Addresses) {
 			List<string> Result = new List<string>();
-			foreach (string Address in Addresses) {
-				if (Address == "*") {
+			foreach ( string Address in Addresses ) {
+				if ( Address == "*" ) {
 					continue;
 				}
 
 				//There has to be a better way!
 				string addr;
-				if (!Address.StartsWith("http://")) {
+				if ( !Address.StartsWith("http://") ) {
 					addr = "http://" + Address;
 				} else {
 					addr = Address;
 				}
 
-				if (addr[^1] != '/') {
+				if ( addr[^1] != '/' ) {
 					addr += '/';
 				}
 				Result.Add(addr);
@@ -131,15 +131,15 @@ namespace Webserver {
 		/// <returns></returns>
 		public static bool TryGetValue<T>(this JObject obj, string propertyName, out JToken Value) {
 			bool Found = obj.TryGetValue(propertyName, out Value);
-			if (!Found) {
+			if ( !Found ) {
 				return false;
 			}
 			try {
 				Value.ToObject<T>();
 #pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
-			} catch (ArgumentException) {
+			} catch ( ArgumentException ) {
 				return false;
-			} catch (InvalidCastException) {
+			} catch ( InvalidCastException ) {
 				return false;
 			}
 #pragma warning restore CA1031

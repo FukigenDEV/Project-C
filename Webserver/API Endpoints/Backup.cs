@@ -1,9 +1,9 @@
-﻿using Configurator;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using Configurator;
+using Newtonsoft.Json.Linq;
 
 namespace Webserver.API_Endpoints {
 
@@ -11,7 +11,7 @@ namespace Webserver.API_Endpoints {
 	/// Endpoint for managing backups
 	/// </summary>
 	[EndpointURL("/backup")]
-	class BackupEndpoint : APIEndpoint {
+	internal class BackupEndpoint : APIEndpoint {
 		private readonly string BackupDir = (string)Config.GetValue("BackupSettings.BackupFolder");
 
 		/// <summary>
@@ -21,12 +21,12 @@ namespace Webserver.API_Endpoints {
 		/// </summary>
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void GET() {
-			if (RequestParams.ContainsKey("name")) {
+			if ( RequestParams.ContainsKey("name") ) {
 				string Name = RequestParams["name"][0];
 
 				//Check if the specified file exists
 				//If the name contains a dot, return a NotFound to prevent path traversal.
-				if (Name.Contains('.') || !File.Exists(BackupDir+"\\"+Name + ".zip")) {
+				if ( Name.Contains('.') || !File.Exists(BackupDir + "\\" + Name + ".zip") ) {
 					Send(HttpStatusCode.NotFound);
 					return;
 				}
@@ -37,7 +37,7 @@ namespace Webserver.API_Endpoints {
 				//No backup name was specified, so send
 				List<FileInfo> BackupFiles = new List<FileInfo>(new DirectoryInfo(BackupDir).GetFiles());
 				JArray Names = new JArray();
-				foreach(FileInfo File in BackupFiles) {
+				foreach ( FileInfo File in BackupFiles ) {
 					Names.Add(Path.GetFileNameWithoutExtension(File.Name));
 				}
 				Send(Names.ToString(), HttpStatusCode.OK, "application/json");

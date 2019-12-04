@@ -1,9 +1,10 @@
-﻿using Dapper;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Dapper;
 
 namespace Webserver.Data {
 	/// <summary>
@@ -116,14 +117,14 @@ namespace Webserver.Data {
 		/// <param name="Salt"></param>
 		/// <returns></returns>
 		public static string CreateHash(string Password, string Salt) {
-			if (string.IsNullOrEmpty(Password)) {
+			if ( string.IsNullOrEmpty(Password) ) {
 				throw new ArgumentException("message", nameof(Password));
 			}
 
 			byte[] PassBytes = Encoding.UTF8.GetBytes(Password);
 			byte[] SaltBytes = Encoding.UTF8.GetBytes(Salt);
 			using SHA512 sha = SHA512.Create();
-			return String.Concat(sha
+			return string.Concat(sha
 				.ComputeHash(PassBytes.Concat(SaltBytes).ToArray())
 				.Select(item => item.ToString("x2")));
 		}
@@ -135,5 +136,19 @@ namespace Webserver.Data {
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
 		public static User GetUserByEmail(SQLiteConnection Connection, string Email) => Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
+
+		/// <summary>
+		/// Get a list of all user email addresses.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public static List<string> GetAllEmails(SQLiteConnection Connection) => Connection.Query<string>("SELECT Email FROM Users").AsList();
+
+		/// <summary>
+		/// Get a list of all users.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public static List<User> GetAllUsers(SQLiteConnection Connection) => Connection.Query<User>("SELECT * FROM Users").AsList();
 	}
 }

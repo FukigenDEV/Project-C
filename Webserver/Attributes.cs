@@ -10,9 +10,7 @@ namespace Webserver {
 	public sealed class EndpointURL : Attribute {
 		public string URL;
 
-		public EndpointURL(string URL) {
-			this.URL = URL;
-		}
+		public EndpointURL(string URL) => this.URL = URL;
 	}
 
 	/// <summary>
@@ -22,9 +20,7 @@ namespace Webserver {
 	[AttributeUsage(AttributeTargets.Method)]
 	public sealed class PermissionLevel : Attribute {
 		public PermLevel Level;
-		public PermissionLevel(PermLevel Level) {
-			this.Level = Level;
-		}
+		public PermissionLevel(PermLevel Level) => this.Level = Level;
 	}
 
 	/// <summary>
@@ -41,8 +37,6 @@ namespace Webserver {
 	[AttributeUsage(AttributeTargets.Method)]
 	public sealed class RequireContentType : Attribute {
 		public string ContentType;
-		public RequireContentType(string ContentType) {
-			this.ContentType = ContentType;
-		}
+		public RequireContentType(string ContentType) => this.ContentType = ContentType;
 	}
 }

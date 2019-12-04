@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Webserver.API_Endpoints {
 
@@ -9,7 +9,7 @@ namespace Webserver.API_Endpoints {
 	/// Also used for testing purposes.
 	/// </summary>
 	[EndpointURL("/example")]
-	class Example : APIEndpoint {
+	internal class Example : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		[RequireContentType("application/json")]
 		public override void GET() {
