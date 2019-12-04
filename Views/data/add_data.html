@@ -1,0 +1,129 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<title>Add Data</title>
+</head>
+
+<body>
+	<p><b>Add Data</b></p>
+
+	<form id="add_data_form" method="POST">
+		Table:<br/>
+		<div id="tables_dropdown">
+			<select>
+			</select>
+		</div>
+
+		<br/>
+
+		<div id="rows">
+		</div>
+		
+		<br/>
+
+		<input type="submit" value="Add"><br/>
+
+		<p id="message"></p>
+	</form>
+
+	<script>
+	$(window).load(function(event) {
+		var xhr = new XMLHttpRequest();
+		var url = "/datatable?department=";
+		xhr.open("GET", url, true);
+
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var tables = JSON.parse(xhr.responseText);
+
+				for (var i = 0; i < tables.length; i++) {
+					$("#tables_dropdown select").append("<option value=" + i + ">" + tables[i].Name + "</option>");
+				}
+
+				$("#tables_dropdown").change();
+			}
+		}
+
+		xhr.send();
+	});
+
+	$("#tables_dropdown").on("change", function() {
+		var tableName = $(this).find(":selected").text();
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "/data?table=" + tableName, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#rows").empty();
+
+				var json = JSON.parse(xhr.responseText);
+				var columns = json[tableName]["Columns"];
+
+				if (json[tableName]["Rows"].length === 0) {
+					$("#message").html("Table <em>" + tableName + "</em> doesn't contain any rows.");
+				} else {
+					$("#message").html(xhr.responseText);
+				}
+
+				for (var key in columns) {
+					var dataType = columns[key];
+
+					switch (dataType) {
+						case "Integer":
+						case "Real":
+							$("#rows").append("<div>" + key + ":</div><input type=\"number\" id=\"" + key + "\">");
+							break;
+						case "String":
+							$("#rows").append("<div>" + key + ":</div><input type=\"text\" id=\"" + key + "\">");
+							break;
+						case "Blob":
+							$("#rows").append("<div>" + key + ":</div><input type=\"file\" id=\"" + key + "\">");
+							break;
+					}
+				}
+			}
+		}
+
+		xhr.send();
+	});
+
+	$("#add_data_form").on("submit", function(event) {
+		event.preventDefault();
+
+		var table = $("#tables_dropdown option:selected").text();
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "/data?table=" + table, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				$("#message").html(xhr.responseText);
+			}
+		}
+
+		var jsonString = '{ ';
+		$("#rows").find("input").each(function() {
+			var key = $(this).attr("id");
+			var value = $(this).val();
+
+			if (key == "rowid" || key == "Validated") return;
+			
+			jsonString += '"' + key + '": "' + value + '"';
+
+			// If the last element is not reached yet, add a comma.
+			if ($(this).index("input") !== $("#rows").find("input").length - 1) {
+				jsonString += ', '
+			}
+		});
+		jsonString += '}';
+
+		xhr.send(jsonString);
+	});
+	</script>
+</body>

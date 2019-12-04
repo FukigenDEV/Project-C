@@ -45,7 +45,7 @@ namespace Webserver.API_Endpoints {
 
 			//Insert data and return response
 			Table.Insert(Dict);
-			Send(HttpStatusCode.Created);
+			Send("Data successfully added", HttpStatusCode.Created);
 		}
 	}
 }

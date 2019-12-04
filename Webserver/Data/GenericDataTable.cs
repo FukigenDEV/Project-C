@@ -22,7 +22,7 @@ namespace Webserver.Data {
 		public bool ReqValidation { get; set; }
 		public int Department { get; set; }
 
-		public const string RX = "[A-z]{1}[0-9A-Za-z_]*";
+		public const string RX = "^[A-z]{1}[0-9A-Za-z_]*$";
 
 		/// <summary>
 		/// List of reserved table names
