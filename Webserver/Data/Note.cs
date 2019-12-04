@@ -1,39 +1,31 @@
-﻿using Dapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data.SQLite;
+using System.Text;
+using Dapper;
 
 namespace Webserver.Data
 {
     public class Note
     {
-        public long ID { get; set; }
+        public int ID { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
-        public long Author { get; set; }
+
+        public Note()
+        {
+
+        }
 
         /// <summary>
         /// Creates a new note.
         /// </summary>
         /// <param name="title">The title of the note.</param>
         /// <param name="text">The text of the note.</param>
-        public Note(string title, string text, int author)
+        public Note(string title, string text)
         {
             Title = title;
             Text = text;
-            Author = author;
-        }
-
-        /// <summary>
-        /// Constructor for deserializing database rows into Note objects.
-        /// </summary>
-        public Note(long id, string title, string text, long author)
-        {
-            ID = (int)id;
-            Title = title;
-            Text = text;
-            Author = author;
         }
 
         /// <summary>
@@ -44,7 +36,7 @@ namespace Webserver.Data
         public static List<Note> GetAllNotes(SQLiteConnection connection) => connection.Query<Note>("SELECT * FROM Notes").AsList();
 
         /// <summary>
-        /// Gets a note by its title. Returns null if the note doesn't exist.
+        /// Gets a noe by its title. Returns null if the note doesn't exist.
         /// </summary>
         /// <param name="connection">The SQLite connection.</param>
         /// <param name="title">The note's title.</param>
