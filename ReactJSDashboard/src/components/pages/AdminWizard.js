@@ -182,7 +182,7 @@ class AdminWizard extends Component {
 				"<option value=\"real\">Real</option>" +
 				"<option value=\"blob\">Blob</option>" +
 			"</select>" +
-			"<input id=\"gdt_column_name\" type=\"text\" name=\"gdt_column_name\">" +
+			"<input type=\"text\" name=\"gdt_column_name\">" +
 			"<button class=\"remove_column\" style=\"width: 30px;\">-</button>" +
 		"</div>";
 

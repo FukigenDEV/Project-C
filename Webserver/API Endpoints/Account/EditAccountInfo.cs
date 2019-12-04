@@ -35,7 +35,7 @@ namespace Webserver.API_Endpoints {
 			//Change email if necessary
 			if (JSON.TryGetValue<string>("NewEmail", out JToken NewEmail)) {
 				//Check if the new address is valid
-				Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
+				Regex rx = new Regex("^[A-z0-9]*@[A-z0-9]*.[A-z]*$");
 				if (rx.IsMatch((string)NewEmail)) {
 					Acc.Email = (string)NewEmail;
 				} else {

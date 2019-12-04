@@ -13,6 +13,8 @@ namespace Webserver.API_Endpoints.DataTable {
 		[RequireContentType("application/json")]
 		[PermissionLevel(PermLevel.Manager)]
 		public override void POST() {
+            const string RX = "^[A-z]{1}[0-9A-Za-z_]*$";
+
 			//Get all required fields
 			if (
 				!JSON.TryGetValue<string>("Name", out JToken Name) ||
@@ -25,7 +27,7 @@ namespace Webserver.API_Endpoints.DataTable {
 			}
 
 			//Check name
-			if(!Regex.IsMatch((string)Name, "[0-9A-Za-z_]")){
+			if(!Regex.IsMatch((string)Name, RX)){
 				Send("Invalid name", HttpStatusCode.BadRequest);
 				return;
 			}
@@ -44,7 +46,7 @@ namespace Webserver.API_Endpoints.DataTable {
 			//Convert columns
 			Dictionary<string, DataType> ColumnDict = new Dictionary<string, DataType>();
 			foreach (KeyValuePair<string, JToken> Entry in (JObject)Columns) {
-				if(GenericDataTable.ReservedColumns.Contains(Entry.Key) || !Regex.IsMatch(Entry.Key, "[0-9A-Za-z_]")) {
+				if(GenericDataTable.ReservedColumns.Contains(Entry.Key) || !Regex.IsMatch(Entry.Key, RX)) {
 					Send("Invalid or reserved column name");
 					return;
 				}

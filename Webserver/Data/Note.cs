@@ -11,7 +11,7 @@ namespace Webserver.Data
         public long ID { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
-        public int Author { get; set; }
+        public long Author { get; set; }
 
         /// <summary>
         /// Creates a new note.
@@ -28,7 +28,7 @@ namespace Webserver.Data
         /// <summary>
         /// Constructor for deserializing database rows into Note objects.
         /// </summary>
-        public Note(long id, string title, string text, int author)
+        public Note(long id, string title, string text, long author)
         {
             ID = (int)id;
             Title = title;

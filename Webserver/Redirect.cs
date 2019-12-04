@@ -69,7 +69,7 @@ namespace Webserver {
 				}
 
 				//Check if the source URI is valid
-				Regex ex = new Regex("(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}");
+				Regex ex = new Regex("^(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}$");
 				if (!ex.IsMatch(LineContents[0]) && LineContents[0] != "/") {
 					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URI");
 					continue;
