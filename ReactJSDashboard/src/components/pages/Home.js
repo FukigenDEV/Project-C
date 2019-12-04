@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-class Dashboard extends Component {
+class Home extends Component {
   render() {
     return (
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
-        Dashboard
+        Home
       </div>
     );
   }
 }
 
-export default Dashboard;
+export default Home;

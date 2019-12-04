@@ -1,12 +1,19 @@
-﻿using Dapper;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Dapper;
 
 namespace Webserver.Data {
+	/// <summary>
+	/// Objects representing a user.
+	/// </summary>
 	public class User {
+		/// <summary>
+		/// The user's unique ID
+		/// </summary>
 		public int ID { get; set; }
 		public string Email { get; set; }
 		public string PasswordHash { get; set; }
@@ -32,7 +39,7 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
-		/// Constructor for deserializing database rows into User objects
+		/// Dapper-only constructor for deserializing database rows into user objects. Do not use.
 		/// </summary>
 		public User(
 			long ID,
@@ -103,9 +110,6 @@ namespace Webserver.Data {
 		/// <param name="Department"></param>
 		public void SetPermissionLevel(SQLiteConnection Connection, PermLevel Level, int Department) => Connection.Execute("INSERT OR REPLACE INTO Permissions (User, Permission, Department) VALUES (@User, @Permission, @Department)", new { user = this.ID, Permission = Level, Department });
 
-
-		/// ########################################### Static Methods
-
 		/// <summary>
 		/// Given a password and salt, returns a salted SHA512 hash.
 		/// </summary>
@@ -113,14 +117,14 @@ namespace Webserver.Data {
 		/// <param name="Salt"></param>
 		/// <returns></returns>
 		public static string CreateHash(string Password, string Salt) {
-			if (string.IsNullOrEmpty(Password)) {
+			if ( string.IsNullOrEmpty(Password) ) {
 				throw new ArgumentException("message", nameof(Password));
 			}
 
 			byte[] PassBytes = Encoding.UTF8.GetBytes(Password);
 			byte[] SaltBytes = Encoding.UTF8.GetBytes(Salt);
 			using SHA512 sha = SHA512.Create();
-			return String.Concat(sha
+			return string.Concat(sha
 				.ComputeHash(PassBytes.Concat(SaltBytes).ToArray())
 				.Select(item => item.ToString("x2")));
 		}
@@ -131,8 +135,20 @@ namespace Webserver.Data {
 		/// <param name="Connection">The database connection</param>
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
-		public static User GetUserByEmail(SQLiteConnection Connection, string Email) {
-			return Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
-		}
+		public static User GetUserByEmail(SQLiteConnection Connection, string Email) => Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
+
+		/// <summary>
+		/// Get a list of all user email addresses.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public static List<string> GetAllEmails(SQLiteConnection Connection) => Connection.Query<string>("SELECT Email FROM Users").AsList();
+
+		/// <summary>
+		/// Get a list of all users.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public static List<User> GetAllUsers(SQLiteConnection Connection) => Connection.Query<User>("SELECT * FROM Users").AsList();
 	}
 }

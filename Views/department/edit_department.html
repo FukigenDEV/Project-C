@@ -2,25 +2,25 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-	<title>View Departments</title>
+	<title>Edit Department</title>
 </head>
 
 <body>
-	<p>View Departments</p>
+	<p>Edit Departments</p>
 
-	<form id="view_department_form" method="GET">
-		Department name: <input id="department_name" type="text" name="department_name"></br>
-		</br>
-		New department name: <input id="new_department_name" type="text" name="new_department_name"></br>
-		New department description: <input id="new_department_description" type="text" name="new_department_description"></br>
+	<form id="edit_department_form" method="GET">
+		Department name: <input id="department_name" type="text" name="department_name"><br/>
 		<br/>
-		<input type="submit" value="Edit"></br>
+		New department name: <input id="new_department_name" type="text" name="new_department_name"><br/>
+		New department description: <input id="new_department_description" type="text" name="new_department_description"><br/>
+		<br/>
+		<input type="submit" value="Edit"><br/>
 
 		<p id="result"></p>
 	</form>
 
 	<script>
-	$("#view_department_form").on("submit", function(event) {
+	$("#edit_department_form").on("submit", function(event) {
 		event.preventDefault();
 		
 		var name = $("#department_name").val();

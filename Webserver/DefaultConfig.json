@@ -1,12 +1,19 @@
 ﻿{
 	"ConnectionSettings": {
-		//The URLs the server will listen to. Multiple URLs can be specified.
+		//The URLs the server will listen to. Multiple URLs can be specified. HTTP:// is prefixed where needed.
 		//Examples: localhost, http://example.com, https://contoso.com
 		"ServerAddresses": [
-			"localhost"
+            "localhost:80"
+		],
+		//Allow external domains to communicate with this server. This is primarily useful when a system's front-end is running on a different webserver.
+		//Only the addresses specified in the ServerAddresses are allowed by default. Use an asterisk (*) to allow all domains. HTTP:// is prefixed where needed.
+		"AccessControl": [
+            "localhost:3000"
 		],
 		//Whether the server should automatically detect its address. This address will be used in addition to the ones specified in ServerAddresses.
-		"AutoDetectAddress": true
+		"AutoDetectAddress": true,
+		//The port that the server should run on. Only used if AutoDetectAddress is true.
+		"AutoDetectPort": 80
 	},
 	"PerformanceSettings": {
 		//The amount of worker threads the server should use. More threads allows the server to handle more requests at once, but increases server load.
@@ -38,5 +45,14 @@
 		//###########################################################################
 		//The password for the built-in Administrator account.
 		"AdministratorPassword": "W@chtw00rd"
+	},
+	"BackupSettings": {
+		//The time between each automatic backup. Backups can always be manually triggered through the /backup endpoint if necessary.
+		//Do NOT place this folder within either wwwroot or errorpages. Doing so will allow users to download the backup files without requiring administrator privileges, exposing your database to the public.
+		//To restore a backup, extract the ZIP file and move its contents to the server's folder.
+		//Default is 86400, equal to 1 day. Set to 0 to disable.
+		"BackupInterval": 86400,
+		//The folder to write the backup files to.
+		"BackupFolder": "Backups"
 	}
 }

@@ -1,8 +1,8 @@
-﻿using Configurator;
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using Configurator;
 
 namespace Logging {
 	public class Logger {
@@ -14,9 +14,7 @@ namespace Logging {
 
 		private DateTime LastMsg = DateTime.Now;
 
-		public static void Init() {
-			Config.AddConfig(new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Logging.DefaultConfig.json")));
-		}
+		public static void Init() => Config.AddConfig(new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Logging.DefaultConfig.json")));
 
 		/// <summary>
 		/// Creates a new logger object.
@@ -28,10 +26,10 @@ namespace Logging {
 			this.Level = Level;
 			this.WriteToConsole = WriteToConsole;
 
-			if (File.Exists("Logs\\latest.log") || File.Exists("Logs\\" + Filename + "_err.log")) {
+			if ( File.Exists("Logs\\latest.log") || File.Exists("Logs\\" + Filename + "_err.log") ) {
 				AdvanceFile();
 			} else {
-				if (!Directory.Exists("Logs")) {
+				if ( !Directory.Exists("Logs") ) {
 					Directory.CreateDirectory("Logs");
 				}
 				stdout = File.CreateText("Logs\\latest.log");
@@ -74,8 +72,8 @@ namespace Logging {
 		/// <param name="Level"></param>
 		/// <param name="Message"></param>
 		private void Log(LogLevel Level, object Message) {
-			if (this.Level <= Level) {
-				if (LastMsg.Day < DateTime.Now.Day || LastMsg.Month < DateTime.Now.Month) {
+			if ( this.Level <= Level ) {
+				if ( LastMsg.Day < DateTime.Now.Day || LastMsg.Month < DateTime.Now.Month ) {
 					AdvanceFile();
 				}
 				LastMsg = DateTime.Now;
@@ -85,11 +83,11 @@ namespace Logging {
 				stdout.WriteLine(Msg);
 				stdout.Flush();
 
-				if (WriteToConsole) {
+				if ( WriteToConsole ) {
 					Console.WriteLine(Msg);
 				}
 
-				if (Level >= LogLevel.Warning) {
+				if ( Level >= LogLevel.Warning ) {
 					stderr.WriteLine(Msg);
 					stderr.Flush();
 				}
@@ -102,6 +100,8 @@ namespace Logging {
 		/// </summary>
 		private void AdvanceFile() {
 			DateTime CreationDate = File.GetCreationTime("Logs\\latest.log");
+			File.SetCreationTime("Logs\\latest.log", DateTime.Now);
+			File.SetCreationTime("Logs\\latest_err.log", DateTime.Now);
 
 			//Close stdout and stderr streams if they exist.
 			stderr?.Close();
@@ -109,7 +109,7 @@ namespace Logging {
 
 			//Create a temporary directory, then move the log files there.
 			//If the temp directory already exists (leftovers from a crash or whatever), delete it first
-			if (Directory.Exists("Logs\\temp")) {
+			if ( Directory.Exists("Logs\\temp") ) {
 				Directory.Delete("Logs\\temp");
 			}
 			Directory.CreateDirectory("Logs\\temp");
@@ -126,7 +126,7 @@ namespace Logging {
 			//Delete temp folder
 			Directory.Delete("Logs\\temp", true);
 
-			//Create new log files
+			//Create new log files	
 			stdout = File.CreateText("Logs\\latest.log");
 			stderr = File.CreateText("Logs\\latest_err.log");
 		}

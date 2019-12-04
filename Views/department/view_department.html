@@ -2,29 +2,29 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-	<title>Delete Department</title>
+	<title>View Department</title>
 </head>
 
 <body>
-	<p>Delete a Department</p>
+	<p>View Department</p>
 
-	<form id="add_department_form" method="DELETE">
-		Department name: <input id="department_name" type="text" name="department_name"></br>
-		</br>
-		<input type="submit" value="Delete"></br>
+	<form id="view_department_form" method="GET">
+		Department name: <input id="department_name" type="text" name="department_name"><br/>
+		<br/>
+		<input type="submit" value="View"><br/>
 
 		<p id="result"></p>
 	</form>
 
 	<script>
-	$("#add_department_form").on("submit", function(event) {
+	$("#view_department_form").on("submit", function(event) {
 		event.preventDefault();
-
+		
 		var name = $("#department_name").val();
 
 		var xhr = new XMLHttpRequest();
 		
-		xhr.open("DELETE", "/department", true);
+		xhr.open("GET", "/department?name=" + name, true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 
 		xhr.onreadystatechange = function() {
@@ -32,9 +32,8 @@
 				$("#result").html(xhr.responseText);
 			}
 		}
-		
-		var data = JSON.stringify({"name": name});
-		xhr.send(data);
+
+		xhr.send();
 	});
 	</script>
 </body>

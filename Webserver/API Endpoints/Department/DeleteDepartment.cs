@@ -1,33 +1,36 @@
-﻿using Dapper.Contrib.Extensions;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Dapper.Contrib.Extensions;
+using Newtonsoft.Json.Linq;
+using Webserver.Data;
 
-namespace Webserver.API_Endpoints
-{
-    internal partial class Department : APIEndpoint
-    {
-        public override void DELETE()
-        {
-            // Get required fields
-            if (!Content.TryGetValue<string>("name", out JToken name))
-            {
-                Send("Missing fields", HttpStatusCode.BadRequest);
-                return;
-            }
+namespace Webserver.API_Endpoints {
+	internal partial class DepartmentEndPoint : APIEndpoint {
+		public override void DELETE() {
+			// Get required fields
+			if ( !RequestParams.ContainsKey("name") ) {
+				Send("Missing params", HttpStatusCode.BadRequest);
+				return;
+			}
+			string Name = RequestParams["name"][0];
 
-            //Check if the specified department exists. If it doesn't, send a 404 Not Found
-            Data.Department department = Data.Department.GetDepartmentByName(Connection, (string)name);
-            if (department == null)
-            {
-                Send("No such department", HttpStatusCode.NotFound);
-                return;
-            }
+			//Don't allow users to delete the Administrators and All Users departments.
+			if ( Name == "Administrators" || Name == "All Users" ) {
+				Send("Cannot delete system department", HttpStatusCode.Forbidden);
+				return;
+			}
 
-            Connection.Delete(department);
-            Send("Department successfully deleted", StatusCode: HttpStatusCode.OK);
-        }
-    }
+			//Check if the specified department exists. If it doesn't, send a 404 Not Found
+			Department department = Department.GetByName(Connection, Name);
+			if ( department == null ) {
+				Send("No such department", HttpStatusCode.NotFound);
+				return;
+			}
+
+			Connection.Delete(department);
+			Send("Department successfully deleted", StatusCode: HttpStatusCode.OK);
+		}
+	}
 }
