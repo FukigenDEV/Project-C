@@ -32,7 +32,7 @@ class addDepartments extends Component {
     xhr.open("POST", "/department", true);
     xhr.onreadystatechange = () => {
       if(xhr.readyState === 4) {
-        if(xhr.status === 200) {
+        if(xhr.status >= 200 && xhr.status < 300) {
           const alert = {...this.state.alert};
           alert.type = 200;
           alert.value = 'Department succesfully added';
@@ -52,7 +52,7 @@ class addDepartments extends Component {
   // Zorgt weer voor de balk die een groene melding laat zien (goed) of een rode melding (error)
   getBadgeClasses = () => {
     let classes = 'alert mr-3 ml-3 ';
-    classes += (this.state.alert.type === 200) ? "alert-success" : "alert-danger";
+    classes += (this.state.alert.type >= 200 && this.state.alert.type < 300) ? "alert-success" : "alert-danger";
     classes += (this.state.alert.type === 0) ? " d-none" : " d-block";
     return classes;
   }
