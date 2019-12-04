@@ -11,7 +11,7 @@ using Logging;
 using Webserver.Threads;
 
 namespace Webserver {
-	internal class Program {
+	public static class Program {
 		public static Logger Log;
 		public static List<Type> Endpoints;
 		public static List<string> CORSAddresses = new List<string>();
