@@ -237,8 +237,8 @@ namespace Webserver.Data {
 				throw new ArgumentException("Column does not exist");
 			}
 			Columns.Remove(Name);
-			if ( Columns.Count == 0 ) {
-				throw new ArgumentException("Table must have at least 1 column");
+			if ( (ReqValidation && Columns.Count == 2) || Columns.Count == 1) {
+				throw new ArgumentException("Table must have at least 1 column, excluding Validated and rowid");
 			}
 
 			//Additional handling for system columns
@@ -335,7 +335,7 @@ namespace Webserver.Data {
 			}; ;
 		}
 
-		private static dynamic CastValue(object Value, DataType DT) => DT == DataType.Integer ? (int)(long)Value : (dynamic)(string)Value;
+		public static dynamic CastValue(object Value, DataType DT) => DT == DataType.Integer ? (int)(long)Value : (dynamic)Value.ToString();
 
 		/// <summary>
 		/// Updates a row

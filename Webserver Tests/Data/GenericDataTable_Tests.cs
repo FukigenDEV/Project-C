@@ -66,82 +66,88 @@ namespace Webserver.Data.Tests {
 		/// Check if GenericDataTables can be created, assuming all parameters are correct.
 		/// Test is done by simply querying the table that was created during initialization. If this succeeds, the table exists.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Constructor_ValidArgumentsTest() => Connection.Query("SELECT StringColumn, IntegerColumn FROM Table1");
 
 		/// <summary>
 		/// Check if the table name regex check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_InvalidNameRegexTest() => CreateTestTable(Connection, "12345");
 
 		/// <summary>
 		/// Check if the table reserved name check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ReservedName() => CreateTestTable(Connection, "Functions");
 
 		/// <summary>
 		/// Check if the column count check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ColumnCountCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>());
 
 		/// <summary>
 		/// Check if the reserved column name check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() {{"Validated", DataType.Integer}});
 
 		/// <summary>
 		/// Check if the column name regex check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ColumnNameRegexCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "12345", DataType.Integer } });
 
 		/// <summary>
 		/// Check if the department existence check is working.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_DepartmentCheck() => CreateTestTable(Connection, DepartmentID: 100);
 
 		/// <summary>
 		/// Check if the table existence check is working
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_AlreadyExistsCheck() => CreateTestTable(Connection);
 
 		/// <summary>
 		/// Check if the AddColumn function works when given valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void AddColumn_ValidArgumentsTest() => Table.AddColumn("NewColumn", DataType.String);
+
+		/// <summary>
+		/// Check if we can add columns in bulk
+		/// </summary>
+		[TestMethod]
+		public void AddColumn_ValidBulk() => Table.AddColumn(new Dictionary<string, DataType> { { "NewColumn1", DataType.String }, { "NewColumn2", DataType.Integer } });
 
 		/// <summary>
 		/// Check if the AddColumn function properly throws an exception when an invalid name is given
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddColumn_RegexCheck() => Table.AddColumn("12345", DataType.String);
 
 		/// <summary>
 		/// Check if the AddColumn function properly throws an exception when a reserved name is given
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddColumn_ReservedCheck() => Table.AddColumn("Validated", DataType.String);
 
 		/// <summary>
 		/// Check if the AddColumn function properly throws an exception when an existing column name is given
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddColumn_AlreadyExistsCheck() {
 			Table.AddColumn("NewColumn", DataType.String);
@@ -151,7 +157,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the AddValidatedColumn function works when we only call it once.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void AddValidatedColumn_Valid() {
 			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
 			Table.AddValidatedColumn();
@@ -160,7 +166,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the AddValidatedColumn function throws an exception if we call it twice
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddValidatedColumn_Invalid1() {
 			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
@@ -171,14 +177,14 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the AddValidatedColumn function throws an exception if we call it when the table already has a Validated column through its constructor
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddValidatedColumn_Invalid2() => Table.AddValidatedColumn();
 
 		/// <summary>
 		/// Check if the RenameColumn function works with valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void RenameColumn_ValidArguments() {
 			Table.Insert(new Dictionary<string, dynamic>() { { "StringColumn", "Hello World!" } });
 			Table.RenameColumn("StringColumn", "NewStringColumn");
@@ -199,44 +205,76 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if a nonexistent column is specified
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void RenameColumn_DoesntExistCheck() => Table.RenameColumn("SomeColumn", "SomeOtherColumn");
 
 		/// <summary>
 		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if a column already exists with the specified name
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void RenameColumn_AlreadyExiststCheck() => Table.RenameColumn("StringColumn", "IntegerColumn");
 
 		/// <summary>
 		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if the user tries to rename the Validated column
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void RenameColumn_ValidatedColumnCheck1() => Table.RenameColumn("Validated", "SomeColumn");
 
 		/// <summary>
 		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if the user tries to rename the Validated column
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void RenameColumn_ValidatedColumnCheck2() => Table.RenameColumn("IntegerColumn", "Validated");
 
 		/// <summary>
+		/// Check if we can rename columns in bulk
+		/// </summary>
+		[TestMethod]
+		public void RenameColumn_ValidBulk() => Table.RenameColumn(new Dictionary<string, string> { { "StringColumn", "NewStringColumn" }, { "IntegerColumn", "NewIntegerColumn" } });
+
+		/// <summary>
 		/// Check if we can drop a column using valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void DropColumn_ValidArguments() {
 			Table.DropColumn("StringColumn");
 			Assert.AreEqual(3, Table.GetColumns().Count);
 		}
 
 		/// <summary>
+		/// Check if we can drop columns in bulk
+		/// </summary>
+		[TestMethod]
+		public void DropColumn_ValidBulk() {
+			Table.AddColumn("NewColumn", DataType.Real);
+			Table.DropColumn(new List<string> { "StringColumn", "IntegerColumn" });
+			Assert.AreEqual(3, Table.GetColumns().Count);
+		}
+
+		/// <summary>
+		/// Check if we get an ArgumentExceptions if we drop too many columns
+		/// </summary>
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException))]
+		public void DropColumn_TooMany() => Table.DropColumn(new List<string> { "StringColumn", "IntegerColumn", "SomeOtherColumn" });
+
+		/// <summary>
+		/// Check if we can drop the Validated column
+		/// </summary>
+		[TestMethod]
+		public void DropColumn_DropValidated() {
+			Table.DropColumn("Validated");
+			Assert.IsTrue(!Table.GetColumns().ContainsKey("Validated"));
+		}
+
+		/// <summary>
 		/// Check if the column existence check is working
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void DropColumn_DoesntExistCheck() => Table.DropColumn("SomeColumn");
 
@@ -244,7 +282,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can drop a table.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(SQLiteException), "Table not dropped")]
 		public void DropTable() {
 			Table.DropTable();
@@ -255,7 +293,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can get rows out of a datatable using valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetRows_ValidArgs() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" }, { "IntegerColumn", 11111 } });
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value2" }, { "IntegerColumn", 22222 } });
@@ -280,7 +318,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can get rows out of an empty datatable
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetRows_EmptyTable() {
 			Assert.IsTrue(JToken.DeepEquals(new JObject {
 				{ "Columns", new JObject {
@@ -297,28 +335,28 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the range checks throw an exception when given a negative begin value.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
 		public void GetRows_RangeCheck1() => Table.GetRows(-1);
 
 		/// <summary>
 		/// Check if the range checks throw an exception when given a negative end value.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
 		public void GetRows_RangeCheck2() => Table.GetRows(0, -1);
 
 		/// <summary>
 		/// Check if the range checks throw an exception when begin is higher than end.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetRows_RangeCheck3() => Table.GetRows(10, 5);
 
 		/// <summary>
 		/// Check if we can retrieve all unvalidated rows in a table
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetUnvalidatedRows_ValidArgs() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" }, { "IntegerColumn", 11111 }, { "Validated", 1 } });
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value2" }, { "IntegerColumn", 22222 } });
@@ -341,7 +379,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can retrieve all unvalidated rows in an empty table
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetUnvalidatedRows_EmptyTable() {
 			Assert.IsTrue(JToken.DeepEquals(new JObject {
 				{ "Columns", new JObject {
@@ -358,28 +396,28 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if the range checks throw an exception when given a negative begin value.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_RangeCheck1() => Table.GetUnvalidatedRows(-1);
 
 		/// <summary>
 		/// Check if the range checks throw an exception when given a negative end value.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_RangeCheck2() => Table.GetUnvalidatedRows(0, -1);
 
 		/// <summary>
 		/// Check if the range checks throw an exception when begin is higher than end.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_RangeCheck3() => Table.GetUnvalidatedRows(10, 5);
 
 		/// <summary>
 		/// Check if the Validated column check throws an exception when the table has no Validated column.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_Columnheck() {
 			Table = CreateTestTable(Connection, "Table2", ReqValidation:false);
@@ -389,7 +427,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can update values in a database.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Update_ValidArgs() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" } } );
 			Table.Update(1, new Dictionary<string, dynamic>{ {"StringColumn", "Value2"} });
@@ -410,14 +448,14 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can update data if we specify an invalid row
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Update_RowCheck() => Table.Update(1, new Dictionary<string, dynamic> { { "SomeColumn", 1 } });
 
 		/// <summary>
 		/// Check if we can update data if we input data with an invalid type
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Update_DataTypeCheck() {
 			Table.Insert(new Dictionary<string, dynamic> { {"StringColumn", "Value" } });
@@ -427,7 +465,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can update data if we specify an invalid column
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Update_ColumnCheck() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value" } });
@@ -437,7 +475,7 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can delete rows
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Delete_ValidArguments() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value" } });
 			Table.Delete(1);
@@ -458,13 +496,13 @@ namespace Webserver.Data.Tests {
 		/// Check if we can delete rows if we specify an invalid ID
 		/// No point in returning an exception if the column doesn't exist, because we can always assume that the data is gone anyway.
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Delete_InvalidColumn() => Table.Delete(1);
 
 		/// <summary>
 		/// 
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Insert_ValidArguments() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" } });
 
@@ -484,20 +522,35 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if we can insert data if we specify invalid columns
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Insert_ColumnCheck() => Table.Insert(new Dictionary<string, dynamic> { { "SomeColumn", "Value1" } });
 
 		/// <summary>
 		/// Check if we can insert data if we specify an invalid data type
 		/// </summary>
-		[TestMethod()]
-		public void Insert_DataTypeCheck() => Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", 100 } });
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException))]
+		public void Insert_DataTypeCheck() => Table.Insert(new Dictionary<string, dynamic> { { "IntegerColumn", "Hello" } });
+
+		/// <summary>
+		/// Check if we get an ArgumentException when trying to inserting an empty list.
+		/// </summary>
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void Insert_EmptyList() => Table.Insert(new List<Dictionary<string, dynamic>>());
+
+		/// <summary>
+		/// Check if we get an ArgumentException when trying to insert a list with an empty dict
+		/// </summary>
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException))]
+		public void Insert_EmptyDict() => Table.Insert(new List<Dictionary<string, dynamic>>() { {new Dictionary<string, dynamic>()} });
 
 		/// <summary>
 		/// Check if we can retrieve a list of columns
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetColumns_Test() {
 			Dictionary<string, DataType> Columns = Table.GetColumns();
 			Assert.IsTrue(4 == Columns.Count && Columns.SequenceEqual(new Dictionary<string, DataType> { 
@@ -511,19 +564,19 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if Exists returns true when given a valid table
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Exists_ValidTable() => Assert.IsTrue(GenericDataTable.Exists(Connection, "Table1"));
 
 		/// <summary>
 		/// Check if Exists returns true when given a valid table
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void Exists_InvalidTable() => Assert.IsFalse(GenericDataTable.Exists(Connection, "SomeTable"));
 
 		/// <summary>
 		/// Check if RowExists returns true when given a valid column
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void RowExists_ValidRow() {
 			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" } });
 			Assert.IsTrue(Table.RowExists(1));
@@ -532,25 +585,25 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Check if RowExists returns false when given an invalid column
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void RowExists_InvalidRow() => Assert.IsFalse(Table.RowExists(1));
 
 		/// <summary>
 		/// Check if GetTableByName works when given valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetTableByName_Valid() => Assert.IsNotNull(GenericDataTable.GetTableByName(Connection, "Table1"));
 
 		/// <summary>
 		/// Check if GetTableByName works when given invalid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetTableByName_Invalid() => Assert.IsNull(GenericDataTable.GetTableByName(Connection, "SomeTable"));
 
 		/// <summary>
 		/// Check if we can retrieve a list of table names if we provide valid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void GetTableNames_ValidArgs() {
 			//Table1 is created during init
 			CreateTestTable(Connection, "Table2");
@@ -562,9 +615,20 @@ namespace Webserver.Data.Tests {
 		}
 
 		/// <summary>
+		/// Check if we can retrieve a list of table names, filtered by department
+		/// </summary>
+		[TestMethod]
+		public void GetTableNames_ValidDepartment() {
+			CreateTestTable(Connection, "Table2");
+			Assert.IsTrue(GenericDataTable.GetTableNames(Connection, 2).Count == 0);
+			CreateTestTable(Connection, "Table3", DepartmentID: 2);
+			Assert.IsTrue(GenericDataTable.GetTableNames(Connection, 2).Count == 1);
+		}
+
+		/// <summary>
 		/// Check if we can retrieve a list of table names if we provide invalid arguments
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check passed when it shouldn't")]
 		public void GetTableNames_InvalidArgs() => GenericDataTable.GetTableNames(Connection, 12345);
 	}

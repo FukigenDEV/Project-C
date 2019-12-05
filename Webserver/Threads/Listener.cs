@@ -43,6 +43,7 @@ namespace Webserver.Threads {
 			} catch ( HttpListenerException e ) {
 				Log.Fatal("An exception occured. The server did not start.");
 				Log.Fatal(e.GetType().Name + ": " + e.Message);
+				Log.Fatal("Press the any key to exit.");
 				Console.ReadKey();
 				Environment.Exit(-1);
 			}
