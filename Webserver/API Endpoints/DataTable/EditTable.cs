@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
-namespace Webserver.API_Endpoints.DataTable {
+namespace Webserver.API_Endpoints {
 	internal partial class DataTable : APIEndpoint {
 		[RequireBody]
 		[RequireContentType("application/json")]

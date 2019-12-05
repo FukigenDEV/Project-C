@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
-namespace Webserver.API_Endpoints.DataTable {
+namespace Webserver.API_Endpoints {
 	internal partial class DataTable : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void DELETE() {
