@@ -68,7 +68,7 @@ namespace Webserver {
 			}
 
 			//Create Queue and launch listener
-			using BlockingCollection<HttpListenerContext> Queue = new BlockingCollection<HttpListenerContext>();
+			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
 			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
 			ListenerThread.Start();
 

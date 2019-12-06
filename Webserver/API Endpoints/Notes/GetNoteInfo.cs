@@ -14,28 +14,28 @@ namespace Webserver.API_Endpoints {
 		/// </summary>
 		public override void GET() {
 			// Get required fields
-			if ( !RequestParams.ContainsKey("title") ) {
-				Send("Missing params", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("title") ) {
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the title parameter exists. If it doesn't, return all notes.
-			if ( RequestParams["title"][0].Length == 0 ) {
+			if ( Params["title"][0].Length == 0 ) {
 				List<Note> notes = Note.GetAllNotes(Connection);
-				Send(JsonConvert.SerializeObject(notes), HttpStatusCode.OK);
+				Response.Send(JsonConvert.SerializeObject(notes), HttpStatusCode.OK);
 				return;
 			}
 
 			// Check if the specified note exists. If it doesn't, send a 404 Not Found
-			Note note = Note.GetNoteByTitle(Connection, RequestParams["title"][0]);
+			Note note = Note.GetNoteByTitle(Connection, Params["title"][0]);
 			if ( note == null ) {
-				Send("No such note", HttpStatusCode.NotFound);
+				Response.Send("No such note", HttpStatusCode.NotFound);
 				return;
 			}
 
 			// Build and send response
 			JObject JSON = JObject.FromObject(note);
-			Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
+			Response.Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
 		}
 	}
 }

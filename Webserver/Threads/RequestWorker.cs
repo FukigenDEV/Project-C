@@ -20,7 +20,7 @@ namespace Webserver.Threads {
 	/// </summary>
 	internal class RequestWorker {
 		private readonly Logger Log;
-		private readonly BlockingCollection<HttpListenerContext> Queue;
+		private readonly BlockingCollection<ContextProvider> Queue;
 		private readonly SQLiteConnection Connection;
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue) {
 			this.Log = Log;
 			this.Queue = Queue;
 			this.Connection = Database.CreateConnection();
@@ -39,10 +39,10 @@ namespace Webserver.Threads {
 		/// </summary>
 		public void Run() {
 			while ( true ) {
-				HttpListenerContext Context = Queue.Take();
+				ContextProvider Context = Queue.Take();
 				DateTime Started = DateTime.Now;
-				HttpListenerRequest Request = Context.Request;
-				HttpListenerResponse Response = Context.Response;
+				RequestProvider Request = Context.Request;
+				ResponseProvider Response = Context.Response;
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
@@ -50,11 +50,11 @@ namespace Webserver.Threads {
 
 				if ( URL == null ) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.RawUrl.ToLower());
-					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
+					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
 				} else if ( URL != Request.RawUrl.ToLower() ) {
 					Response.Redirect(URL);
-					Utils.Send(Response, null, HttpStatusCode.Redirect);
+					Response.Send(HttpStatusCode.Redirect);
 					continue;
 				}
 
@@ -72,7 +72,7 @@ namespace Webserver.Threads {
 					} else {
 						//No endpoint or resource was found, so send a 404.
 						Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
-						Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
+						Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 					}
 				}
 				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
@@ -88,7 +88,7 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Request"></param>
 		/// <returns></returns>
-		public Type FindEndpoint(HttpListenerRequest Request) {
+		public Type FindEndpoint(RequestProvider Request) {
 			//Search through endpoints
 			foreach ( Type T in Program.Endpoints ) {
 				//Get endpoint info attribute. If the attribute is missing, show an error in console and continue to the next.
@@ -112,9 +112,9 @@ namespace Webserver.Threads {
 		/// <param name="T"></param>
 		/// <param name="Context"></param>
 		[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-		public void ProcessEndpoint(Type T, HttpListenerContext Context) {
-			HttpListenerRequest Request = Context.Request;
-			HttpListenerResponse Response = Context.Response;
+		public void ProcessEndpoint(Type T, ContextProvider Context) {
+			RequestProvider Request = Context.Request;
+			ResponseProvider Response = Context.Response;
 
 			//Create an instance of the specified endpoint and set the required values.
 			APIEndpoint Endpoint = (APIEndpoint)Activator.CreateInstance(T);
@@ -123,11 +123,6 @@ namespace Webserver.Threads {
 			Endpoint.Response = Context.Response;
 			Endpoint.Request = Context.Request;
 
-			//Convert query string to a Dict because NameValueCollections are trash
-			foreach ( string key in Request.QueryString ) {
-				Endpoint.RequestParams.Add(key?.ToLower() ?? "null", new List<string>(Request.QueryString[key]?.Split(',')));
-			}
-
 			//Set access control headers for CORS support.
 			List<string> AllowedMethods = new List<string>();
 			foreach ( MethodInfo M in T.GetMethods() ) {
@@ -135,9 +130,10 @@ namespace Webserver.Threads {
 					AllowedMethods.Add(M.Name);
 				}
 			}
-			string Origin = Request.Headers.Get("Origin");
-			if ( Program.CORSAddresses.Contains(Origin + '/') ) {
-				Response.Headers.Add("Access-Control-Allow-Origin", Origin);
+
+			bool OriginHeader = Request.Headers.TryGetValue("origin", out List<string> Origins);
+			if ( OriginHeader && Program.CORSAddresses.Contains(Origins[0] + '/') ) {
+				Response.Headers.Add("Access-Control-Allow-Origin", Origins[0]);
 			}
 			Response.Headers.Add("Allow", string.Join(", ", AllowedMethods));
 			Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
@@ -160,7 +156,7 @@ namespace Webserver.Threads {
 							Log.Warning("Refused request for endpoint " + T.Name + ": Could not parse JSON");
 							Log.Debug("Message: " + e.Message);
 							Log.Debug("Received JSON: " + JSONText);
-							Utils.Send(Response, "Invalid JSON: " + e.Message, HttpStatusCode.BadRequest);
+							Response.Send("Invalid JSON: " + e.Message, HttpStatusCode.BadRequest);
 							return;
 						}
 						Endpoint.JSON = null;
@@ -175,14 +171,14 @@ namespace Webserver.Threads {
 				//Check cookie. If its missing, send a 401 Unauthorized if the cookie is missing. (because a user MUST be logged in to use an endpoint with a PermissionLevel attribute)
 				Cookie SessionIDCookie = Request.Cookies["SessionID"];
 				if ( SessionIDCookie == null ) {
-					Utils.Send(Response, "No Session", HttpStatusCode.Unauthorized);
+					Response.Send("No Session", HttpStatusCode.Unauthorized);
 					return;
 				}
 
 				//Check if a session exists with the Session ID contained in the session cookie. If none is found or the session has expired, send back a 401 Unauthorized
 				Session s = Session.GetUserSession(Connection, SessionIDCookie.Value);
 				if ( s == null ) {
-					Utils.Send(Response, "Expired session", HttpStatusCode.Unauthorized);
+					Response.Send("Expired session", HttpStatusCode.Unauthorized);
 					return;
 				}
 				//Renew the session, and save it in the endpoint object.
@@ -194,8 +190,8 @@ namespace Webserver.Threads {
 
 				//Get department name. If none was found, assume Administrators
 				string DepartmentName;
-				if ( Endpoint.RequestParams.ContainsKey("Department") ) {
-					DepartmentName = Endpoint.RequestParams["Department"][0];
+				if ( Endpoint.Params.ContainsKey("Department") ) {
+					DepartmentName = Endpoint.Params["Department"][0];
 				} else {
 					DepartmentName = "Administrators";
 				}
@@ -203,7 +199,7 @@ namespace Webserver.Threads {
 				//Get department. If none was found, send 400 Bad Request
 				Department Dept = Department.GetByName(Connection, DepartmentName);
 				if ( Dept == null ) {
-					Utils.Send(Response, "No such Department", HttpStatusCode.BadRequest);
+					Response.Send("No such Department", HttpStatusCode.BadRequest);
 					return;
 				}
 
@@ -215,7 +211,7 @@ namespace Webserver.Threads {
 				if ( Level < Attr.Level ) {
 					Log.Warning("User " + Endpoint.RequestUser.Email + " attempted to access endpoint " + T.Name + " without sufficient permissions");
 					Log.Warning("Department: '" + DepartmentName + "', User is '" + Level + "' but must be at least '" + Attr.Level + "'");
-					Utils.Send(Response, null, HttpStatusCode.Forbidden);
+					Response.Send(HttpStatusCode.Forbidden);
 					return;
 				}
 			}
@@ -226,7 +222,7 @@ namespace Webserver.Threads {
 				Method.Invoke(Endpoint, null);
 			} catch ( Exception e ) {
 				Log.Error("Failed to fullfill request for endpoint " + T.Name + ": " + e.GetType().Name + ", " + e.Message);
-				Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.InternalServerError, e.Message), HttpStatusCode.InternalServerError);
 			}
 		}
 
@@ -235,14 +231,14 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Target">The URL the resource is located at.</param>
 		/// <param name="Context"></param>
-		public void ProcessResource(string Target, HttpListenerContext Context) {
-			HttpListenerRequest Request = Context.Request;
-			HttpListenerResponse Response = Context.Response;
+		public void ProcessResource(string Target, ContextProvider Context) {
+			RequestProvider Request = Context.Request;
+			ResponseProvider Response = Context.Response;
 
 			//Content-type header shouldn't be set for resources
 			if ( Request.ContentType != null ) {
 				Log.Warning("Refused request for resource " + Target + ": Unsupported Media Type (" + Request.ContentType + ")");
-				Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType);
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType);
 				return;
 			}
 
@@ -250,7 +246,7 @@ namespace Webserver.Threads {
 			switch ( Request.HttpMethod ) {
 				case "GET":
 					//Send the resource to the client. Content type will be set according to the resource's file extension.
-					Utils.Send(Response, File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch
+					Response.Send(File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch
 					{
 						".css" => "text/css",
 						".png" => "image/png",
@@ -263,7 +259,7 @@ namespace Webserver.Threads {
 
 				case "HEAD":
 					//A HEAD request is the same as GET, except without the body. Since the resource exists, we can just send back a 200 OK and call it a day.
-					Utils.Send(Response, null, HttpStatusCode.OK);
+					Response.Send(HttpStatusCode.OK);
 					return;
 
 				case "OPTIONS":
@@ -272,13 +268,13 @@ namespace Webserver.Threads {
 					if ( Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString()) ) {
 						Response.Headers.Add("Access-Control-Allow-Origin", Request.LocalEndPoint.ToString());
 					}
-					Utils.Send(Response, null, HttpStatusCode.OK);
+					Response.Send(HttpStatusCode.OK);
 					return;
 
 				default:
 					//Resources only support the three methods defined above, so send back a 405 Method Not Allowed.
 					Log.Warning("Refused request for resource " + Target + ": Method Not Allowed (" + Request.HttpMethod + ")");
-					Utils.Send(Response, Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed);
+					Response.Send(Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed);
 					return;
 			}
 		}

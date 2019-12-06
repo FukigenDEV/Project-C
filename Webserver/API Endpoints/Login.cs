@@ -31,7 +31,7 @@ namespace Webserver.API_Endpoints {
 
 				if ( CurrentSession != null ) {
 					CurrentSession.Renew(Connection);
-					Send("Renewed", HttpStatusCode.OK);
+					Response.Send("Renewed", HttpStatusCode.OK);
 					return;
 				}
 			}
@@ -41,33 +41,33 @@ namespace Webserver.API_Endpoints {
 			bool foundPassword = JSON.TryGetValue<string>("Password", out JToken Password);
 			bool foundRememberMe = JSON.TryGetValue<string>("RememberMe", out JToken RememberMe);
 			if ( !foundEmail || !foundPassword || !foundRememberMe ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the email is valid. If it isn't, send a 400 Bad Request.
 			Regex rx = new Regex("[A-z0-9]*@[A-z0-9]*.[A-z]*");
 			if ( !rx.IsMatch((string)Email) && (string)Email != "Administrator" ) {
-				Send("Invalid Email", HttpStatusCode.BadRequest);
+				Response.Send("Invalid Email", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the user exists. If it doesn't, send a 400 Bad Request
 			User Account = User.GetUserByEmail(Connection, (string)Email);
 			if ( Account == null ) {
-				Send("No such user", HttpStatusCode.BadRequest);
+				Response.Send("No such user", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if password is an empty string, and send a 400 Bad Request if it is.
 			if ( ( (string)Password ).Length == 0 ) {
-				Send("Empty password", HttpStatusCode.BadRequest);
+				Response.Send("Empty password", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check password. If its invalid, return a 401 Unauthorized
 			if ( Account.PasswordHash != User.CreateHash((string)Password, (string)Email) ) {
-				Send(StatusCode: HttpStatusCode.Unauthorized);
+				Response.Send(StatusCode: HttpStatusCode.Unauthorized);
 				return;
 			}
 
@@ -77,7 +77,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(NewSession);
 
 			AddCookie("SessionID", NewSession.SessionID, NewSession.GetRemainingTime());
-			Send(StatusCode: HttpStatusCode.NoContent);
+			Response.Send(StatusCode: HttpStatusCode.NoContent);
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Webserver.API_Endpoints {
 		public override void DELETE() {
 			Connection.Delete(UserSession);
 			AddCookie("SessionID", "", 0);
-			Send(StatusCode: HttpStatusCode.OK);
+			Response.Send(StatusCode: HttpStatusCode.OK);
 		}
 	}
 }

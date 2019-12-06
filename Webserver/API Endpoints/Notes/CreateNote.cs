@@ -14,14 +14,14 @@ namespace Webserver.API_Endpoints {
 			// Get all required values
 			if ( !JSON.TryGetValue<string>("title", out JToken title) ||
 				!JSON.TryGetValue<string>("text", out JToken text) ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the specified note exists. If it doesn't, send a 404 Not Found
 			Note note = Note.GetNoteByTitle(Connection, (string)title);
 			if ( note != null ) {
-				Send("Note already exists", HttpStatusCode.BadRequest);
+				Response.Send("Note already exists", HttpStatusCode.BadRequest);
 				return;
 			}
 
@@ -31,7 +31,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(newNote);
 
 			// Send success message
-			Send("Note successfully created", HttpStatusCode.OK);
+			Response.Send("Note successfully created", HttpStatusCode.OK);
 		}
 	}
 }

@@ -20,24 +20,24 @@ namespace Webserver.API_Endpoints {
 				!JSON.TryGetValue<string>("Department", out JToken DepartmentVal) ||
 				!JSON.TryGetValue<bool>("RequireValidation", out JToken RequireValidation)
 			) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check name
 			if ( !Regex.IsMatch((string)Name, "[0-9A-Za-z_]") ) {
-				Send("Invalid name", HttpStatusCode.BadRequest);
+				Response.Send("Invalid name", HttpStatusCode.BadRequest);
 				return;
 			}
 			if ( GenericDataTable.Exists(Connection, (string)Name) ) {
-				Send("Already exists", HttpStatusCode.BadRequest);
+				Response.Send("Already exists", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check Department
 			Department Dept = Department.GetByName(Connection, (string)DepartmentVal);
 			if ( Dept == null ) {
-				Send("No such department", HttpStatusCode.BadRequest);
+				Response.Send("No such department", HttpStatusCode.BadRequest);
 				return;
 			}
 
@@ -45,18 +45,18 @@ namespace Webserver.API_Endpoints {
 			Dictionary<string, DataType> ColumnDict = new Dictionary<string, DataType>();
 			foreach ( KeyValuePair<string, JToken> Entry in (JObject)Columns ) {
 				if ( GenericDataTable.ReservedColumns.Contains(Entry.Key) || !Regex.IsMatch(Entry.Key, "[0-9A-Za-z_]") ) {
-					Send("Invalid or reserved column name");
+					Response.Send("Invalid or reserved column name");
 					return;
 				}
 				if ( !Enum.TryParse<DataType>((string)Entry.Value, out DataType DT) ) {
-					Send("Invalid column type. Type must be either Integer, String, Real, or Blob");
+					Response.Send("Invalid column type. Type must be either Integer, String, Real, or Blob");
 					return;
 				}
 				ColumnDict.Add(Entry.Key, DT);
 			}
 
 			new GenericDataTable(Connection, (string)Name, ColumnDict, Dept, (bool)RequireValidation);
-			Send(StatusCode: HttpStatusCode.Created);
+			Response.Send(StatusCode: HttpStatusCode.Created);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace Webserver.API_Endpoints {
 				!JSON.TryGetValue<string>("country", out JToken country) ||
 				!JSON.TryGetValue<string>("phoneNumber", out JToken phoneNumber) ||
 				!JSON.TryGetValue<string>("email", out JToken email) ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
@@ -32,7 +32,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(company);
 
 			// Send success message
-			Send(StatusCode: HttpStatusCode.Created);
+			Response.Send(StatusCode: HttpStatusCode.Created);
 		}
 	}
 }

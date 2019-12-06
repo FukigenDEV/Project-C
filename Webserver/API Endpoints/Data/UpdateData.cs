@@ -16,15 +16,15 @@ namespace Webserver.API_Endpoints {
 		[RequireContentType("application/json")]
 		public override void PATCH() {
 			//Get required fields
-			if ( !RequestParams.ContainsKey("table") ) {
-				Send("Missing params", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("table") ) {
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if all specified table exist
-			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, RequestParams["table"][0]);
+			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, Params["table"][0]);
 			if ( Table == null ) {
-				Send("No such table", HttpStatusCode.NotFound);
+				Response.Send("No such table", HttpStatusCode.NotFound);
 				return;
 			}
 
@@ -33,33 +33,33 @@ namespace Webserver.API_Endpoints {
 			Dictionary<string, DataType> Columns = Table.GetColumns();
 			foreach ( KeyValuePair<string, JToken> Entry in JSON ) {
 				if ( !int.TryParse(Entry.Key, out int RowID) ) {
-					Send("Invalid row ID", HttpStatusCode.BadRequest);
+					Response.Send("Invalid row ID", HttpStatusCode.BadRequest);
 					return;
 				}
 				if ( Entry.Value.Type != JTokenType.Object ) {
-					Send("Invalid row data", HttpStatusCode.BadRequest);
+					Response.Send("Invalid row data", HttpStatusCode.BadRequest);
 					return;
 				}
 				Dict.Add(RowID, new Dictionary<string, dynamic>());
 				foreach ( KeyValuePair<string, JToken> Column in (JObject)Entry.Value ) {
 					if ( Columns.ContainsKey(Column.Key) ) {
 						if ( Column.Key == "rowid" ) {
-							Send("Can't modify row ID", HttpStatusCode.BadRequest);
+							Response.Send("Can't modify row ID", HttpStatusCode.BadRequest);
 							return;
 						}
 						if ( Columns[Column.Key] == DataType.Integer && Column.Value.Type != JTokenType.Integer ) {
-							Send("Invalid datatype (" + Column.Key + " should be Integer)", HttpStatusCode.BadRequest);
+							Response.Send("Invalid datatype (" + Column.Key + " should be Integer)", HttpStatusCode.BadRequest);
 							return;
 						}
 						Dict[RowID].Add(Column.Key, Columns[Column.Key] == DataType.Integer ? (int)Column.Value : (dynamic)Column.Value);
 					} else {
-						Send("Unknown column " + Column.Key, HttpStatusCode.BadRequest);
+						Response.Send("Unknown column " + Column.Key, HttpStatusCode.BadRequest);
 						return;
 					}
 				}
 			}
 			Table.Update(Dict);
-			Send(HttpStatusCode.OK);
+			Response.Send(HttpStatusCode.OK);
 		}
 	}
 }

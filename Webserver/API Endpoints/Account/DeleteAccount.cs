@@ -11,25 +11,25 @@ namespace Webserver.API_Endpoints {
 		public override void DELETE() {
 			//Get required fields
 			if ( !JSON.TryGetValue<string>("Email", out JToken Email) ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Cancel if Email is "Administrator", because the built-in Admin shouldn't ever be deleted.
 			if ( (string)Email == "Administrator" ) {
-				Send(StatusCode: HttpStatusCode.Forbidden);
+				Response.Send(StatusCode: HttpStatusCode.Forbidden);
 				return;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
 			User Acc = User.GetUserByEmail(Connection, (string)Email);
 			if ( Acc == null ) {
-				Send("No such user", HttpStatusCode.NotFound);
+				Response.Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}
 
 			Connection.Delete(Acc);
-			Send(StatusCode: HttpStatusCode.OK);
+			Response.Send(StatusCode: HttpStatusCode.OK);
 		}
 	}
 }

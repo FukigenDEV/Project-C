@@ -10,19 +10,19 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void DELETE() {
 			// Get all required values
-			if ( !RequestParams.ContainsKey("table") ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("table") ) {
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//If table exists, delete it
-			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, RequestParams["table"][0]);
+			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, Params["table"][0]);
 			if ( Table == null ) {
-				Send("No such table", HttpStatusCode.BadRequest);
+				Response.Send("No such table", HttpStatusCode.BadRequest);
 				return;
 			} else {
 				Table.DropTable();
-				Send(StatusCode: HttpStatusCode.OK);
+				Response.Send(StatusCode: HttpStatusCode.OK);
 			}
 		}
 	}

@@ -12,12 +12,12 @@ namespace Webserver.API_Endpoints {
 		public override void GET() {
 			//Get required fields
 			List<User> Users = new List<User>();
-			if ( RequestParams.ContainsKey("email") ) {
+			if ( Params.ContainsKey("email") ) {
 
 				//Check if the specified user exists. If it doesn't, send a 404 Not Found
-				User Acc = User.GetUserByEmail(Connection, RequestParams["email"][0]);
+				User Acc = User.GetUserByEmail(Connection, Params["email"][0]);
 				if ( Acc == null ) {
-					Send("No such user", HttpStatusCode.NotFound);
+					Response.Send("No such user", HttpStatusCode.NotFound);
 					return;
 				}
 				Users.Add(Acc);
@@ -28,11 +28,11 @@ namespace Webserver.API_Endpoints {
 
 			//If a department was specified, only return permission level and department
 			JArray JSON = new JArray();
-			if ( RequestParams.ContainsKey("department") ) {
+			if ( Params.ContainsKey("department") ) {
 				//Get department. If no department is found, return a 404
-				Department Dept = Department.GetByName(Connection, RequestParams["department"][0]);
+				Department Dept = Department.GetByName(Connection, Params["department"][0]);
 				if ( Dept == null ) {
-					Send("No such department", HttpStatusCode.NotFound);
+					Response.Send("No such department", HttpStatusCode.NotFound);
 					return;
 				}
 
@@ -51,7 +51,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Send response
-			Send(JSON, HttpStatusCode.OK);
+			Response.Send(JSON, HttpStatusCode.OK);
 		}
 	}
 }

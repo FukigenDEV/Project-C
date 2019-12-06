@@ -16,7 +16,7 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log"></param>
 		/// <param name="Queue"></param>
-		public static void Run(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+		public static void Run(Logger Log, BlockingCollection<ContextProvider> Queue) {
 			Log.Info("Starting ListenerThread");
 
 			//Get addresses the server should listen to.
@@ -51,7 +51,7 @@ namespace Webserver.Threads {
 			//Listen for incoming requests and add them to the queue.
 			Log.Info("Now listening!");
 			while ( true ) {
-				Queue.Add(Listener.GetContext());
+				Queue.Add(new ContextProvider(Listener.GetContext()));
 			}
 		}
 	}

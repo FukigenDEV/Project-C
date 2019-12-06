@@ -15,20 +15,20 @@ namespace Webserver.API_Endpoints {
 		public override void PATCH() {
 			//Get required fields
 			if ( !JSON.TryGetValue<string>("Email", out JToken Email) ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Administrator account can't be modified;
 			if ( (string)Email == "Administrator" ) {
-				Send(StatusCode: HttpStatusCode.Forbidden);
+				Response.Send(StatusCode: HttpStatusCode.Forbidden);
 				return;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
 			User Acc = User.GetUserByEmail(Connection, (string)Email);
 			if ( Acc == null ) {
-				Send("No such user", HttpStatusCode.NotFound);
+				Response.Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}
 
@@ -39,7 +39,7 @@ namespace Webserver.API_Endpoints {
 				if ( rx.IsMatch((string)NewEmail) ) {
 					Acc.Email = (string)NewEmail;
 				} else {
-					Send("Invalid Email", HttpStatusCode.BadRequest);
+					Response.Send("Invalid Email", HttpStatusCode.BadRequest);
 					return;
 				}
 			}
@@ -87,7 +87,7 @@ namespace Webserver.API_Endpoints {
 
 			//Update DB row
 			Connection.Update<User>(Acc);
-			Send(StatusCode: HttpStatusCode.OK);
+			Response.Send(StatusCode: HttpStatusCode.OK);
 		}
 	}
 }
