@@ -10,12 +10,8 @@ import json
 
 Cookies = dict(SessionID="7xZ5YxF3dE61Eg9p51wcxA==")
 
-address = "http://localhost/account?department=Administrators"
+address = "http://localhost/account?email=Administrator"
 JSON = {
-	"Email": "memes@memes.com",
-	"Password": "whateverlol",
-	"AccountType": "User",
-	"MemberOf": "All Users"
 }
 response = requests.get(address, json=JSON, cookies=Cookies)
 print(response.headers)

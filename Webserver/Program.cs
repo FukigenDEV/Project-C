@@ -60,12 +60,7 @@ namespace Webserver {
 			Redirect.Init();
 
 			//Find all API endpoints
-			Endpoints = new List<Type>();
-			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
-				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
-					Endpoints.Add(type);
-				}
-			}
+			DiscoverEndpoints();
 
 			//Create Queue and launch listener
 			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
@@ -88,6 +83,15 @@ namespace Webserver {
 			Log.Info("Type 'Exit' to exit.");
 			while ( Console.ReadLine().ToLower() != "exit" ) ;
 			Environment.Exit(0);
+		}
+
+		public static void DiscoverEndpoints() {
+			Endpoints = new List<Type>();
+			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
+				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
+					Endpoints.Add(type);
+				}
+			}
 		}
 	}
 }

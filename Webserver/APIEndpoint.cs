@@ -46,56 +46,56 @@ namespace Webserver {
 		/// Called when a HTTP.GET request is sent to this endpoint.
 		/// A GET request should only be used to retrieve data from the server.
 		/// </summary>
-		public virtual void GET() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void GET() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.HEAD request is sent to this endpoint.
 		/// HEAD requests ask for the same response as GET requests do, but without a response body.
 		/// </summary>
-		public virtual void HEAD() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void HEAD() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.POST request is sent to this endpoint.
 		/// POST requests are used to submit new data to the server.
 		/// </summary>
-		public virtual void POST() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void POST() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.PUT request is sent to this endpoint.
 		/// PUT requests are used to replace data on the server.
 		/// </summary>
-		public virtual void PUT() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void PUT() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.DELETE request is sent to this endpoint.
 		/// DELETE requests are used to delete data from the server.
 		/// </summary>
-		public virtual void DELETE() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void DELETE() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.CONNECT request is sent to this endpoint.
 		/// A CONNECT request is used to establish a tunnel to the server, identified by the targeted resource
 		/// </summary>
-		public virtual void CONNECT() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void CONNECT() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.OPTIONS request is sent to this endpoint.
 		/// The OPTIONS method returns the HTTP methods that the server supports for the specified URL.
 		/// The method cannot be overriden, as its implementation must be the same for all endpoints.
 		/// </summary>
-		public void OPTIONS() => Response.Send(null, HttpStatusCode.OK);
+		public void OPTIONS() => Response.Send( HttpStatusCode.OK);
 
 		/// <summary>
 		/// Called when a HTTP.TRACE request is sent to this endpoint.
 		/// A TRACE request is used to perform a message loop-back test along the path to the target resource.
 		/// </summary>
-		public virtual void TRACE() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void TRACE() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Called when a HTTP.PATCH request is sent to this endpoint.
 		/// A PATH request is used to partially modify data.
 		/// </summary>
-		public virtual void PATCH() => Response.Send(null, HttpStatusCode.MethodNotAllowed);
+		public virtual void PATCH() => Response.Send( HttpStatusCode.MethodNotAllowed);
 
 		/// <summary>
 		/// Send a cookie to the client.

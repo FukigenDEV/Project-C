@@ -6,9 +6,8 @@ using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
 	[EndpointURL("/account")]
-	internal partial class AccountEndpoint : APIEndpoint {
+	public partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Manager)]
-		[RequireContentType("application/json")]
 		public override void GET() {
 			//Get required fields
 			List<User> Users = new List<User>();
@@ -51,7 +50,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Send response
-			Response.Send(JSON, HttpStatusCode.OK);
+			Response.Send(JSON);
 		}
 	}
 }

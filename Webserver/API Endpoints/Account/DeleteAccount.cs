@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
-	internal partial class AccountEndpoint : APIEndpoint {
+	public partial class AccountEndpoint : APIEndpoint {
 		[PermissionLevel(PermLevel.Administrator)]
 		[RequireBody]
 		[RequireContentType("application/json")]

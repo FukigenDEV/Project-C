@@ -33,10 +33,10 @@ namespace Webserver {
 
 		public Encoding ContentEncoding { get; set; }
 		public string ContentType { get; set; }
-		public CookieCollection Cookies { get; set; }
+		public CookieCollection Cookies { get; set; } = new CookieCollection();
 		public HttpMethod HttpMethod { get; set; }
-		public Dictionary<string, List<string>> Params { get; set; }
-		public Dictionary<string, List<string>> Headers { get; set; }
+		public Dictionary<string, List<string>> Params { get; set; } = new Dictionary<string, List<string>>();
+		public Dictionary<string, List<string>> Headers { get; set; } = new Dictionary<string, List<string>>();
 		public Stream InputStream { get; set; }
 		public IPEndPoint LocalEndPoint { get; set; }
 		public Uri Url { get; set; }
@@ -77,7 +77,7 @@ namespace Webserver {
 		public string ContentType {
 			get => _ContentType;
 			set {
-				if ( Response == null ) Response.ContentType = ContentType;
+				if ( Response != null ) Response.ContentType = ContentType;
 				_ContentType = value;
 			}
 		}
@@ -116,14 +116,14 @@ namespace Webserver {
 		/// Send just a status code to the client, answering the request.
 		/// </summary>
 		/// <param name="StatusCode"></param>
-		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(null, StatusCode);
+		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Send( StatusCode);
 
 		/// <summary>
 		/// Send JSON data to the client, answering the request.
 		/// </summary>
 		/// <param name="JSON"></param>
 		/// <param name="StatusCode"></param>
-		public void Send(JObject JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON, StatusCode, "application/json");
+		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(), StatusCode, "application/json");
 
 		/// <summary>
 		/// Sends data to the client in the form of a byte array.
@@ -144,11 +144,13 @@ namespace Webserver {
 			this.StatusCode = StatusCode;
 			this.ContentType = ContentType;
 
-			try {
-				Response.OutputStream.Write(Data, 0, Data.Length);
-				Response.OutputStream.Close();
-			} catch ( HttpListenerException e ) {
-				Program.Log?.Error("Failed to send data to host: " + e.Message);
+			if(Response != null ) {
+				try {
+					Response.OutputStream.Write(Data, 0, Data.Length);
+					Response.OutputStream.Close();
+				} catch ( HttpListenerException e ) {
+					Program.Log?.Error("Failed to send data to host: " + e.Message);
+				}
 			}
 		}
 
@@ -158,8 +160,8 @@ namespace Webserver {
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public void Send(object Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
-			if ( Data == null ) Data = "";
+		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
+			if ( Data == null ) Data = string.Empty;
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Buffer, StatusCode, ContentType);
 		}

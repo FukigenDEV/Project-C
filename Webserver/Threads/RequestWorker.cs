@@ -83,6 +83,7 @@ namespace Webserver.Threads {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			} while ( !Debug && Queue.Count != 0);
+			Connection.Close();
 		}
 
 		/// <summary>
