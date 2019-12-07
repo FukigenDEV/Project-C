@@ -139,7 +139,7 @@ class AdminWizard extends Component {
 
 		var name = $("#gdt_name").val();
 		var department = $("#departments_dropdown option:selected").text();
-		var requireValidation = $("#gdt_require_validation").val() === "on" ? true : false;
+		var requireValidation = $("#gdt_require_validation").is(":checked") ? true : false;
 
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "/datatable", true);

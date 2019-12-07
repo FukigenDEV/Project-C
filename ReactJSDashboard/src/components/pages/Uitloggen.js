@@ -55,8 +55,13 @@ class Uitloggen extends Component {
 
     return (
       <div className="col-sm-12 shadow-sm p-3 mb-5 bg-white rounded">
-        Weet je zeker dat je wilt uitloggen?
-        <br/><br/><br/>
+		<h2>Uitloggen</h2>
+
+		<hr/>
+
+        <p>Weet je zeker dat je wilt uitloggen?</p>
+
+        <br/>
         <div className={this.getBadgeClasses()}>{(this.state.alert.type === 401) ? "An error occured, couldn't log out" : "Logout was succesful"}</div>
         <button onClick={this.handleLogout.bind(this)} className="logout-button">Log uit</button>        
       </div>

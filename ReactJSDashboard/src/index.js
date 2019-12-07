@@ -22,8 +22,7 @@ import manCompany from './components/pages/admin/manage/Company';
 import EditCompany from './components/pages/admin/manage/edit/Company';
 
 import Navs from './components/navs';
-import GegevensRegistreren from './components/pages/GegevensRegistreren';
-import GegevensBekijken from './components/pages/GegevensBekijken';
+import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
 import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedenis';
 import Backup from './components/pages/Backup';
@@ -56,8 +55,7 @@ export {
     addCompany,
     manCompany,
     EditCompany,
-    GegevensRegistreren,
-    GegevensBekijken,
+    Gegevens,
     Notities,
     Activiteitengeschiedenis,
     Backup,

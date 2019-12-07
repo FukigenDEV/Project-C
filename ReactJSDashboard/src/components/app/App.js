@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
 import { createHashHistory } from 'history';
-import { Dashboard, Home, Admin, GegevensRegistreren, GegevensBekijken, Notities, Activiteitengeschiedenis, Backup, Uitloggen, AdminWizard } from '../../index';
+import { Dashboard, Home, Admin, Gegevens, Notities, Activiteitengeschiedenis, Backup, Uitloggen, AdminWizard } from '../../index';
 import Login from '../login';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,10 +17,9 @@ class App extends Component {
     this.state = {
       loggedin: { value: null },
       navs: [
-        { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
+        { id: 0, heading: 'Registratieplatform', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
         { id: 1, heading: 'Admin', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
-        { id: 2, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-        { id: 3, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+        { id: 3, heading: 'Gegevens', link: '/dashboard/Gegevens', path: '/dashboard/Gegevens', component: Gegevens, active: false, icon: 'file' },
         { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
         { id: 5, heading: 'Activiteiten geschiedenis', link: '/dashboard/Activiteitengeschiedenis', path: '/dashboard/Activiteitengeschiedenis', component: Activiteitengeschiedenis, active: false, icon: 'history' },
         { id: 6, heading: 'Back-up maken', link: '/dashboard/Back-up', path: '/dashboard/Back-up', component: Backup, active: false, icon: 'download' },

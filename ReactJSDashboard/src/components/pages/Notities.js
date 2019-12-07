@@ -58,14 +58,16 @@ class Notities extends Component {
 		return (
 			<div className="shadow-sm p-3 mb-5 bg-white rounded">
 				<h2>Notities</h2>
+
 				<hr />
 
 				<button type="button" id="alleNotitiesKnop" class="btn btn-outline-primary" style={{ display: "inline-block" }}>
 					Alle notities</button>
 
 				<button type="button" id="notitieAanmakenKnop" class="btn btn-outline-primary" style={{ display: "inline-block" }}>
-					Notitie aanmaken</button>
+					Notitie aanmaken</button><br/>
 
+				<br/>
 
 				<div id="alleNotities">
 					<h5><b>Een overzicht van alle notities:</b></h5>

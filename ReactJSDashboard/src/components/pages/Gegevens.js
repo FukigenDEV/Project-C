@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-class GegevensRegistreren extends Component {
+class Gegevens extends Component {
   componentDidMount() {
 	var xhr = new XMLHttpRequest();
 	var url = "/datatable?department=";
@@ -9,8 +9,12 @@ class GegevensRegistreren extends Component {
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status === 200) {
+		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 			var tables = JSON.parse(xhr.responseText);
+
+			if (tables.length === 0) {
+				$("#add_row").hide();
+			}
 
 			for (var i = 0; i < tables.length; i++) {
 				$("#tables_dropdown select").append("<option value=" + i + ">" + tables[i].Name + "</option>");
@@ -39,6 +43,11 @@ class GegevensRegistreren extends Component {
 				// Build the first row with the column names
 				var columnElement = "<tr style=\"background-color: #DDD;\">";
 				for (var columnName in json[tableName]["Columns"]) {
+					// The reversed column "rowid" should not be visible
+					if (columnName === "rowid") {
+						continue;
+					}
+
 					columnElement += "<th>" + columnName + "</th>";
 				}
 				columnElement += "</tr>"
@@ -50,7 +59,8 @@ class GegevensRegistreren extends Component {
 					var row = json[tableName]["Rows"][r];
 
 					var rowElement = "<tr>";
-					for (var el = 0; el < row.length; el++) {
+					// Start at index 1 (index 0 is the rowid that should not be visible)
+					for (var el = 1; el < row.length; el++) {
 						rowElement += "<td>" + row[el] + "</td>";
 					}
 					rowElement += "</tr>"
@@ -60,8 +70,13 @@ class GegevensRegistreren extends Component {
 
 				// Build the last row with the input fields (for adding new data)
 				var lastRowElement = "<tr id=\"new_row\">";
-				for (var columnName in json[tableName]["Columns"]) {
-					lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"text\" id=\"" + columnName + "\" placeholder=\"" + columnName + "\"></td>";
+				for (var lastColumnName in json[tableName]["Columns"]) {
+					// The reversed column "rowid" should not be visible
+					if (lastColumnName === "rowid") {
+						continue;
+					}
+
+					lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"text\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
 				}
 				lastRowElement += "<tr/>";
 				
@@ -81,7 +96,7 @@ class GegevensRegistreren extends Component {
 			var key = $(this).attr("id");
 			var value = $(this).val();
 
-			if (key == "rowid" || key == "Validated") return;
+			if (key === "rowid" || key === "Validated") return;
 			
 			jsonString += '"' + key + '": "' + value + '"';
 
@@ -110,6 +125,10 @@ class GegevensRegistreren extends Component {
   render() {
     return (
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
+		<h2>Gegevens</h2>
+
+		<hr/>
+
 		Table:<br/>
 		<div id="tables_dropdown">
 			<select>
@@ -130,4 +149,4 @@ class GegevensRegistreren extends Component {
   }
 }
 
-export default GegevensRegistreren;
+export default Gegevens;
