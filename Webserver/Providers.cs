@@ -18,6 +18,11 @@ namespace Webserver {
 			Request = new RequestProvider(Context.Request);
 			Response = new ResponseProvider(Context.Response);
 		}
+
+		public ContextProvider(RequestProvider Request, ResponseProvider Response) {
+			this.Request = Request;
+			this.Response = Response;
+		}
 	}
 
 	/// <summary>
@@ -29,12 +34,11 @@ namespace Webserver {
 		public Encoding ContentEncoding { get; set; }
 		public string ContentType { get; set; }
 		public CookieCollection Cookies { get; set; }
-		public string HttpMethod { get; set; }
+		public HttpMethod HttpMethod { get; set; }
 		public Dictionary<string, List<string>> Params { get; set; }
 		public Dictionary<string, List<string>> Headers { get; set; }
 		public Stream InputStream { get; set; }
 		public IPEndPoint LocalEndPoint { get; set; }
-		public string RawUrl { get; set; }
 		public Uri Url { get; set; }
 
 		public RequestProvider(HttpListenerRequest Request) {
@@ -46,11 +50,15 @@ namespace Webserver {
 			Cookies = Request.Cookies;
 			Params = Utils.NameValueToDict(Request.QueryString);
 			Headers = Utils.NameValueToDict(Request.Headers);
-			HttpMethod = Request.HttpMethod;
+			HttpMethod = Enum.Parse<HttpMethod>(Request.HttpMethod);
 			InputStream = Request.InputStream;
 			LocalEndPoint = Request.LocalEndPoint;
-			RawUrl = Request.RawUrl;
 			Url = Request.Url;
+		}
+
+		public RequestProvider(Uri Url, HttpMethod HttpMethod) {
+			this.Url = Url;
+			this.HttpMethod = HttpMethod;
 		}
 	}
 
@@ -96,6 +104,8 @@ namespace Webserver {
 			ContentType = Response.ContentType;
 			StatusCode = (HttpStatusCode)Response.StatusCode;
 		}
+
+		public ResponseProvider() {}
 
 		public void AppendHeader(string name, string value) {
 			Response.AppendHeader(name, value);
@@ -158,5 +168,17 @@ namespace Webserver {
 			RedirectURL = URL;
 			Response.Redirect(URL);
 		}
+	}
+
+	public enum HttpMethod {
+		GET,
+		HEAD,
+		POST,
+		PUT,
+		DELETE,
+		CONNECT,
+		OPTIONS,
+		TRACE,
+		PATCH
 	}
 }

@@ -18,41 +18,43 @@ namespace Webserver.Threads {
 	/// <summary>
 	/// Request handlers. Meant to run in a separate thread.
 	/// </summary>
-	internal class RequestWorker {
+	public class RequestWorker {
 		private readonly Logger Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
 		private readonly SQLiteConnection Connection;
+		private readonly bool Debug;
 
 		/// <summary>
 		/// Create a new RequestWorker, which processes incoming HttpListener requests. Meant to run in a separate thread.
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue) {
+		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, bool Debug = false) {
 			this.Log = Log;
 			this.Queue = Queue;
 			this.Connection = Database.CreateConnection();
+			this.Debug = Debug;
 		}
 
 		/// <summary>
 		/// Start this RequestWorker. Meant to run in a separate thread.
 		/// </summary>
 		public void Run() {
-			while ( true ) {
+			do {
 				ContextProvider Context = Queue.Take();
 				DateTime Started = DateTime.Now;
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
 				//Resolve redirects, if any
-				string URL = Redirect.Resolve(Request.RawUrl.ToLower());
+				string URL = Redirect.Resolve(Request.Url.PathAndQuery.ToLower());
 				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
 
 				if ( URL == null ) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.RawUrl.ToLower());
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.PathAndQuery.ToLower());
 					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
-				} else if ( URL != Request.RawUrl.ToLower() ) {
+				} else if ( URL != Request.Url.PathAndQuery.ToLower() ) {
 					Response.Redirect(URL);
 					Response.Send(HttpStatusCode.Redirect);
 					continue;
@@ -80,7 +82,7 @@ namespace Webserver.Threads {
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
-			}
+			} while ( !Debug && Queue.Count != 0);
 		}
 
 		/// <summary>
@@ -117,11 +119,13 @@ namespace Webserver.Threads {
 			ResponseProvider Response = Context.Response;
 
 			//Create an instance of the specified endpoint and set the required values.
+			//We're not using a constructor because it would require each individual endpoint to have its own constructor that just calls the base APIEndpoint constructor, and that's a pain.
 			APIEndpoint Endpoint = (APIEndpoint)Activator.CreateInstance(T);
 			Endpoint.Connection = Connection;
 			Endpoint.Context = Context;
 			Endpoint.Response = Context.Response;
 			Endpoint.Request = Context.Request;
+			Endpoint.Params = Context.Request.Params;
 
 			//Set access control headers for CORS support.
 			List<string> AllowedMethods = new List<string>();
@@ -139,7 +143,7 @@ namespace Webserver.Threads {
 			Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
 			// Get the endpoint method
-			MethodInfo Method = Endpoint.GetType().GetMethod(Request.HttpMethod);
+			MethodInfo Method = Endpoint.GetType().GetMethod(Request.HttpMethod.ToString());
 
 			//Check this method's required content type, if any.
 			RequireContentType CT = Method.GetCustomAttribute<RequireContentType>();
@@ -244,7 +248,7 @@ namespace Webserver.Threads {
 
 			//Switch to the request's HTTP method
 			switch ( Request.HttpMethod ) {
-				case "GET":
+				case HttpMethod.GET:
 					//Send the resource to the client. Content type will be set according to the resource's file extension.
 					Response.Send(File.ReadAllBytes(Target), HttpStatusCode.OK, Path.GetExtension(Target).ToString() switch
 					{
@@ -257,12 +261,12 @@ namespace Webserver.Threads {
 					});
 					return;
 
-				case "HEAD":
+				case HttpMethod.HEAD:
 					//A HEAD request is the same as GET, except without the body. Since the resource exists, we can just send back a 200 OK and call it a day.
 					Response.Send(HttpStatusCode.OK);
 					return;
 
-				case "OPTIONS":
+				case HttpMethod.OPTIONS:
 					//Return a list of allowed HTTP methods for this resource (which is always the same), along with access-control headers for CORS support.
 					Response.Headers.Add("Allow", "GET, HEAD, OPTIONS");
 					if ( Program.CORSAddresses.Contains("http://" + Request.LocalEndPoint.ToString()) ) {

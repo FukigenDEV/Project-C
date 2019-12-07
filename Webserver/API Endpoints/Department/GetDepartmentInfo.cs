@@ -19,7 +19,6 @@ namespace Webserver.API_Endpoints {
 			if ( Params["name"][0].Length == 0 ) {
 				List<Department> departments = Department.GetAllDepartments(Connection);
 				Response.Send(JsonConvert.SerializeObject(departments), HttpStatusCode.OK);
-
 				return;
 			}
 
