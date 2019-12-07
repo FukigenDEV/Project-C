@@ -10,11 +10,20 @@ class manDepartments extends Component {
         type: 0,
         value: ''
       },
-      data: []
+      data: [],
     }
   }
 
   componentDidMount() {
+    this.getDepartments();
+  }
+
+  handleDelete = async (name) => {
+    await fetch(`/department?name=${name}`, {method: 'DELETE',});
+    this.getDepartments();
+  }
+
+  getDepartments = () => {
     fetch('/department?name=')
     .then(departments => {
       return departments.json();
@@ -42,8 +51,8 @@ class manDepartments extends Component {
               <th scope="row">{department.ID}</th>
               <td>{department.Name}</td>
               <td>{department.Description}</td>
-              <td><Link>Edit</Link></td>
-              <td><Link>Delete</Link></td>
+              <td><Link to={`/dashboard/Admin/departments/manage/edit/${department.Name}`}>Edit</Link></td>
+              <td><a href onClick={() => this.handleDelete(department.Name)}>Delete</a></td>
             </tr>
           ))}
           </tbody>

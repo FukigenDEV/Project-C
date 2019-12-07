@@ -377,3 +377,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 >>>>>>> b31cde37b27458f2f854d7368b01c6a33e2ebfd7
+
+# ReactJS generated files
+Views/static
+Views/precache-manifest*.js

@@ -11,6 +11,7 @@
 	<form id="add_note_form" method="POST">
 		Note title: <input id="note_title" type="text" name="note_title"><br/>
 		Note text: <input id="note_text" type="text" name="note_text"><br/>
+		Note author (email): <input id="note_author" type="text" name="note_author"><br/>
 		<br/>
 		<input type="submit" value="Add"><br/>
 
@@ -23,6 +24,7 @@
 
 		var title = $("#note_title").val();
 		var text = $("#note_text").val();
+		var author = $("#note_author").val();
 
 		var xhr = new XMLHttpRequest();
 		
@@ -37,7 +39,7 @@
 			}
 		}
 		
-		var data = JSON.stringify({"title": title, "text": text});
+		var data = JSON.stringify({"title": title, "text": text, "author": author});
 		xhr.send(data);
 	});
 	</script>

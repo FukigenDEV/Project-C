@@ -36,7 +36,7 @@ namespace Webserver.API_Endpoints {
 					return;
 				}
 
-				foreach(User Acc in Users ) {
+				foreach ( User Acc in Users ) {
 
 					JSON.Add(new JObject() { { "Email", Acc.Email }, { "Level", Acc.GetPermissionLevel(Connection, Dept).ToString() } });
 				}

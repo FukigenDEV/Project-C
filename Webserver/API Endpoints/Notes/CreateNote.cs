@@ -31,7 +31,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(newNote);
 
 			// Send success message
-			Response.Send("Note successfully created", HttpStatusCode.OK);
+			Response.Send(HttpStatusCode.OK);
 		}
 	}
 }

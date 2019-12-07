@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Switch, Route, Link } from "react-router-dom";
-import { manDepartments, addDepartments } from '../../../index';
+import { EditDepartments, manDepartments, addDepartments } from '../../../index';
 
 class Departments extends Component {
   render() {
+    const {onRedirect} = this.props;
     return (
       <React.Fragment>
         <div class="nav">
@@ -17,6 +18,7 @@ class Departments extends Component {
           <Route exact path="/dashboard/Admin/departments" component={addDepartments} />
           <Route exact path="/dashboard/Admin/departments/add" component={addDepartments} />
           <Route exact path="/dashboard/Admin/departments/manage" component={manDepartments} />
+          <Route path="/dashboard/Admin/departments/manage/edit/:name" render={props => <EditDepartments {...props} onRedirect={onRedirect} />} />
         </div>
       </React.Fragment>
     );

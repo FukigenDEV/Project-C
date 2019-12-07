@@ -23,7 +23,7 @@ namespace Webserver.Data {
 		public bool ReqValidation { get; set; }
 		public int Department { get; set; }
 
-		public const string RX = "[A-z]{1}[0-9A-Za-z_]*";
+		public const string RX = "^[A-z]{1}[0-9A-Za-z_]*$";
 
 		/// <summary>
 		/// List of reserved table names
@@ -237,7 +237,7 @@ namespace Webserver.Data {
 				throw new ArgumentException("Column does not exist");
 			}
 			Columns.Remove(Name);
-			if ( (ReqValidation && Columns.Count == 2) || Columns.Count == 1) {
+			if ( ( ReqValidation && Columns.Count == 2 ) || Columns.Count == 1 ) {
 				throw new ArgumentException("Table must have at least 1 column, excluding Validated and rowid");
 			}
 

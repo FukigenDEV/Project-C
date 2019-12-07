@@ -10,7 +10,7 @@ namespace Webserver {
 	/// <summary>
 	/// Acts as an in-between for HttpListenerContext instances and the RequestWorkers. This allows us to create mock requests for testing purposes.
 	/// </summary>
-	 public class ContextProvider {
+	public class ContextProvider {
 		public RequestProvider Request;
 		public ResponseProvider Response;
 
@@ -24,7 +24,7 @@ namespace Webserver {
 	/// Acts as an in-between for HttpListenerRequest instances and the RequestWorkers. This allows us to create mock requests for testing purposes.
 	/// </summary>
 	public class RequestProvider {
-		private readonly HttpListenerRequest Request;
+		//private readonly HttpListenerRequest Request;
 
 		public Encoding ContentEncoding { get; set; }
 		public string ContentType { get; set; }
@@ -38,7 +38,7 @@ namespace Webserver {
 		public Uri Url { get; set; }
 
 		public RequestProvider(HttpListenerRequest Request) {
-			this.Request = Request;
+			//this.Request = Request;
 
 			//Set values
 			ContentEncoding = Request.ContentEncoding;
@@ -91,8 +91,8 @@ namespace Webserver {
 
 		public ResponseProvider(HttpListenerResponse Response) {
 			this.Response = Response;
-		
-			
+
+
 			ContentType = Response.ContentType;
 			StatusCode = (HttpStatusCode)Response.StatusCode;
 		}
@@ -137,7 +137,7 @@ namespace Webserver {
 			try {
 				Response.OutputStream.Write(Data, 0, Data.Length);
 				Response.OutputStream.Close();
-			} catch(HttpListenerException e ) {
+			} catch ( HttpListenerException e ) {
 				Program.Log?.Error("Failed to send data to host: " + e.Message);
 			}
 		}

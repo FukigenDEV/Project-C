@@ -1,18 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Webserver.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data.SQLite;
-using Dapper.Contrib.Extensions;
-using Dapper;
 using System.Diagnostics.CodeAnalysis;
-using Configurator;
 using System.IO;
-using System.Reflection;
-using Newtonsoft.Json.Linq;
-using System.Net;
 using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Text;
+using Configurator;
+using Dapper;
+using Dapper.Contrib.Extensions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
+using Webserver.Data;
 
 namespace Webserver.Data.Tests {
 	[TestClass()]
@@ -95,7 +95,7 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() {{"Validated", DataType.Integer}});
+		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "Validated", DataType.Integer } });
 
 		/// <summary>
 		/// Check if the column name regex check is working.
@@ -420,7 +420,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_Columnheck() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation:false);
+			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
 			Table.GetUnvalidatedRows();
 		}
 
@@ -429,8 +429,8 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		public void Update_ValidArgs() {
-			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" } } );
-			Table.Update(1, new Dictionary<string, dynamic>{ {"StringColumn", "Value2"} });
+			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value1" } });
+			Table.Update(1, new Dictionary<string, dynamic> { { "StringColumn", "Value2" } });
 
 			Assert.IsTrue(JToken.DeepEquals(new JObject {
 				{ "Columns", new JObject {
@@ -458,7 +458,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Update_DataTypeCheck() {
-			Table.Insert(new Dictionary<string, dynamic> { {"StringColumn", "Value" } });
+			Table.Insert(new Dictionary<string, dynamic> { { "StringColumn", "Value" } });
 			Table.Update(1, new Dictionary<string, dynamic> { { "SomeColumn", 1 } });
 		}
 
@@ -545,7 +545,7 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
-		public void Insert_EmptyDict() => Table.Insert(new List<Dictionary<string, dynamic>>() { {new Dictionary<string, dynamic>()} });
+		public void Insert_EmptyDict() => Table.Insert(new List<Dictionary<string, dynamic>>() { { new Dictionary<string, dynamic>() } });
 
 		/// <summary>
 		/// Check if we can retrieve a list of columns
@@ -553,11 +553,11 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		public void GetColumns_Test() {
 			Dictionary<string, DataType> Columns = Table.GetColumns();
-			Assert.IsTrue(4 == Columns.Count && Columns.SequenceEqual(new Dictionary<string, DataType> { 
-				{ "rowid", DataType.Integer }, 
-				{ "StringColumn", DataType.String }, 
-				{ "IntegerColumn", DataType.Integer }, 
-				{"Validated", DataType.Integer } 
+			Assert.IsTrue(4 == Columns.Count && Columns.SequenceEqual(new Dictionary<string, DataType> {
+				{ "rowid", DataType.Integer },
+				{ "StringColumn", DataType.String },
+				{ "IntegerColumn", DataType.Integer },
+				{"Validated", DataType.Integer }
 			}));
 		}
 

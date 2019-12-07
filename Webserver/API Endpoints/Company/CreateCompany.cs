@@ -32,7 +32,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(company);
 
 			// Send success message
-			Response.Send(StatusCode: HttpStatusCode.Created);
+			Response.Send(HttpStatusCode.Created);
 		}
 	}
 }
