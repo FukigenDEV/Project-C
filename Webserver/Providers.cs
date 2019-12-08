@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -58,6 +59,7 @@ namespace Webserver {
 
 		public RequestProvider(Uri Url, HttpMethod HttpMethod) {
 			this.Url = Url;
+			this.Params = Utils.NameValueToDict(HttpUtility.ParseQueryString(Url.Query));
 			this.HttpMethod = HttpMethod;
 		}
 	}

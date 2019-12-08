@@ -49,7 +49,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <param name="RememberMe">If true, delays session expiration</param>
 		/// <returns>A cookie named SessionID, which contains the session ID</returns>
 		public Cookie Login(string Email = "Administrator", bool RememberMe = false) {
-			SQLiteConnection Connection = Database.CreateConnection();
+			using SQLiteConnection Connection = Database.CreateConnection();
 			return new Cookie("SessionID", new Session(User.GetUserByEmail(Connection, Email).ID, RememberMe, Connection).SessionID);
 		}
 
