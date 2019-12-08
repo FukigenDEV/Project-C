@@ -31,7 +31,7 @@ namespace Webserver.API_Endpoints {
 					return;
 				}
 				Response.AppendHeader("Content-disposition", "attachment; filename=" + Name + ".zip");
-				Response.Send(File.ReadAllBytes(BackupDir + "\\" + Name + ".zip"), "application/zip");
+				Response.Send(File.ReadAllBytes(BackupDir + "\\" + Name + ".zip"), HttpStatusCode.OK, "application/zip");
 
 			} else {
 				//No backup name was specified, so send

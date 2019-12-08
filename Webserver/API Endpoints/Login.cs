@@ -77,7 +77,7 @@ namespace Webserver.API_Endpoints {
 			Connection.Insert(NewSession);
 
 			AddCookie("SessionID", NewSession.SessionID, NewSession.GetRemainingTime());
-			Response.Send(StatusCode: HttpStatusCode.NoContent);
+			Response.Send(HttpStatusCode.NoContent);
 		}
 
 		/// <summary>

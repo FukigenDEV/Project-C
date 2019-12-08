@@ -51,7 +51,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="Path"></param>
 		public static void ParseRedirectFile(string Path) {
-			string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
+			//string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
 
 			if ( !File.Exists(Path) ) {
 				throw new FileNotFoundException();

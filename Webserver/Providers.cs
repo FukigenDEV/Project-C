@@ -116,7 +116,7 @@ namespace Webserver {
 		/// Send just a status code to the client, answering the request.
 		/// </summary>
 		/// <param name="StatusCode"></param>
-		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Send( StatusCode);
+		public void Send(HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(string.Empty, StatusCode);
 
 		/// <summary>
 		/// Send JSON data to the client, answering the request.
@@ -124,13 +124,6 @@ namespace Webserver {
 		/// <param name="JSON"></param>
 		/// <param name="StatusCode"></param>
 		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(), StatusCode, "application/json");
-
-		/// <summary>
-		/// Sends data to the client in the form of a byte array.
-		/// </summary>
-		/// <param name="Data"></param>
-		/// <param name="ContentType"></param>
-		public void Send(byte[] Data, string ContentType) => Send(Data, HttpStatusCode.OK, ContentType);
 
 		/// <summary>
 		/// Sends data to the client in the form of a byte array.

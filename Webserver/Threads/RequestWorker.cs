@@ -50,6 +50,7 @@ namespace Webserver.Threads {
 				string URL = Redirect.Resolve(Request.Url.PathAndQuery.ToLower());
 				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
 
+
 				if ( URL == null ) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.PathAndQuery.ToLower());
 					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
