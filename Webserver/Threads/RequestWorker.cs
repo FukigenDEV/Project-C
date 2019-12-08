@@ -46,7 +46,7 @@ namespace Webserver.Threads {
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
-				Log.Debug("Processing request for " + Request.Url.LocalPath);
+				Log.Debug("Processing "+Request.HttpMethod+" request for " + Request.Url.LocalPath);
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
