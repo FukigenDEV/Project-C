@@ -14,8 +14,13 @@ class AddUsers extends Component {
         'Password': '',
         'AccountType': '',
         'MemberOf': ''
-      }
+      },
+      data: [],
     }
+  }
+
+  componentDidMount() {
+    this.getDepartments();
   }
 
   handleChange = (event) => {
@@ -47,9 +52,18 @@ class AddUsers extends Component {
         }
       }
     }
-  
+
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
+  }
+
+  getDepartments = () => {
+    fetch('/department?name=')
+    .then(departments => {
+      return departments.json();
+    }).then(data => {
+      this.setState({data});
+    })
   }
 
   render() {
@@ -67,8 +81,11 @@ class AddUsers extends Component {
           </div>
 
           <div class="form-group">
-            <label for="Department">Department</label>
-            <input onChange={this.handleChange} type="text" name="MemberOf" class="form-control" id="Department" placeholder="Enter department" />
+            <label for="Type">Department</label>
+            <select onChange={this.handleChange} name="MemberOf" class="form-control" id="Department">
+              <option value="">Select department...</option>
+              {this.state.data.map(department => (<option value={department.Name}>{department.Name}</option>))}
+            </select>
           </div>
 
           <div class="form-group">
