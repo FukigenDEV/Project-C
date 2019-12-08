@@ -14,7 +14,7 @@ namespace Webserver.API_Endpoints {
 		[RequireContentType("application/json")]
 		public override void PATCH() {
 			//Get required fields
-			if ( !Params.ContainsKey("Email") ) {
+			if ( !Params.ContainsKey("email") ) {
 				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
