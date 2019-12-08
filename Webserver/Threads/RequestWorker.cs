@@ -46,8 +46,10 @@ namespace Webserver.Threads {
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
+				Log.Debug("Processing request for " + Request.Url.LocalPath);
+
 				//Resolve redirects, if any
-				string URL = Redirect.Resolve(Request.Url.PathAndQuery.ToLower());
+				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
 				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
 
 
