@@ -50,14 +50,13 @@ namespace Webserver.Threads {
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
-				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
-
-
+				if ( URL.EndsWith('/') && URL.Length > 1) URL = URL.Remove(URL.Length - 1);
 				if ( URL == null ) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.PathAndQuery.ToLower());
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.LocalPath.ToLower());
 					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
-				} else if ( URL != Request.Url.PathAndQuery.ToLower() ) {
+				} else if ( URL != Request.Url.LocalPath.ToLower() ) {
+					Log.Debug("Request redirected to " + URL);
 					Response.Redirect(URL);
 					Response.Send(HttpStatusCode.Redirect);
 					continue;
