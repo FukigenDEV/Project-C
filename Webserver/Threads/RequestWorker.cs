@@ -46,16 +46,17 @@ namespace Webserver.Threads {
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
+				Log.Debug("Processing request for " + Request.Url.LocalPath);
+
 				//Resolve redirects, if any
-				string URL = Redirect.Resolve(Request.Url.PathAndQuery.ToLower());
-				if ( URL.EndsWith('/') ) URL = URL.Remove(URL.Length - 1);
-
-
+				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
+				if ( URL.EndsWith('/') && URL.Length > 1) URL = URL.Remove(URL.Length - 1);
 				if ( URL == null ) {
-					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.PathAndQuery.ToLower());
+					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.LocalPath.ToLower());
 					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
-				} else if ( URL != Request.Url.PathAndQuery.ToLower() ) {
+				} else if ( URL != Request.Url.LocalPath.ToLower() ) {
+					Log.Debug("Request redirected to " + URL);
 					Response.Redirect(URL);
 					Response.Send(HttpStatusCode.Redirect);
 					continue;
@@ -83,7 +84,7 @@ namespace Webserver.Threads {
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
-			} while ( !Debug && Queue.Count != 0);
+			} while ( !Debug || Queue.Count != 0);
 			Connection.Close();
 		}
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -34,7 +35,8 @@ namespace Configurator {
 			try {
 				Config = JObject.Parse(File.ReadAllText(Path));
 #pragma warning disable CA1031 // Silence "Do not catch general exception types" message.
-			} catch ( JsonReaderException ) {
+			} catch ( JsonReaderException e) {
+				Console.WriteLine(e.Message);
 				return null;
 			}
 #pragma warning restore CA1031
