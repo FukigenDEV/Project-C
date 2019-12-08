@@ -13,9 +13,9 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		[RequireContentType("application/json")]
 		public override void GET() {
-			Console.WriteLine(RequestParams["null"][0]);
+			Console.WriteLine(Params["null"][0]);
 
-			Send();
+			Response.Send();
 		}
 	}
 }

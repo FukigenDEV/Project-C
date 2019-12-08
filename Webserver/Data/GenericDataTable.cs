@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Dapper;
@@ -81,11 +82,6 @@ namespace Webserver.Data {
 			this.Department = DepartmentID;
 			this.ReqValidation = RequireValidation;
 
-			//Add Validated column if necessary
-			if ( RequireValidation ) {
-				Columns.Add("Validated", DataType.Integer);
-			}
-
 			//Create table
 			string SQL = "CREATE TABLE `" + Name + "` (rowid Integer PRIMARY KEY,";
 			List<string> SQLColumns = new List<string>();
@@ -96,6 +92,10 @@ namespace Webserver.Data {
 
 			Connection.Execute(SQL);
 			Connection.Execute("INSERT INTO GenericTableConfigurations (Name, ReqValidation, Department) VALUES ('" + Name + "', " + ( RequireValidation ? 1 : 0 ) + ", " + DepartmentID + ")");
+
+			if ( RequireValidation ) {
+				AddValidatedColumn();
+			}
 		}
 
 		/// <summary>
@@ -142,7 +142,7 @@ namespace Webserver.Data {
 		/// Add a new validation column to the table.
 		/// </summary>
 		public void AddValidatedColumn() {
-			if ( GetColumns().Keys.Contains(Name) ) {
+			if ( GetColumns().Keys.Contains("Validated") ) {
 				throw new ArgumentException("Column already exists");
 			}
 			this.ReqValidation = true;
@@ -170,9 +170,16 @@ namespace Webserver.Data {
 			if ( !Columns.ContainsKey(OldName) ) {
 				throw new ArgumentException("Column does not exist");
 			}
+			if ( Columns.ContainsKey(NewName) ) {
+				throw new ArgumentException("Column already exists");
+			}
+			if ( OldName == "Validated" || NewName == "Validated" ) {
+				throw new ArgumentException("Can't rename Validated column");
+			}
 
 			//Retrieve all data from the table.
-			List<dynamic> Rows = Connection.Query("SELECT `" + string.Join(',', Columns.Keys) + "` FROM `" + this.Name + "`").ToList();
+			string aaa = "SELECT `" + string.Join("`,`", Columns.Keys) + "` FROM `" + this.Name + "`";
+			List<dynamic> Rows = Connection.Query(aaa).ToList();
 			List<IDictionary<string, object>> Data = ( Rows.Select(Row => (IDictionary<string, object>)Row) ).ToList();
 
 			//Update columns list
@@ -190,10 +197,18 @@ namespace Webserver.Data {
 			SQL += string.Join(',', SQLColumns) + ")";
 			Connection.Execute(SQL);
 
+			RestoreData(Data);
+		}
+
+		/// <summary>
+		/// Inserts the specified data into the table.
+		/// </summary>
+		/// <param name="Data"></param>
+		private void RestoreData(List<IDictionary<string, object>> Data) {
 			//Restore all data if necessary
 			if ( Data.Count > 0 ) {
+				Dictionary<string, DataType> Columns = GetColumns();
 				List<string> ColumnNames = Columns.Keys.AsList();
-				SQL = "INSERT INTO `" + this.Name + "` (" + string.Join(',', ColumnNames) + ") VALUES ";
 				List<string> Values = new List<string>();
 				foreach ( IDictionary<string, object> Row in Data ) {
 					List<string> Cells = new List<string>();
@@ -202,8 +217,7 @@ namespace Webserver.Data {
 					}
 					Values.Add("(" + string.Join(',', Cells) + ")");
 				}
-				SQL += string.Join(',', Values);
-				Connection.Execute(SQL);
+				Connection.Execute("INSERT INTO `" + this.Name + "` (" + string.Join(',', ColumnNames) + ") VALUES " + string.Join(',', Values));
 			}
 		}
 
@@ -223,8 +237,8 @@ namespace Webserver.Data {
 				throw new ArgumentException("Column does not exist");
 			}
 			Columns.Remove(Name);
-			if ( Columns.Count == 0 ) {
-				throw new ArgumentException("Table must have at least 1 column");
+			if ( ( ReqValidation && Columns.Count == 2 ) || Columns.Count == 1 ) {
+				throw new ArgumentException("Table must have at least 1 column, excluding Validated and rowid");
 			}
 
 			//Additional handling for system columns
@@ -247,19 +261,8 @@ namespace Webserver.Data {
 			SQL += string.Join(',', SQLColumns) + ")";
 			Connection.Execute(SQL);
 
-			//Restore all data
-			List<string> ColumnNames = Columns.Keys.AsList();
-			SQL = "INSERT INTO `" + this.Name + "` (" + string.Join(',', ColumnNames) + ") VALUES ";
-			List<string> Values = new List<string>();
-			foreach ( IDictionary<string, object> Row in Data ) {
-				List<string> Cells = new List<string>();
-				foreach ( string Key in Row.Keys ) {
-					Cells.Add("'" + Row[Key].ToString() + "'");
-				}
-				Values.Add("(" + string.Join(',', Cells) + ")");
-			}
-			SQL += string.Join(',', Values);
-			Connection.Execute(SQL);
+			//Restore all data if necessary
+			RestoreData(Data);
 		}
 
 		/// <summary>
@@ -279,13 +282,15 @@ namespace Webserver.Data {
 		/// <param name="End"></param>
 		/// <returns></returns>
 		public JObject GetRows(int Begin = 0, int End = 25) {
+			if ( Begin < 0 || End < 1 ) throw new IndexOutOfRangeException("Begin/End too low");
+			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE rowid BETWEEN " + Begin + " AND " + End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
 
 		/// <summary>
-		/// Returns a JObject containing JObjects that represent a table's rows.
+		/// Returns a JObject containing JObjects that represent a table's unvalidated rows.
 		/// </summary>
 		/// <param name="Begin"></param>
 		/// <param name="End"></param>
@@ -295,6 +300,8 @@ namespace Webserver.Data {
 			if ( !Columns.ContainsKey("Validated") ) {
 				throw new ArgumentException("Table contains no Validated column");
 			}
+			if ( Begin < 0 || End < 1 ) throw new IndexOutOfRangeException("Begin/End too low");
+			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
@@ -328,7 +335,7 @@ namespace Webserver.Data {
 			}; ;
 		}
 
-		private static dynamic CastValue(object Value, DataType DT) => DT == DataType.Integer ? (int)(long)Value : (dynamic)(string)Value;
+		public static dynamic CastValue(object Value, DataType DT) => DT == DataType.Integer ? (int)(long)Value : (dynamic)Value.ToString();
 
 		/// <summary>
 		/// Updates a row
@@ -414,7 +421,11 @@ namespace Webserver.Data {
 					if ( Row.ContainsKey(Column) ) {
 						Value.Add("'" + Row[Column] + "'");
 					} else {
-						Value.Add("'null'");
+						if ( Columns[Column] == DataType.Integer ) {
+							Value.Add("0");
+						} else {
+							Value.Add("'null'");
+						}
 					}
 				}
 				Values.Add("(" + string.Join(',', Value) + ")");
@@ -470,25 +481,14 @@ namespace Webserver.Data {
 		/// <param name="Connection"></param>
 		/// <param name="ID"></param>
 		/// <returns></returns>
-		public bool RowExists(SQLiteConnection Connection, string ID) => RowExists(Connection, new List<string>() { ID });
+		public bool RowExists(int ID) => RowExists(new List<int>() { ID });
 		/// <summary>
 		/// Returns true if the specified row exists.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="IDs"></param>
 		/// <returns></returns>
-		public bool RowExists(SQLiteConnection Connection, List<string> IDs) {
-#pragma warning disable CA2100
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT rowid FROM `" + this.Name + "`", Connection);
-#pragma warning restore CA2100
-			using SQLiteDataReader Reader = CMD.ExecuteReader();
-			List<string> Rows = new List<string>();
-			while ( Reader.Read() ) {
-				NameValueCollection Row = Reader.GetValues();
-				Rows.AddRange(new List<string>(Row.AllKeys).Select(Column => Row[Column]));
-			}
-			return IDs.Intersect(Rows).Count() == IDs.Count();
-		}
+		public bool RowExists(List<int> IDs) => IDs.Intersect(Connection.Query<int>("SELECT rowid FROM `" + Name + "` WHERE rowid IN (" + string.Join(',', IDs) + ")").ToList()).Count() == IDs.Count();
 
 		/// <summary>
 		/// Retrieves a GenericDataTable from the database, using its name.
@@ -498,7 +498,7 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public static GenericDataTable GetTableByName(SQLiteConnection Connection, string Name) {
 			GenericDataTable Table = Connection.QueryFirstOrDefault<GenericDataTable>("SELECT * FROM GenericTableConfigurations WHERE Name = @Name", new { Name });
-			Table.Connection = Connection;
+			if ( Table != null ) Table.Connection = Connection;
 			return Table;
 		}
 
@@ -506,15 +506,18 @@ namespace Webserver.Data {
 		/// Returns a list of all generic data table names.
 		/// </summary>
 		/// <param name="Connection"></param>
-		/// <param name="Department"></param>
+		/// <param name="DepartmentID"></param>
 		/// <returns></returns>
-		public static List<string> GetTableNames(SQLiteConnection Connection, int Department = 0) {
+		public static List<string> GetTableNames(SQLiteConnection Connection, int DepartmentID = 0) {
+			if ( DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID) ) {
+				throw new ArgumentException("No such department");
+			}
 			using SQLiteCommand CMD = new SQLiteCommand("SELECT Name, Department FROM GenericTableConfigurations", Connection);
 			using SQLiteDataReader Reader = CMD.ExecuteReader();
 			List<string> Rows = new List<string>();
 			while ( Reader.Read() ) {
 				NameValueCollection Row = Reader.GetValues();
-				if ( Department != 0 && Department != int.Parse(Row["Department"]) ) continue;
+				if ( DepartmentID != 0 && DepartmentID != int.Parse(Row["Department"]) ) continue;
 				Rows.Add(Row["Name"]);
 			}
 			return Rows;

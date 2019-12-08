@@ -11,7 +11,7 @@ using Logging;
 using Webserver.Threads;
 
 namespace Webserver {
-	internal class Program {
+	public static class Program {
 		public static Logger Log;
 		public static List<Type> Endpoints;
 		public static List<string> CORSAddresses = new List<string>();
@@ -60,15 +60,10 @@ namespace Webserver {
 			Redirect.Init();
 
 			//Find all API endpoints
-			Endpoints = new List<Type>();
-			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
-				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
-					Endpoints.Add(type);
-				}
-			}
+			DiscoverEndpoints();
 
 			//Create Queue and launch listener
-			using BlockingCollection<HttpListenerContext> Queue = new BlockingCollection<HttpListenerContext>();
+			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
 			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
 			ListenerThread.Start();
 
@@ -88,6 +83,15 @@ namespace Webserver {
 			Log.Info("Type 'Exit' to exit.");
 			while ( Console.ReadLine().ToLower() != "exit" ) ;
 			Environment.Exit(0);
+		}
+
+		public static void DiscoverEndpoints() {
+			Endpoints = new List<Type>();
+			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
+				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
+					Endpoints.Add(type);
+				}
+			}
 		}
 	}
 }

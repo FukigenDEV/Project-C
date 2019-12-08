@@ -10,28 +10,28 @@ namespace Webserver.API_Endpoints {
 	internal partial class CompanyEndpoint : APIEndpoint {
 		public override void GET() {
 			// Get required fields
-			if ( !RequestParams.ContainsKey("name") ) {
-				Send("Missing params", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("name") ) {
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
-			if ( string.IsNullOrEmpty(RequestParams["name"][0]) ) {
+			if ( string.IsNullOrEmpty(Params["name"][0]) ) {
 				List<Company> companies = Company.GetAllCompanies(Connection);
-				Send(JsonConvert.SerializeObject(companies), HttpStatusCode.OK);
+				Response.Send(JsonConvert.SerializeObject(companies), HttpStatusCode.OK);
 
 				return;
 			}
 
 			// Check if the specified company exists. If it doesn't, send a 404 Not Found
-			Company company = Company.GetCompanyByName(Connection, RequestParams["name"][0]);
+			Company company = Company.GetCompanyByName(Connection, Params["name"][0]);
 			if ( company == null ) {
-				Send("No such company", HttpStatusCode.NotFound);
+				Response.Send("No such company", HttpStatusCode.NotFound);
 				return;
 			}
 
 			// Build and send response
 			JObject JSON = JObject.FromObject(company);
-			Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
+			Response.Send(JSON.ToString(Formatting.None), HttpStatusCode.OK);
 		}
 	}
 }

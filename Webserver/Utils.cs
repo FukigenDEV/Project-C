@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -37,42 +38,6 @@ namespace Webserver {
 		}
 
 		/// <summary>
-		/// Sends data to the client in the form of a byte array.
-		/// </summary>
-		/// <param name="Data">The data to be sent to the client.</param>
-		/// <param name="Response">The Response object</param>
-		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public static void Send(HttpListenerResponse Response, byte[] Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/html") {
-			if ( Data == null ) {
-				Data = Array.Empty<byte>();
-			}
-
-			try {
-				Response.StatusCode = (int)StatusCode;
-				Response.ContentType = ContentType;
-				Response.OutputStream.Write(Data, 0, Data.Length);
-				Response.OutputStream.Close();
-			} catch ( HttpListenerException e ) {
-				Log.Error("Failed to send data to host: " + e.Message);
-			}
-
-		}
-		/// <summary>
-		/// Sends data to the client, answering the request.
-		/// </summary>
-		/// <param name="Data">The data to be sent to the client.</param>
-		/// <param name="Response">The Response object</param>
-		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-
-		public static void Send(HttpListenerResponse Response, object Data = null, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
-			if ( Data == null ) {
-				Data = "";
-			}
-			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
-			Send(Response, Buffer, StatusCode, ContentType);
-		}
-
-		/// <summary>
 		/// Get the current UNIX timestamp
 		/// </summary>
 		/// <returns></returns>
@@ -102,6 +67,14 @@ namespace Webserver {
 					addr += '/';
 				}
 				Result.Add(addr);
+			}
+			return Result;
+		}
+
+		public static Dictionary<string, List<string>> NameValueToDict(NameValueCollection Data) {
+			Dictionary<string, List<string>> Result = new Dictionary<string, List<string>>();
+			foreach ( string key in Data ) {
+				Result.Add(key?.ToLower() ?? "null", new List<string>(Data[key]?.Split(',')));
 			}
 			return Result;
 		}

@@ -13,7 +13,7 @@ using Webserver.Data;
 using static Dapper.SqlMapper;
 
 namespace Webserver {
-	internal static class Database {
+	public static class Database {
 		private static readonly Logger Log = Program.Log;
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="log"></param>
 		public static void Init() {
-			Log.Info("Initializing database...");
+			Log?.Info("Initializing database...");
 
 			//Create the database if it doesn't exist already.
 			if ( !File.Exists("Database.db") ) {

@@ -21,17 +21,17 @@ namespace Webserver.API_Endpoints {
 		/// </summary>
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void GET() {
-			if ( RequestParams.ContainsKey("name") ) {
-				string Name = RequestParams["name"][0];
+			if ( Params.ContainsKey("name") ) {
+				string Name = Params["name"][0];
 
 				//Check if the specified file exists
 				//If the name contains a dot, return a NotFound to prevent path traversal.
 				if ( Name.Contains('.') || !File.Exists(BackupDir + "\\" + Name + ".zip") ) {
-					Send(HttpStatusCode.NotFound);
+					Response.Send(HttpStatusCode.NotFound);
 					return;
 				}
-				Response.AddHeader("Content-disposition", "attachment; filename=" + Name + ".zip");
-				Send(File.ReadAllBytes(BackupDir + "\\" + Name + ".zip"), "application/zip");
+				Response.AppendHeader("Content-disposition", "attachment; filename=" + Name + ".zip");
+				Response.Send(File.ReadAllBytes(BackupDir + "\\" + Name + ".zip"), HttpStatusCode.OK, "application/zip");
 
 			} else {
 				//No backup name was specified, so send
@@ -40,7 +40,7 @@ namespace Webserver.API_Endpoints {
 				foreach ( FileInfo File in BackupFiles ) {
 					Names.Add(Path.GetFileNameWithoutExtension(File.Name));
 				}
-				Send(Names.ToString(), HttpStatusCode.OK, "application/json");
+				Response.Send(Names.ToString(), HttpStatusCode.OK, "application/json");
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Administrator)]
 		public override void POST() {
 			BackupManager.CreateManualBackup();
-			Send(HttpStatusCode.OK);
+			Response.Send(HttpStatusCode.OK);
 		}
 	}
 }

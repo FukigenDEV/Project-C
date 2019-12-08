@@ -90,10 +90,18 @@ namespace Webserver.Data {
 		/// <param name="Connection"></param>
 		/// <param name="Department"></param>
 		/// <returns></returns>
-		public PermLevel GetPermissionLevel(SQLiteConnection Connection, int Department) => (PermLevel)Math.Max(
-			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE User = @ID AND Department = @Department", new { this.ID, Department }),
-			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @ID AND Permission = 3", new { this.ID })
-		);
+		public PermLevel GetPermissionLevel(SQLiteConnection Connection, int Department) => GetPermissionLevel(Connection, this.ID, Department);
+
+		public static PermLevel GetPermissionLevel(SQLiteConnection Connection, int User, int Department) => (PermLevel)Math.Max(
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE User = @User AND Department = @Department", new { User, Department }),
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @User AND Permission = 3", new { User }));
+
+		/// <summary>
+		/// Returns True if the user is an Administrator
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public bool IsAdmin(SQLiteConnection Connection) => (PermLevel)Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @ID AND Permission = 3", new { this.ID }) == PermLevel.Administrator;
 
 		/// <summary>
 		/// Sets a user permission level.
@@ -136,6 +144,8 @@ namespace Webserver.Data {
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
 		public static User GetUserByEmail(SQLiteConnection Connection, string Email) => Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
+
+		public static List<User> GetUsersByEmail(SQLiteConnection Connection, List<string> Emails) => Connection.Query<User>("SELECT * FROM Users WHERE Email IN @Emails",  new[] { Emails }).ToList();
 
 		/// <summary>
 		/// Get a list of all user email addresses.
