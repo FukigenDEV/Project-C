@@ -77,7 +77,7 @@ namespace Webserver {
 		public string ContentType {
 			get => _ContentType;
 			set {
-				if ( Response != null ) Response.ContentType = ContentType;
+				if (Response != null) Response.ContentType = value;
 				_ContentType = value;
 			}
 		}
@@ -153,7 +153,7 @@ namespace Webserver {
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
+		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/plain") {
 			if ( Data == null ) Data = string.Empty;
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Buffer, StatusCode, ContentType);
