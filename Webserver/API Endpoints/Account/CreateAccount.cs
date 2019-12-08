@@ -63,7 +63,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Create a new user
-			User NewUser = new User((string)Email, (string)Password);
+			User NewUser = new User((string)Email, (string)Password, Connection);
 
 			//Set optional fields
 			foreach ( var x in JSON ) {
@@ -79,7 +79,7 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Upload account to database and set permission
-			Connection.Insert(NewUser);
+			Connection.Update<User>(NewUser);
 			NewUser.SetPermissionLevel(Connection, level, Dept);
 			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
 

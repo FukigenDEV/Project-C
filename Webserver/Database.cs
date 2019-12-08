@@ -126,8 +126,7 @@ namespace Webserver {
 			//one specified in the server configuration file.
 			User Administrator = Connection.Get<User>(1);
 			if ( Administrator == null ) {
-				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
-				Connection.Insert(Administrator);
+				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"), Connection);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 1);
 			} else {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
