@@ -20,13 +20,13 @@ namespace Webserver.API_Endpoints {
 			}
 
 			//Administrator account can't be modified;
-			if (Params["Email"][0] == "Administrator" ) {
+			if (Params["email"][0] == "Administrator" ) {
 				Response.Send(HttpStatusCode.Forbidden);
 				return;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
-			User Acc = User.GetUserByEmail(Connection, Params["Email"][0]);
+			User Acc = User.GetUserByEmail(Connection, Params["email"][0]);
 			if ( Acc == null ) {
 				Response.Send("No such user", HttpStatusCode.NotFound);
 				return;
