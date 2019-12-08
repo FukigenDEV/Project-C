@@ -10,6 +10,7 @@ import Admin from './components/pages/admin/Admin';
 import Users from './components/pages/admin/Users';
 import AddUsers from './components/pages/admin/add/Users';
 import ManUsers from './components/pages/admin/manage/Users';
+import EditUsers from './components/pages/admin/manage/edit/Users';
 
 import Departments from './components/pages/admin/Departments';
 import addDepartments from './components/pages/admin/add/Departments';
@@ -32,6 +33,7 @@ import AdminWizard from './components/pages/AdminWizard';
 import Error from './components/pages/Error';
 
 import * as serviceWorker from './serviceWorker';
+import { faOilCan } from '@fortawesome/free-solid-svg-icons';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
@@ -48,6 +50,7 @@ export {
     Users,
     AddUsers,
     ManUsers,
+    EditUsers,
     Departments,
     addDepartments,
     manDepartments,

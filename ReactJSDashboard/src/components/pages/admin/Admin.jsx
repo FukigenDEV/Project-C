@@ -16,8 +16,8 @@ class Admin extends Component {
         </div>
 
         <div className="shadow-sm p-3 mb-5 bg-white rounded">
-          <Route exact path="/dashboard/Admin" component={Users} />
-          <Route path="/dashboard/Admin/users" component={Users} />
+          <Route exact path="/dashboard/Admin"  render={() => <Users onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/users" render={() => <Users onRedirect={onRedirect} />} />
           <Route path="/dashboard/Admin/departments" render={() => <Departments onRedirect={onRedirect} />} />
           <Route path="/dashboard/Admin/company" render={() => <Company onRedirect={onRedirect} />} />
         </div>

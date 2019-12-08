@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Switch, Route, Link } from "react-router-dom";
-import { EditCompany, ManUsers, AddUsers } from '../../../index';
+import { EditUsers, ManUsers, AddUsers } from '../../../index';
 
 class Users extends Component {
   render() {
@@ -20,7 +20,7 @@ class Users extends Component {
           <Route exact path="/dashboard/Admin/users/add" component={AddUsers} />
           <Route exact path="/dashboard/Admin/users/manage" component={ManUsers} />
           <Route path="/dashboard/Admin/users/manage/details/:id" component={ManUsers} />
-          <Route path="/dashboard/Admin/users/manage/edit/:name" render={props => <EditCompany {...props} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/users/manage/edit/:name" render={props => <EditUsers {...props} onRedirect={onRedirect} />} />
         </div>
       </React.Fragment>
     );
