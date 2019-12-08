@@ -123,7 +123,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="JSON"></param>
 		/// <param name="StatusCode"></param>
-		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(), StatusCode, "application/json");
+		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(Formatting.None), StatusCode, "application/json");
 
 		/// <summary>
 		/// Sends data to the client in the form of a byte array.

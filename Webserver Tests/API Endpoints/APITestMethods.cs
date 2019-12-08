@@ -3,12 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using Configurator;
 using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Webserver;
+using Webserver.Data;
 using Webserver.Threads;
 
 namespace Webserver.API_Endpoints.Tests {
@@ -38,6 +40,17 @@ namespace Webserver.API_Endpoints.Tests {
 		public void ExecuteQueue() {
 			RequestWorker Worker = new RequestWorker(new Logger(), Queue, true);
 			Worker.Run();
+		}
+
+		/// <summary>
+		/// Creates a new session. Bypasses the Login endpoint to save time.
+		/// </summary>
+		/// <param name="Email">The user to login. Defaults to Administrator</param>
+		/// <param name="RememberMe">If true, delays session expiration</param>
+		/// <returns>A cookie named SessionID, which contains the session ID</returns>
+		public Cookie Login(string Email = "Administrator", bool RememberMe = false) {
+			SQLiteConnection Connection = Database.CreateConnection();
+			return new Cookie("SessionID", new Session(User.GetUserByEmail(Connection, Email).ID, RememberMe, Connection).SessionID);
 		}
 
 		[TestCleanup()]
