@@ -1,3 +1,7 @@
+.full_note {
+    position: relative;
+}
+
 .full_note p {
     overflow-wrap: break-word;
 }
@@ -5,4 +9,10 @@
 .note_border {
     border: 2px outset lightgrey;
     padding: 0.5rem;
+}
+
+.note_delete {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
 }

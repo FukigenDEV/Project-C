@@ -2,6 +2,14 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import './Style/Notities.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(
+	fas,
+	faTrashAlt
+)
+
 
 class Notities extends Component {
 	constructor(props) {
@@ -53,6 +61,21 @@ class Notities extends Component {
 				console.log(this.state.allNotes)
 			})
 	}
+	deleteNote = async (name) => {
+		await fetch('/note', {
+			method: 'DELETE',
+			body: JSON.stringify({ title: name }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		this.getAllNotes();
+	}
+	deleteConfirm = (title) => {
+		if (window.confirm("Weet u zeker dat u deze notitie wilt verwijderen?")) {
+			this.deleteNote(title)
+		}
+	}
 
 	render() {
 		return (
@@ -73,9 +96,11 @@ class Notities extends Component {
 						{this.state.allNotes.map((Note, index) => {
 							return <div className="full_note note_border">
 								<h6>{Note.Title}</h6>
+								<a class="note_delete" onClick={() => this.deleteConfirm(Note.Title)}><FontAwesomeIcon icon={['fas', 'trash-alt']} /></a>
 								<p>
 									{Note.Text}
 								</p>
+
 							</div>
 						})}
 					</div>
