@@ -20,11 +20,13 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Database connection. Will be automatically closed upon test completion.
 		/// </summary>
-		public SQLiteConnection Connection;
+		public static SQLiteConnection Connection;
 		/// <summary>
 		/// Standard testing table.
 		/// </summary>
-		public GenericDataTable Table;
+		public static GenericDataTable Table;
+
+		public SQLiteTransaction Transaction;
 
 		public TestContext TestContext { get; set; }
 
@@ -34,6 +36,12 @@ namespace Webserver.Data.Tests {
 			Config.AddConfig(new StreamReader(Assembly.LoadFrom("Webserver").GetManifestResourceStream("Webserver.DefaultConfig.json")));
 			Config.SaveDefaultConfig();
 			Config.LoadConfig();
+
+			//Init database and create initial connection + table
+			if (File.Exists("Database.db")) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
+			Database.Init();
+			Connection = Database.CreateConnection();
+			Table = CreateTestTable(Connection);
 		}
 
 		[TestInitialize()]
@@ -41,19 +49,22 @@ namespace Webserver.Data.Tests {
 			//Check if init should be skipped
 			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
 
-			//Init database and create initial connection + table
-			if ( File.Exists("Database.db") ) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
-			Database.Init();
-			Connection = Database.CreateConnection();
-			Table = CreateTestTable(Connection);
+			Transaction = Connection.BeginTransaction();
 		}
+
 		public class SkipInitCleanup : Attribute { }
 
 		[TestCleanup()]
 		public void Cleanup() {
 			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
+
+			Transaction.Rollback();
+			//File.Delete("Database.db");
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup() {
 			Connection.Close();
-			File.Delete("Database.db");
 		}
 
 		/// <summary>
@@ -165,8 +176,8 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		public void AddValidatedColumn_Valid() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.AddValidatedColumn();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.AddValidatedColumn();
 		}
 
 		/// <summary>
@@ -175,9 +186,9 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddValidatedColumn_Invalid1() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.AddValidatedColumn();
-			Table.AddValidatedColumn();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.AddValidatedColumn();
+			Table2.AddValidatedColumn();
 		}
 
 		/// <summary>
@@ -389,8 +400,8 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_Columnheck() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.GetUnvalidatedRows();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.GetUnvalidatedRows();
 		}
 
 		/// <summary>
