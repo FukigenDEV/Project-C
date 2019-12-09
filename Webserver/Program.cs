@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -55,7 +56,7 @@ namespace Webserver {
 			CORSAddresses = CORSAddresses.Concat(Addresses).ToList();
 
 			//Run inits
-			Database.Init();
+			SQLiteConnection Connection = Database.Init();
 			WebFiles.Init();
 			Redirect.Init();
 
@@ -70,7 +71,7 @@ namespace Webserver {
 			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
-				RequestWorker Worker = new RequestWorker(Log, Queue);
+				RequestWorker Worker = new RequestWorker(Log, Queue, (SQLiteConnection)Connection.Clone());
 				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);

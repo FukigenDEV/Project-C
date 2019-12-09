@@ -21,7 +21,7 @@ namespace Webserver.Threads {
 	public class RequestWorker {
 		private readonly Logger Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
-		private readonly SQLiteConnection Connection;
+		public SQLiteConnection Connection;
 		private readonly bool Debug;
 
 		/// <summary>
@@ -29,10 +29,10 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, bool Debug = false) {
+		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
 			this.Log = Log;
 			this.Queue = Queue;
-			this.Connection = Database.CreateConnection();
+			this.Connection = Connection;
 			this.Debug = Debug;
 		}
 
@@ -85,7 +85,7 @@ namespace Webserver.Threads {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			} while ( !Debug || Queue.Count != 0);
-			Connection.Close();
+			//Connection.Close();
 		}
 
 		/// <summary>

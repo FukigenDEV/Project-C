@@ -25,7 +25,9 @@ namespace Webserver.Data.Tests {
 		/// Standard testing table.
 		/// </summary>
 		public static GenericDataTable Table;
-
+		/// <summary>
+		/// SQL transaction
+		/// </summary>
 		public SQLiteTransaction Transaction;
 
 		public TestContext TestContext { get; set; }
@@ -39,8 +41,7 @@ namespace Webserver.Data.Tests {
 
 			//Init database and create initial connection + table
 			if (File.Exists("Database.db")) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
-			Database.Init();
-			Connection = Database.CreateConnection();
+			Connection = Database.Init(true);
 			Table = CreateTestTable(Connection);
 		}
 
@@ -63,9 +64,7 @@ namespace Webserver.Data.Tests {
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup() {
-			Connection.Close();
-		}
+		public static void ClassCleanup() => Connection.Close();
 
 		/// <summary>
 		/// Create a datatable for testing purposes. Should be deleted after use.
