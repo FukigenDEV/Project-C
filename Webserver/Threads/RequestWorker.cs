@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -42,7 +43,8 @@ namespace Webserver.Threads {
 		public void Run() {
 			do {
 				ContextProvider Context = Queue.Take();
-				DateTime Started = DateTime.Now;
+				Stopwatch S = new Stopwatch();
+				S.Start();
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
@@ -79,7 +81,7 @@ namespace Webserver.Threads {
 						Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 					}
 				}
-				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
+				long TimeSpent = S.ElapsedMilliseconds;
 				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");

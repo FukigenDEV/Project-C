@@ -7,6 +7,7 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using Webserver.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 
 namespace Webserver.API_Endpoints.Tests {
 	[TestClass()]
@@ -181,7 +182,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_AllUsers() {
-			//Create test user
+			//Create test users
 			new User("TestUser1@example.com", "TestPassword1", Connection);
 			new User("TestUser2@example.com", "TestPassword2", Connection);
 
