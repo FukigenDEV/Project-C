@@ -14,9 +14,6 @@ namespace Webserver.API_Endpoints {
 		[PermissionLevel(PermLevel.Manager)]
 		public override void GET() {
 			//Get required fields
-			Stopwatch S = new Stopwatch();
-			S.Start();
-
 			List<User> Users = new List<User>();
 			if (Params.ContainsKey("email")) {
 
@@ -48,9 +45,6 @@ namespace Webserver.API_Endpoints {
 
 				Entry.Add("Permissions", PermissionInfo);
 			}
-
-			Console.WriteLine(S.ElapsedMilliseconds+"ms");
-			Console.WriteLine(JSON.ToString());
 
 			//Send response
 			Response.Send(JSON);
