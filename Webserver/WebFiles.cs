@@ -7,7 +7,7 @@ using Configurator;
 using Logging;
 
 namespace Webserver {
-	internal static class WebFiles {
+	public static class WebFiles {
 		public static List<string> WebPages;
 		public static Dictionary<int, string> ErrorPages;
 		private static readonly Logger Log = Program.Log;

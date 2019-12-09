@@ -30,19 +30,18 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		public static SQLiteConnection Connection;
 
-		public static Logger Log = new Logger();
+		public static Logger Log = Program.Log = new Logger();
 
 		public TestContext TestContext { get; set; }
 
 		[ClassInitialize]
 		public static void ClassInit(TestContext _) {
-			//Init config
+			//Run inits
 			Config.AddConfig(new StreamReader(Assembly.LoadFrom("Webserver").GetManifestResourceStream("Webserver.DefaultConfig.json")));
 			Config.SaveDefaultConfig();
 			Config.LoadConfig();
-
-			//Init database and create initial connection + table
-			//if ( File.Exists("Database.db") ) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
+			WebFiles.Init();
+			Redirect.Init();
 			Connection = Database.Init(true);
 
 			Program.DiscoverEndpoints();
@@ -78,7 +77,7 @@ namespace Webserver.API_Endpoints.Tests {
 			//Check if cleanup should be skipped
 			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
 
-			Transaction.Rollback();
+			Transaction?.Rollback();
 		}
 
 		public class SkipInitCleanup : Attribute { }

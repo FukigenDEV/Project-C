@@ -110,7 +110,7 @@ namespace Webserver {
 		public ResponseProvider() {}
 
 		public void AppendHeader(string name, string value) {
-			Response.AppendHeader(name, value);
+			Response?.AppendHeader(name, value);
 			Headers.Add(name, value);
 		}
 

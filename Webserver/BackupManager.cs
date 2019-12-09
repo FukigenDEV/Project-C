@@ -13,7 +13,7 @@ namespace Webserver {
 		/// <summary>
 		/// DateTime string format
 		/// </summary>
-		private const string Format = "yyyy-MM-dd_HH-mm";
+		public const string Format = "yyyy-MM-dd_HH-mm";
 		private static readonly Logger Log = Program.Log;
 
 		/// <summary>

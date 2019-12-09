@@ -7,7 +7,7 @@ using Webserver;
 
 namespace Webserver.API_Endpoints.Tests {
 	[TestClass]
-	public class Authentication : APITestMethods {
+	public class Authentication_Tests : APITestMethods {
 
 		/// <summary>
 		/// Call base ClassInit because it can't be inherited

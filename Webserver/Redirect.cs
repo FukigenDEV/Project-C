@@ -5,7 +5,7 @@ using Configurator;
 using Logging;
 
 namespace Webserver {
-	internal static class Redirect {
+	public static class Redirect {
 		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		private static readonly Logger Log = Program.Log;
 
