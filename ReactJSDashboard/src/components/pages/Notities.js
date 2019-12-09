@@ -60,7 +60,7 @@ class Notities extends Component {
 				<h2>Notities</h2>
 				<hr />
 
-				<button type="button" id="alleNotitiesKnop" class="btn btn-outline-primary" style={{ display: "inline-block" }}>
+				<button type="button" id="alleNotitiesKnop" class="btn btn-outline-primary" onClick={this.getAllNotes} style={{ display: "inline-block" }}>
 					Alle notities</button>
 
 				<button type="button" id="notitieAanmakenKnop" class="btn btn-outline-primary" style={{ display: "inline-block" }}>
@@ -71,7 +71,7 @@ class Notities extends Component {
 					<h5><b>Een overzicht van alle notities:</b></h5>
 					<div className="all_notes">
 						{this.state.allNotes.map((Note, index) => {
-							return <div className="full_note">
+							return <div className="full_note note_border">
 								<h6>{Note.Title}</h6>
 								<p>
 									{Note.Text}
@@ -88,7 +88,7 @@ class Notities extends Component {
 						<label>Titel:</label><br />
 						<input id="note_title" type="text" name="note_title" style={{ width: "50%", marginBottom: "15px" }} /><br />
 						<label>Tekst:</label><br />
-						<input id="note_text" type="text" name="note_text" style={{ width: "50%", height: "225px" }} /><br />
+						<textarea id="note_text" type="text" name="note_text" style={{ width: "50%", height: "225px" }} > </textarea> <br />
 						<br />
 						<input type="submit" value="Toevoegen" style={{ width: "200px" }} /><br /><br />
 
