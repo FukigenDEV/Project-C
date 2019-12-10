@@ -10,7 +10,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	[EndpointURL("/account")]
 	public partial class AccountEndpoint : APIEndpoint {
-		[PermissionLevel(PermLevel.Manager)]
+        [PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
 			List<User> Users = new List<User>();

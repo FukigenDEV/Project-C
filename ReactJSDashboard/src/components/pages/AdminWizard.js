@@ -101,7 +101,7 @@ class AdminWizard extends Component {
 		var address = $("#user_address").val();
 		var postCode = $("#user_post_code").val();
 		var accountType = $("input[name=user_account_type]:checked").val();
-		var department = $("#departments_dropdown option:selected").text();
+		var department = $("#departments_dropdown_user option:selected").text();
 
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "/account", true);
@@ -138,7 +138,7 @@ class AdminWizard extends Component {
 		event.preventDefault();
 
 		var name = $("#gdt_name").val();
-		var department = $("#departments_dropdown option:selected").text();
+		var department = $("#departments_dropdown_gdt").find("option:selected").text();
 		var requireValidation = $("#gdt_require_validation").is(":checked") ? true : false;
 
 		var xhr = new XMLHttpRequest();
@@ -202,11 +202,12 @@ class AdminWizard extends Component {
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status === 200) {
+		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 			var departments = JSON.parse(xhr.responseText);
 
 			for (var i = 0; i < departments.length; i++) {
-				$("#departments_dropdown select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
+				$("#departments_dropdown_gdt select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
+				$("#departments_dropdown_user select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
 			}
 		}
 	}
@@ -221,24 +222,6 @@ class AdminWizard extends Component {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////// End of Generic data table code ///////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
-
-	xhr = new XMLHttpRequest();
-	url = "/department?name=";
-	xhr.open("GET", url, true);
-
-	xhr.setRequestHeader("Content-Type", "application/json");
-
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
-			var departments = JSON.parse(xhr.responseText);
-
-			for (var i = 0; i < departments.length; i++) {
-				$("#departments_dropdown select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
-			}
-		}
-	}
-
-	xhr.send();
   }
 
   render() {
@@ -325,7 +308,7 @@ class AdminWizard extends Component {
 				<input id="user_account_type_user" type="radio" name="user_account_type"  value="User" checked/>User<br/>
 
 				Department:<br/>
-				<div id="departments_dropdown">
+				<div id="departments_dropdown_user">
 					<select>
 					</select>
 				</div>
@@ -386,7 +369,7 @@ class AdminWizard extends Component {
 				<br/>
 
 				Department:<br/>
-				<div id="departments_dropdown">
+				<div id="departments_dropdown_gdt">
 					<select>
 					</select>
 				</div>
