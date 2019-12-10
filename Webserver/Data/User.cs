@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace Webserver.Data {
 	/// <summary>
@@ -33,9 +34,10 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Email">The user's email address</param>
 		/// <param name="Password">The user's password. This will be converted into a salted hash and stored in the PasswordHash field.</param>
-		public User(string Email, string Password) {
+		public User(string Email, string Password, SQLiteConnection Connection) {
 			this.Email = Email;
 			this.PasswordHash = CreateHash(Password, Email);
+			Connection.Insert<User>(this);
 		}
 
 		/// <summary>

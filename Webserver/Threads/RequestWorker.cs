@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -21,7 +22,7 @@ namespace Webserver.Threads {
 	public class RequestWorker {
 		private readonly Logger Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
-		private readonly SQLiteConnection Connection;
+		public SQLiteConnection Connection;
 		private readonly bool Debug;
 
 		/// <summary>
@@ -29,10 +30,10 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, bool Debug = false) {
+		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
 			this.Log = Log;
 			this.Queue = Queue;
-			this.Connection = Database.CreateConnection();
+			this.Connection = Connection;
 			this.Debug = Debug;
 		}
 
@@ -42,11 +43,12 @@ namespace Webserver.Threads {
 		public void Run() {
 			do {
 				ContextProvider Context = Queue.Take();
-				DateTime Started = DateTime.Now;
+				Stopwatch S = new Stopwatch();
+				S.Start();
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
-				Log.Debug("Processing request for " + Request.Url.LocalPath);
+				Log.Debug("Processing "+Request.HttpMethod+" request for " + Request.Url.LocalPath);
 
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
@@ -79,13 +81,13 @@ namespace Webserver.Threads {
 						Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
 					}
 				}
-				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
+				long TimeSpent = S.ElapsedMilliseconds;
 				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			} while ( !Debug || Queue.Count != 0);
-			Connection.Close();
+			//Connection.Close();
 		}
 
 		/// <summary>

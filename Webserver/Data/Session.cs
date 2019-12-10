@@ -20,11 +20,12 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="User">The user this session belongs to</param>
 		/// <param name="RememberMe"></param>
-		public Session(long User, bool RememberMe) {
+		public Session(int User, bool RememberMe, SQLiteConnection Connection) {
 			this.SessionID = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-			this.User = (int)User;
+			this.User = User;
 			this.RememberMe = RememberMe;
 			this.Token = Utils.GetUnixTimestamp();
+			Connection.Insert(this);
 		}
 
 		/// <summary>

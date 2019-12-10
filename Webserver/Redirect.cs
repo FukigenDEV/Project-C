@@ -5,7 +5,7 @@ using Configurator;
 using Logging;
 
 namespace Webserver {
-	internal static class Redirect {
+	public static class Redirect {
 		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		private static readonly Logger Log = Program.Log;
 
@@ -13,15 +13,15 @@ namespace Webserver {
 		///	Initialize the redirect system.
 		/// </summary>
 		public static void Init() {
-			string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
 
 			//If no Redirects file exists yet, create a default one.
 			if ( !File.Exists("Redirects.config") ) {
-				using StreamWriter RedirectsFile = File.CreateText("Redirects.config");
+				StreamWriter RedirectsFile = File.CreateText("Redirects.config");
 				//If wwwroot contains an index.html file, add it to redirects.
-				if ( File.Exists(wwwroot + "/index.html") ) {
+				if (File.Exists((string)Configurator.Config.GetValue("WebserverSettings.wwwroot") + "/index.html") ) {
 					RedirectsFile.WriteLine("/ => /index.html");
 				}
+				RedirectsFile.Close();
 			}
 
 			ParseRedirectFile("Redirects.config");

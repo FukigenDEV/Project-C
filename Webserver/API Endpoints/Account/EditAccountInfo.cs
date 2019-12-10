@@ -14,34 +14,40 @@ namespace Webserver.API_Endpoints {
 		[RequireContentType("application/json")]
 		public override void PATCH() {
 			//Get required fields
-			if ( !JSON.TryGetValue<string>("Email", out JToken Email) ) {
+			if ( !Params.ContainsKey("email") ) {
 				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Administrator account can't be modified;
-			if ( (string)Email == "Administrator" ) {
+			if (Params["email"][0] == "Administrator" ) {
 				Response.Send(HttpStatusCode.Forbidden);
 				return;
 			}
 
 			//Check if the specified user exists. If it doesn't, send a 404 Not Found
-			User Acc = User.GetUserByEmail(Connection, (string)Email);
+			User Acc = User.GetUserByEmail(Connection, Params["email"][0]);
 			if ( Acc == null ) {
 				Response.Send("No such user", HttpStatusCode.NotFound);
 				return;
 			}
 
 			//Change email if necessary
-			if ( JSON.TryGetValue<string>("NewEmail", out JToken NewEmail) ) {
+			if ( JSON.TryGetValue<string>("Email", out JToken NewEmail) ) {
 				//Check if the new address is valid
 				Regex rx = new Regex("^[A-z0-9]*@[A-z0-9]*.[A-z]*$");
-				if ( rx.IsMatch((string)NewEmail) ) {
-					Acc.Email = (string)NewEmail;
-				} else {
+				if (!rx.IsMatch((string)NewEmail)) {
 					Response.Send("Invalid Email", HttpStatusCode.BadRequest);
 					return;
 				}
+
+				//Check if the new address is already in use
+				if(User.GetUserByEmail(Connection, (string)NewEmail) != null) {
+					Response.Send("New Email already in use", HttpStatusCode.BadRequest);
+					return;
+				}
+				Acc.Email = (string)NewEmail;
+
 			}
 
 			//Change password if necessary

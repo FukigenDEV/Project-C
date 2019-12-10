@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,9 +20,9 @@ namespace Webserver {
 			Response = new ResponseProvider(Context.Response);
 		}
 
-		public ContextProvider(RequestProvider Request, ResponseProvider Response) {
+		public ContextProvider(RequestProvider Request) {
 			this.Request = Request;
-			this.Response = Response;
+			this.Response = new ResponseProvider();
 		}
 	}
 
@@ -58,7 +59,9 @@ namespace Webserver {
 
 		public RequestProvider(Uri Url, HttpMethod HttpMethod) {
 			this.Url = Url;
+			this.Params = Utils.NameValueToDict(HttpUtility.ParseQueryString(Url.Query));
 			this.HttpMethod = HttpMethod;
+			this.ContentEncoding = Encoding.UTF8;
 		}
 	}
 
@@ -77,7 +80,7 @@ namespace Webserver {
 		public string ContentType {
 			get => _ContentType;
 			set {
-				if ( Response != null ) Response.ContentType = ContentType;
+				if (Response != null) Response.ContentType = value;
 				_ContentType = value;
 			}
 		}
@@ -108,7 +111,7 @@ namespace Webserver {
 		public ResponseProvider() {}
 
 		public void AppendHeader(string name, string value) {
-			Response.AppendHeader(name, value);
+			Response?.AppendHeader(name, value);
 			Headers.Add(name, value);
 		}
 
@@ -123,7 +126,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="JSON"></param>
 		/// <param name="StatusCode"></param>
-		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(), StatusCode, "application/json");
+		public void Send(JToken JSON, HttpStatusCode StatusCode = HttpStatusCode.OK) => Send(JSON.ToString(Formatting.None), StatusCode, "application/json");
 
 		/// <summary>
 		/// Sends data to the client in the form of a byte array.
@@ -153,7 +156,7 @@ namespace Webserver {
 		/// <param name="Data">The data to be sent to the client.</param>
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
-		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = null) {
+		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/plain") {
 			if ( Data == null ) Data = string.Empty;
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Buffer, StatusCode, ContentType);

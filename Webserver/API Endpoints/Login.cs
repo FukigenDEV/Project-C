@@ -73,8 +73,7 @@ namespace Webserver.API_Endpoints {
 
 			//At this point, we know the user exists and that the credentials are valid. The user will now be logged in.
 			//Create a new session, store it, and send back the Session ID
-			Session NewSession = new Session(Account.ID, (bool)RememberMe);
-			Connection.Insert(NewSession);
+			Session NewSession = new Session(Account.ID, (bool)RememberMe, Connection);
 
 			AddCookie("SessionID", NewSession.SessionID, NewSession.GetRemainingTime());
 			Response.Send(HttpStatusCode.NoContent);
@@ -87,7 +86,7 @@ namespace Webserver.API_Endpoints {
 		public override void DELETE() {
 			Connection.Delete(UserSession);
 			AddCookie("SessionID", "", 0);
-			Response.Send(StatusCode: HttpStatusCode.OK);
+			Response.Send(HttpStatusCode.OK);
 		}
 	}
 }

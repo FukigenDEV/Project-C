@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using Dapper;
@@ -22,7 +23,9 @@ namespace Webserver.API_Endpoints {
 						Users.Add(RequestUser);
 						continue;
 					}
-					Users.Add(User.GetUserByEmail(Connection, Email));
+
+					User Acc = User.GetUserByEmail(Connection, Email);
+					if (Acc != null) Users.Add(Acc);
 				}
 
 			//If email is missing, assume all users

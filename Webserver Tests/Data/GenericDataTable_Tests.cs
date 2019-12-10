@@ -20,31 +20,51 @@ namespace Webserver.Data.Tests {
 		/// <summary>
 		/// Database connection. Will be automatically closed upon test completion.
 		/// </summary>
-		public SQLiteConnection Connection;
+		public static SQLiteConnection Connection;
 		/// <summary>
 		/// Standard testing table.
 		/// </summary>
-		public GenericDataTable Table;
+		public static GenericDataTable Table;
+		/// <summary>
+		/// SQL transaction
+		/// </summary>
+		public SQLiteTransaction Transaction;
 
-		[TestInitialize()]
-		public void Init() {
+		public TestContext TestContext { get; set; }
+
+		[ClassInitialize]
+		public static void ClassInit(TestContext _) {
 			//Init config
 			Config.AddConfig(new StreamReader(Assembly.LoadFrom("Webserver").GetManifestResourceStream("Webserver.DefaultConfig.json")));
 			Config.SaveDefaultConfig();
 			Config.LoadConfig();
 
 			//Init database and create initial connection + table
-			if ( File.Exists("Database.db") ) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
-			Database.Init();
-			Connection = Database.CreateConnection();
+			if (File.Exists("Database.db")) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
+			Connection = Database.Init(true);
 			Table = CreateTestTable(Connection);
 		}
 
+		[TestInitialize()]
+		public void Init() {
+			//Check if init should be skipped
+			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
+
+			Transaction = Connection.BeginTransaction();
+		}
+
+		public class SkipInitCleanup : Attribute { }
+
 		[TestCleanup()]
 		public void Cleanup() {
-			Connection.Close();
-			File.Delete("Database.db");
+			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
+
+			Transaction.Rollback();
+			//File.Delete("Database.db");
 		}
+
+		[ClassCleanup]
+		public static void ClassCleanup() => Connection.Close();
 
 		/// <summary>
 		/// Create a datatable for testing purposes. Should be deleted after use.
@@ -70,23 +90,21 @@ namespace Webserver.Data.Tests {
 		public void Constructor_ValidArgumentsTest() => Connection.Query("SELECT StringColumn, IntegerColumn FROM Table1");
 
 		/// <summary>
-		/// Check if the table name regex check is working.
+		/// Check if the reserved and invalid checks are working.
 		/// </summary>
-		[TestMethod]
+		/// <param name="Name"></param>
+		[DataRow("12345")]
+		[DataRow("Users")]
+		[SkipInitCleanup]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_InvalidNameRegexTest() => CreateTestTable(Connection, "12345");
-
-		/// <summary>
-		/// Check if the table reserved name check is working.
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ReservedName() => CreateTestTable(Connection, "Functions");
+		public void Constructor_ArgumentsCheck(string Name) => CreateTestTable(Connection, Name);
 
 		/// <summary>
 		/// Check if the column count check is working.
 		/// </summary>
 		[TestMethod]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ColumnCountCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>());
 
@@ -94,6 +112,7 @@ namespace Webserver.Data.Tests {
 		/// Check if the reserved column name check is working.
 		/// </summary>
 		[TestMethod]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "Validated", DataType.Integer } });
 
@@ -101,6 +120,7 @@ namespace Webserver.Data.Tests {
 		/// Check if the column name regex check is working.
 		/// </summary>
 		[TestMethod]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ColumnNameRegexCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "12345", DataType.Integer } });
 
@@ -108,6 +128,7 @@ namespace Webserver.Data.Tests {
 		/// Check if the department existence check is working.
 		/// </summary>
 		[TestMethod]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_DepartmentCheck() => CreateTestTable(Connection, DepartmentID: 100);
 
@@ -131,18 +152,13 @@ namespace Webserver.Data.Tests {
 		public void AddColumn_ValidBulk() => Table.AddColumn(new Dictionary<string, DataType> { { "NewColumn1", DataType.String }, { "NewColumn2", DataType.Integer } });
 
 		/// <summary>
-		/// Check if the AddColumn function properly throws an exception when an invalid name is given
+		/// Check if the AddColumn function properly throws an exception when an invalid or reserved name is given
 		/// </summary>
-		[TestMethod]
+		[DataRow("12345", DataType.String)] //Invalid name
+		[DataRow("Validated", DataType.String)] //Reserved name
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void AddColumn_RegexCheck() => Table.AddColumn("12345", DataType.String);
-
-		/// <summary>
-		/// Check if the AddColumn function properly throws an exception when a reserved name is given
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void AddColumn_ReservedCheck() => Table.AddColumn("Validated", DataType.String);
+		public void AddColumn_ArgumentCheck(string Name, DataType DT) => Table.AddColumn(Name, DT);
 
 		/// <summary>
 		/// Check if the AddColumn function properly throws an exception when an existing column name is given
@@ -159,8 +175,8 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		public void AddValidatedColumn_Valid() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.AddValidatedColumn();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.AddValidatedColumn();
 		}
 
 		/// <summary>
@@ -169,9 +185,9 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddValidatedColumn_Invalid1() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.AddValidatedColumn();
-			Table.AddValidatedColumn();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.AddValidatedColumn();
+			Table2.AddValidatedColumn();
 		}
 
 		/// <summary>
@@ -203,32 +219,17 @@ namespace Webserver.Data.Tests {
 		}
 
 		/// <summary>
-		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if a nonexistent column is specified
+		/// Check if the RenameColumn function throws an exception when given invalid arguments
 		/// </summary>
-		[TestMethod]
+		/// <param name="OldName"></param>
+		/// <param name="NewName"></param>
+		[DataRow("SomeColumn", "SomeOtherColumn")] //No such column
+		[DataRow("StringColumn", "IntegerColumn")] //Target already exists
+		[DataRow("Validated", "SomeColumn")] //Rename Validated
+		[DataRow("IntegerColumn", "Validated")] //Rename to Validated
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void RenameColumn_DoesntExistCheck() => Table.RenameColumn("SomeColumn", "SomeOtherColumn");
-
-		/// <summary>
-		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if a column already exists with the specified name
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void RenameColumn_AlreadyExiststCheck() => Table.RenameColumn("StringColumn", "IntegerColumn");
-
-		/// <summary>
-		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if the user tries to rename the Validated column
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void RenameColumn_ValidatedColumnCheck1() => Table.RenameColumn("Validated", "SomeColumn");
-
-		/// <summary>
-		/// Check if the RenameColumn_DoesntExistCheck function throws an exception if the user tries to rename the Validated column
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void RenameColumn_ValidatedColumnCheck2() => Table.RenameColumn("IntegerColumn", "Validated");
+		public void RenameColumn_ArgumentCheck(string OldName, string NewName) => Table.RenameColumn(OldName, NewName);
 
 		/// <summary>
 		/// Check if we can rename columns in bulk
@@ -333,25 +334,14 @@ namespace Webserver.Data.Tests {
 		}
 
 		/// <summary>
-		/// Check if the range checks throw an exception when given a negative begin value.
+		/// Check if the range checks throw an exception when given invalid input
 		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
-		public void GetRows_RangeCheck1() => Table.GetRows(-1);
-
-		/// <summary>
-		/// Check if the range checks throw an exception when given a negative end value.
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
-		public void GetRows_RangeCheck2() => Table.GetRows(0, -1);
-
-		/// <summary>
-		/// Check if the range checks throw an exception when begin is higher than end.
-		/// </summary>
-		[TestMethod]
+		[DataRow(-1, 0)]
+		[DataRow(0, -1)]
+		[DataRow(10, 5)]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void GetRows_RangeCheck3() => Table.GetRows(10, 5);
+		public void GetValidatedRows_RangeCheck(int begin, int end) => Table.GetRows(begin, end);
 
 		/// <summary>
 		/// Check if we can retrieve all unvalidated rows in a table
@@ -394,25 +384,14 @@ namespace Webserver.Data.Tests {
 		}
 
 		/// <summary>
-		/// Check if the range checks throw an exception when given a negative begin value.
+		/// Check if the range checks throw an exception when given invalid input
 		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
-		public void GetUnvalidatedRows_RangeCheck1() => Table.GetUnvalidatedRows(-1);
-
-		/// <summary>
-		/// Check if the range checks throw an exception when given a negative end value.
-		/// </summary>
-		[TestMethod]
-		[ExpectedException(typeof(IndexOutOfRangeException), "Argument check succeeded when it shouldn't")]
-		public void GetUnvalidatedRows_RangeCheck2() => Table.GetUnvalidatedRows(0, -1);
-
-		/// <summary>
-		/// Check if the range checks throw an exception when begin is higher than end.
-		/// </summary>
-		[TestMethod]
+		[DataRow(-1, 0)]
+		[DataRow(0, -1)]
+		[DataRow(10, 5)]
+		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void GetUnvalidatedRows_RangeCheck3() => Table.GetUnvalidatedRows(10, 5);
+		public void GetUnvalidatedRows_RangeCheck(int begin, int end) => Table.GetUnvalidatedRows(begin, end);
 
 		/// <summary>
 		/// Check if the Validated column check throws an exception when the table has no Validated column.
@@ -420,8 +399,8 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_Columnheck() {
-			Table = CreateTestTable(Connection, "Table2", ReqValidation: false);
-			Table.GetUnvalidatedRows();
+			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			Table2.GetUnvalidatedRows();
 		}
 
 		/// <summary>

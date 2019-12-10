@@ -20,7 +20,7 @@ namespace Webserver {
 		/// Initialize the database, inserting all data required for first start-up
 		/// </summary>
 		/// <param name="log"></param>
-		public static void Init() {
+		public static SQLiteConnection Init(bool InMemory = false) {
 			Log?.Info("Initializing database...");
 
 			//Create the database if it doesn't exist already.
@@ -29,7 +29,7 @@ namespace Webserver {
 			}
 
 			//Connect to the database
-			using SQLiteConnection Connection = CreateConnection();
+			SQLiteConnection Connection = CreateConnection(InMemory);
 
 			//Create tables if they don't already exist.
 			//Functions table
@@ -126,23 +126,22 @@ namespace Webserver {
 			//one specified in the server configuration file.
 			User Administrator = Connection.Get<User>(1);
 			if ( Administrator == null ) {
-				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
-				Connection.Insert(Administrator);
+				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"), Connection);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 1);
 			} else {
 				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 				Connection.Update<User>(Administrator);
 			}
 
-			GenericDataTable.GetTableNames(Connection, 2).ForEach(Console.WriteLine);
+			return Connection;
 		}
 
 		/// <summary>
 		/// Creates a new database connection and opens it immediately.
 		/// </summary>
 		/// <returns></returns>
-		public static SQLiteConnection CreateConnection() {
-			SQLiteConnection Connection = new SQLiteConnection("Data Source=Database.db;foreign keys=true");
+		public static SQLiteConnection CreateConnection(bool InMemory = false) {
+			SQLiteConnection Connection = new SQLiteConnection(InMemory? "Data Source=:memory:;Version=3;New=True;foreign keys=true" : "Data Source=Database.db;foreign keys=true");
 			Connection.Open();
 			return ( Connection );
 		}

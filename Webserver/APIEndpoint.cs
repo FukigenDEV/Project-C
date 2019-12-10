@@ -40,7 +40,7 @@ namespace Webserver {
 		/// <summary>
 		/// The request parameters that were used with this request.
 		/// </summary>
-		public Dictionary<string, List<string>> Params;
+		public Dictionary<string, List<string>> Params = null;
 
 		/// <summary>
 		/// Called when a HTTP.GET request is sent to this endpoint.
