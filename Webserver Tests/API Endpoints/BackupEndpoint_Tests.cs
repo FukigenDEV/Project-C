@@ -14,11 +14,9 @@ namespace Webserver.API_Endpoints.Tests {
 		public string Timestamp;
 
 		[ClassInitialize]
-		public new static void ClassInit(TestContext C) {
-			APITestMethods.ClassInit(C);
-		}
+		public new static void ClassInit(TestContext C) => APITestMethods.ClassInit(C);
 
-		
+
 		[TestInitialize]
 		public new void Init() {
 			if (Directory.Exists("Backups")) {
@@ -30,14 +28,7 @@ namespace Webserver.API_Endpoints.Tests {
 		public void GET_GetList() {
 			POST();
 
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/backup"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -54,13 +45,7 @@ namespace Webserver.API_Endpoints.Tests {
 			POST();
 
 			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/backup?name=Backup_"+Timestamp+"_0"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=Backup_" + Timestamp + "_0", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -73,14 +58,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_GetInvalidFile() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/backup?name=SomeFile"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=SomeFile", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.NotFound);
@@ -91,14 +69,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod()]
 		public void POST() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/backup"), HttpMethod.POST);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.POST).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);

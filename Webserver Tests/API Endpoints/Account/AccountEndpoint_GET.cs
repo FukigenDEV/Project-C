@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Webserver.API_Endpoints.Tests {
 	[TestClass()]
-	public class AccountEndpoint_Tests : APITestMethods {
+	public partial class AccountEndpointTests : APITestMethods {
 
 		/// <summary>
 		/// Call base ClassInit because it can't be inherited
@@ -46,14 +46,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_ValidArguments() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=Administrator"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -73,14 +66,7 @@ namespace Webserver.API_Endpoints.Tests {
 			new User("TestUser1@example.com", "TestPassword1", Connection);
 			new User("TestUser2@example.com", "TestPassword2", Connection);
 
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=Administrator,TestUser1@example.com"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,TestUser1@example.com", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -100,14 +86,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_InvalidArguments() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=SomeAccount"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -120,14 +99,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_BulkInvalidArguments() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=SomeAccount,SomeOtherAccount"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount,SomeOtherAccount", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -140,14 +112,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_MixedArguments() {
-			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=Administrator,SomeUser"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,SomeUser", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -162,13 +127,7 @@ namespace Webserver.API_Endpoints.Tests {
 		[TestMethod]
 		public void GET_CurrentUser() {
 			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account?email=CurrentUser"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=CurrentUser", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -187,13 +146,7 @@ namespace Webserver.API_Endpoints.Tests {
 			new User("TestUser2@example.com", "TestPassword2", Connection);
 
 			//Create mock request
-			RequestProvider Request = new RequestProvider(new Uri("http://localhost/account"), HttpMethod.GET);
-			Request.Cookies.Add(Login());
-			ResponseProvider Response = new ResponseProvider();
-
-			//Execute request
-			Queue.Add(new ContextProvider(Request, Response));
-			ExecuteQueue();
+			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.GET).Response;
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
