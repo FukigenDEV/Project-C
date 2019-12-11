@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Configurator;
@@ -15,9 +16,7 @@ namespace Webserver.API_Endpoints {
 			//Get all required fields
 			if (
 				!JSON.TryGetValue<string>("Email", out JToken Email) ||
-				!JSON.TryGetValue<string>("Password", out JToken Password) ||
-				!JSON.TryGetValue<string>("AccountType", out JToken AccountType) ||
-				!JSON.TryGetValue<string>("MemberOf", out JToken MemberDept)
+				!JSON.TryGetValue<string>("Password", out JToken Password)
 			) {
 				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
@@ -44,26 +43,32 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
-			//Check if the specified account type is valid.
-			if ( !PermLevel.TryParse((string)AccountType, out PermLevel level) ) {
-				Response.Send("Invalid accountType", HttpStatusCode.BadRequest);
-				return;
-			}
-			//If the new user has a greater perm than the requestuser, send a 403 Forbidden.
-			if ( level > RequestUserLevel ) {
-				Response.Send("Can't create " + level + " as " + RequestUserLevel, HttpStatusCode.Forbidden);
-				return;
-			}
-
-			//Check if the department is valid
-			Department Dept = Department.GetByName(Connection, (string)MemberDept);
-			if ( Dept == null ) {
-				Response.Send("No such department", HttpStatusCode.BadRequest);
-				return;
-			}
-
 			//Create a new user
 			User NewUser = new User((string)Email, (string)Password, Connection);
+
+			//Set department permissions where necessary
+			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
+			if (JSON.TryGetValue<JObject>("MemberDepartments", out JToken MemberDepartment)) {
+				JObject Perms = (JObject)MemberDepartment;
+				foreach (KeyValuePair<string, JToken> Entry in Perms) {
+					//Check if the specified department exists, skip if it doesn't.
+					Department Dept = Department.GetByName(Connection, Entry.Key);
+					if (Dept == null) {
+						continue;
+					}
+					//Check if the specified account type is valid. If it isn't, skip it.
+					if (!PermLevel.TryParse((string)Entry.Value, out PermLevel Level)) {
+						continue;
+					}
+					//If the new user has a greater perm than the requestuser, skip it.
+					if (Level > RequestUserLevel) {
+						continue;
+					}
+
+					//Set level
+					NewUser.SetPermissionLevel(Connection, Level, Dept);
+				}
+			}
 
 			//Set optional fields
 			foreach ( var x in JSON ) {
@@ -78,11 +83,9 @@ namespace Webserver.API_Endpoints {
 				Prop.SetValue(NewUser, Value);
 			}
 
-			//Upload account to database and set permission
+			//Upload account to database
 			Connection.Update<User>(NewUser);
-			NewUser.SetPermissionLevel(Connection, level, Dept);
-			NewUser.SetPermissionLevel(Connection, PermLevel.User, 2);
-
+			
 			//Send OK
 			Response.Send(HttpStatusCode.Created);
 		}
