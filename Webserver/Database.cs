@@ -32,11 +32,6 @@ namespace Webserver {
 			SQLiteConnection Connection = CreateConnection(InMemory);
 
 			//Create tables if they don't already exist.
-			//Functions table
-			Connection.Execute("CREATE TABLE IF NOT EXISTS Functions (" +
-				"Name				STRING PRIMARY KEY" +
-			")");
-
 			//Company table
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Companies (" +
 			"ID					INTEGER PRIMARY KEY," +
@@ -88,8 +83,7 @@ namespace Webserver {
 				 "Birthday			STRING," +
 				 "Country			STRING," +
 				 "Address			STRING," +
-				 "Postcode			STRING," +
-				 "FOREIGN KEY(Function) REFERENCES Functions(Name) ON UPDATE CASCADE" +
+				 "Postcode			STRING" +
 			")");
 
 			//Sessions table
