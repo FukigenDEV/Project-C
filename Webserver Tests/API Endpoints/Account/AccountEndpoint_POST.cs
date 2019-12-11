@@ -52,6 +52,39 @@ namespace Webserver.API_Endpoints.Tests {
 				},
 				HttpStatusCode.BadRequest,
 				"Password does not meet requirements"
+			},
+			new object[] {
+				new JObject() {
+					{"Email", "Administrator"},
+					{"Password", "examplepassword12345"},
+					{"MemberDepartments", new JObject() {
+						{"All Users", "Manager" }
+					}}
+				},
+				HttpStatusCode.BadRequest,
+				"A user with this email already exists"
+			},
+			new object[] {
+				new JObject() {
+					{"Email", "user@example.com"},
+					{"Password", "examplepassword12345"},
+					{"MemberDepartments", new JObject() {
+						{"All Users", "SomeAccountType" }
+					}}
+				},
+				HttpStatusCode.Created,
+				null
+			},
+			new object[] {
+				new JObject() {
+					{"Email", "user@example.com"},
+					{"Password", "examplepassword12345"},
+					{"MemberDepartments", new JObject() {
+						{"SomeDepartment", "Manager" }
+					}}
+				},
+				HttpStatusCode.Created,
+				null
 			}
 		};
 
@@ -63,57 +96,7 @@ namespace Webserver.API_Endpoints.Tests {
 		public void POST_InvalidArguments(JObject Request, HttpStatusCode StatusCode, string ResponseMsg) {
 			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.POST, Request);
 			Assert.IsTrue(Response.StatusCode == StatusCode);
-			string Result = Encoding.UTF8.GetString(Response.Data);
-			Assert.IsTrue(Result == ResponseMsg);
-		}
-
-		[TestMethod]
-		public void POST_AlreadyExists() {
-			new User("user@example.com", "SomePassword", Connection);
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.POST, new JObject() {
-				{"Email", "user@example.com"},
-				{"Password", "examplepassword12345"},
-				{"MemberDepartments", new JObject() {
-					{"All Users", "Manager" }
-				}}
-			});
-
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.BadRequest);
-			Assert.IsTrue(Encoding.UTF8.GetString(Response.Data) == "A user with this email already exists");
-		}
-
-		/// <summary>
-		/// Check if MemberDepartments entries with an invalid account type are silently ignored
-		/// </summary>
-		[TestMethod]
-		public void POST_InvalidAccountType() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.POST, new JObject() {
-				{"Email", "user@example.com"},
-				{"Password", "examplepassword12345"},
-				{"MemberDepartments", new JObject() {
-					{"All Users", "SomeAccountType" }
-				}}
-			});
-
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.Created);
-			User Account = User.GetUserByEmail(Connection, "user@example.com");
-			Assert.IsNotNull(Account);
-			Assert.IsTrue(Account.GetPermissionLevel(Connection, 2) == PermLevel.User);
-		}
-
-		/// <summary>
-		/// Check if MemberDepartments entries with an invalid department are silently ignored
-		/// </summary>
-		[TestMethod]
-		public void POST_InvalidDepartment() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.POST, new JObject() {
-				{"Email", "user@example.com"},
-				{"Password", "examplepassword12345"},
-				{"MemberDepartments", new JObject() {
-					{"SomeDepartment", "Manager" }
-				}}
-			});
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.Created);
+			if(ResponseMsg != null) Assert.IsTrue(Encoding.UTF8.GetString(Response.Data) == ResponseMsg);
 		}
 
 		/// <summary>
