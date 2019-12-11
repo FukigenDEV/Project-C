@@ -7,7 +7,7 @@ using Logging;
 namespace Webserver {
 	public static class Redirect {
 		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
-		private static readonly Logger Log = Program.Log;
+		public static Logger Log = Program.Log;
 
 		/// <summary>
 		///	Initialize the redirect system.
@@ -66,13 +66,19 @@ namespace Webserver {
 				//Check if the source URI is valid
 				Regex ex = new Regex("^(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}$");
 				if ( !ex.IsMatch(LineContents[0]) && LineContents[0] != "/" ) {
-					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URI");
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URL");
 					continue;
 				}
 
 				//Check if the destination is valid
 				if ( !ex.IsMatch(LineContents[1]) && LineContents[1] != "/" ) {
-					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URI");
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URL");
+					continue;
+				}
+
+				//Check if the entry is a duplicate
+				if (RedirectionDict.ContainsKey(LineContents[0])) {
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Duplicate source URL");
 					continue;
 				}
 

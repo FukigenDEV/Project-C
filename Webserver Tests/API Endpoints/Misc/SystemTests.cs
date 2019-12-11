@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 using Webserver;
@@ -22,6 +23,19 @@ namespace Webserver.API_Endpoints.Tests {
 		public void NotFoundTest() {
 			ResponseProvider Response = ExecuteSimpleRequest("/SomeURL", HttpMethod.GET);
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.NotFound);
+		}
+
+		[DataRow("/a => /a", "/a", HttpStatusCode.LoopDetected, null)]
+		[DataRow("/ => /index.html", "/", HttpStatusCode.Redirect, "/index.html")]
+		[TestMethod]
+		public void RedirectTest(string Entry, string Source, HttpStatusCode StatusCode, string Destination) {
+			File.WriteAllText("Redirects.config", Entry);
+			Redirect.Log = Log;
+			Redirect.Init();
+
+			ResponseProvider Response = ExecuteSimpleRequest(Source, HttpMethod.GET, null);
+			Assert.IsTrue(Response.StatusCode == StatusCode);
+			Assert.IsTrue(Response.RedirectURL == Destination);
 		}
 	}
 }

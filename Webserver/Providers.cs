@@ -164,7 +164,7 @@ namespace Webserver {
 
 		public void Redirect(string URL) {
 			RedirectURL = URL;
-			Response.Redirect(URL);
+			Response?.Redirect(URL);
 		}
 	}
 
