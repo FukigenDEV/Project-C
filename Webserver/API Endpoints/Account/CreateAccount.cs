@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -57,7 +58,7 @@ namespace Webserver.API_Endpoints {
 						continue;
 					}
 					//Check if the specified account type is valid. If it isn't, skip it.
-					if (!PermLevel.TryParse((string)Entry.Value, out PermLevel Level)) {
+					if (!Enum.TryParse((string)Entry.Value, out PermLevel Level)) {
 						continue;
 					}
 					//If the new user has a greater perm than the requestuser, skip it.

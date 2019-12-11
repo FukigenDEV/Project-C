@@ -20,7 +20,7 @@ namespace Webserver.API_Endpoints.Tests {
 
 		[TestMethod]
 		public void NotFoundTest() {
-			ResponseProvider Response = ExecuteSimpleRequest("/SomeURL", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/SomeURL", HttpMethod.GET);
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.NotFound);
 		}
 	}
