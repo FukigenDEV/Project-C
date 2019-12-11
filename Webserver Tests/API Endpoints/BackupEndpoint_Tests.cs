@@ -23,7 +23,7 @@ namespace Webserver.API_Endpoints.Tests {
 				Directory.Delete("Backups", true);
 			}
 		}
-		
+
 		[TestMethod()]
 		public void GET_GetList() {
 			POST();
@@ -50,7 +50,7 @@ namespace Webserver.API_Endpoints.Tests {
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
 			Assert.IsTrue(Response.ContentType == "application/zip");
-			Assert.IsTrue(Response.Headers.Get("Content-disposition") == "attachment; filename=Backup_"+Timestamp+"_0.zip");
+			Assert.IsTrue(Response.Headers.Get("Content-disposition") == "attachment; filename=Backup_" + Timestamp + "_0.zip");
 		}
 
 		/// <summary>

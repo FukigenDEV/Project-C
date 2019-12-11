@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using Webserver.Data;
@@ -22,40 +23,38 @@ namespace Webserver.API_Endpoints.Tests {
 			Assert.IsNull(User.GetUserByEmail(Connection, "user@example.com"));
 		}
 
-		/// <summary>
-		/// Check if we get a Forbidden statuscode if we try to delete Administrator
-		/// </summary>
-		[TestMethod]
-		public void DELETE_Admin() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.DELETE, new JObject() {
-				{"Email", "Administrator"},
-			});
-
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.Forbidden);
-		}
-
-		/// <summary>
-		/// Check if we get a NotFound statuscode if we try to delete a nonexistent account
-		/// </summary>
-		[TestMethod]
-		public void DELETE_NoSuchUser() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.DELETE, new JObject() {
-				{"Email", "user@example.com"},
-			});
-
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.NotFound);
-			Assert.IsTrue(Encoding.UTF8.GetString(Response.Data) == "No such user");
-		}
+		[SuppressMessage("Code Quality", "IDE0051")]
+		static IEnumerable<object[]> InvalidDeleteTestData => new[]{
+			new object[] {
+				new JObject() {
+					{"Email", "Administrator"},
+				},
+				HttpStatusCode.Forbidden,
+				null
+			},
+			new object[] {
+				new JObject() {
+					{"Email", "user@example.com"},
+				},
+				HttpStatusCode.NotFound,
+				"No such user"
+			},
+			new object[] {
+				new JObject(),
+				HttpStatusCode.BadRequest,
+				"Missing fields"
+			}
+		};
 
 		/// <summary>
-		/// Check if we get a BadRequest if we don't specify an email
+		/// Check if we get an error if we specify invalid arguments
 		/// </summary>
 		[TestMethod]
-		public void DELETE_MissingFields() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.DELETE, new JObject());
-
-			Assert.IsTrue(Response.StatusCode == HttpStatusCode.BadRequest);
-			Assert.IsTrue(Encoding.UTF8.GetString(Response.Data) == "Missing fields");
+		[DynamicData("InvalidDeleteTestData")]
+		public void DELETE_InvalidArguments(JObject JSON, HttpStatusCode StatusCode, string ResponseMessage) {
+			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.DELETE, JSON);
+			Assert.IsTrue(Response.StatusCode == StatusCode);
+			if (ResponseMessage != null) Assert.IsTrue(Encoding.UTF8.GetString(Response.Data) == ResponseMessage);
 		}
 	}
 }
