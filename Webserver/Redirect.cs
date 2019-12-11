@@ -16,12 +16,7 @@ namespace Webserver {
 
 			//If no Redirects file exists yet, create a default one.
 			if ( !File.Exists("Redirects.config") ) {
-				StreamWriter RedirectsFile = File.CreateText("Redirects.config");
-				//If wwwroot contains an index.html file, add it to redirects.
-				if (File.Exists((string)Configurator.Config.GetValue("WebserverSettings.wwwroot") + "/index.html") ) {
-					RedirectsFile.WriteLine("/ => /index.html");
-				}
-				RedirectsFile.Close();
+				File.CreateText("Redirects.config");
 			}
 
 			ParseRedirectFile("Redirects.config");

@@ -70,16 +70,7 @@ namespace Webserver.Threads {
 					ProcessEndpoint(T, Context);
 				} else {
 					//No endpoint was found, so see if a resource exists at this address instead.
-					//Add wwwroot to URL
-					string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
-
-					if ( WebFiles.WebPages.Contains(Target) && File.Exists(Target) ) {
-						ProcessResource(Target, Context);
-					} else {
-						//No endpoint or resource was found, so send a 404.
-						Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
-						Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
-					}
+					ProcessResource(Request.Url.LocalPath.ToLower(), Context);
 				}
 				long TimeSpent = S.ElapsedMilliseconds;
 				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
@@ -243,11 +234,23 @@ namespace Webserver.Threads {
 		public void ProcessResource(string Target, ContextProvider Context) {
 			RequestProvider Request = Context.Request;
 			ResponseProvider Response = Context.Response;
+			string wwwroot = Config.GetValue("WebserverSettings.wwwroot");
+			Target = wwwroot + Target;
+
+			//If target is '/', send index.html if it exists
+			if(Target == wwwroot+"/" && File.Exists(wwwroot + "/index.html")) Target += "index.html";
+
+			//If the file doesn't exist, send a 404
+			if(!WebFiles.WebPages.Contains(Target) || !File.Exists(Target)){
+				Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound, "text/html");
+				return;
+			}
 
 			//Content-type header shouldn't be set for resources
 			if ( Request.ContentType != null ) {
 				Log.Warning("Refused request for resource " + Target + ": Unsupported Media Type (" + Request.ContentType + ")");
-				Response.Send(Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType);
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType, "text/html");
 				return;
 			}
 
@@ -283,7 +286,7 @@ namespace Webserver.Threads {
 				default:
 					//Resources only support the three methods defined above, so send back a 405 Method Not Allowed.
 					Log.Warning("Refused request for resource " + Target + ": Method Not Allowed (" + Request.HttpMethod + ")");
-					Response.Send(Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed);
+					Response.Send(Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed, "text/html");
 					return;
 			}
 		}
