@@ -30,7 +30,6 @@ namespace Webserver.API_Endpoints.Tests {
 		[TestMethod]
 		public void RedirectTest(string Entry, string Source, HttpStatusCode StatusCode, string Destination) {
 			File.WriteAllText("Redirects.config", Entry);
-			Redirect.Log = Log;
 			Redirect.Init();
 
 			ResponseProvider Response = ExecuteSimpleRequest(Source, HttpMethod.GET, null);

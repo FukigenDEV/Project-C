@@ -65,13 +65,13 @@ namespace Webserver {
 
 			//Create Queue and launch listener
 			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
-			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
+			Thread ListenerThread = new Thread(() => Listener.Run(Queue));
 			ListenerThread.Start();
 
 			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
-				RequestWorker Worker = new RequestWorker(Log, Queue, (SQLiteConnection)Connection.Clone());
+				RequestWorker Worker = new RequestWorker(Queue, (SQLiteConnection)Connection.Clone());
 				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);

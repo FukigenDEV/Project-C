@@ -20,7 +20,7 @@ namespace Webserver.Threads {
 	/// Request handlers. Meant to run in a separate thread.
 	/// </summary>
 	public class RequestWorker {
-		private readonly Logger Log;
+		private readonly Logger Log = Program.Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
 		public SQLiteConnection Connection;
 		private readonly bool Debug;
@@ -30,8 +30,7 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
-			this.Log = Log;
+		public RequestWorker(BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
 			this.Queue = Queue;
 			this.Connection = Connection;
 			this.Debug = Debug;

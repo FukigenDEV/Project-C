@@ -10,7 +10,7 @@ using Webserver.Data;
 
 namespace Webserver.Threads {
 	internal class MaintenanceThread {
-		public Logger Log;
+		public Logger Log = Program.Log;
 		/// <summary>
 		/// Run all maintenance tasks
 		/// </summary>

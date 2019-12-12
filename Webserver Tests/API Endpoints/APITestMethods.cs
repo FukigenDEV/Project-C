@@ -31,8 +31,6 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		public static SQLiteConnection Connection;
 
-		public static Logger Log = Program.Log = new Logger();
-
 		public TestContext TestContext { get; set; }
 
 		[ClassInitialize]
@@ -71,7 +69,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// Creates a RequestWorker and runs it. The RequestWorker will continue to run until all requests in the queue have been processed.
 		/// </summary>
 		public void ExecuteQueue() {
-			RequestWorker Worker = new RequestWorker(Log, Queue, Connection, true);
+			RequestWorker Worker = new RequestWorker(Queue, Connection, true);
 			Worker.Run();
 		}
 
