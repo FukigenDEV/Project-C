@@ -92,7 +92,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// Check invalid arguments
 		/// </summary>
 		[TestMethod]
-		[DynamicData("InvalidTestData")]
+		[DynamicData("InvalidPostTestData")]
 		public void POST_InvalidArguments(JObject Request, HttpStatusCode StatusCode, string ResponseMsg) {
 			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.POST, Request);
 			Assert.IsTrue(Response.StatusCode == StatusCode);
