@@ -9,8 +9,6 @@ namespace Webserver_Tests {
 	[TestClass]
 	public class AssemblyInit {
 		[AssemblyInitialize]
-		public static void Init(TestContext _) {
-			Program.Log = new Logger();
-		}
+		public static void Init(TestContext _) => Program.Log = new Logger();
 	}
 }

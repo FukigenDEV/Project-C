@@ -52,9 +52,10 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <summary>
 		/// Sends a simple request to a RequestWorker
 		/// </summary>
-		public ResponseProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JObject JSON = null, bool Login = true) {
+		public ResponseProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JObject JSON = null, bool Login = true, Cookie C = null) {
 			RequestProvider Request = new RequestProvider(new Uri("http://localhost"+URL), Method);
 			if(Login) Request.Cookies.Add(CreateSession());
+			if (C != null) Request.Cookies.Add(C);
 			if (JSON != null) {
 				Request.ContentEncoding = Encoding.UTF8;
 				Request.InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JSON.ToString()));
