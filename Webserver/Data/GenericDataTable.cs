@@ -282,7 +282,7 @@ namespace Webserver.Data {
 		/// <param name="End"></param>
 		/// <returns></returns>
 		public JObject GetRows(int Begin = 0, int End = 25) {
-			if ( Begin < 0 || End < 1 ) throw new IndexOutOfRangeException("Begin/End too low");
+			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE rowid BETWEEN " + Begin + " AND " + End).ToList();
@@ -300,7 +300,7 @@ namespace Webserver.Data {
 			if ( !Columns.ContainsKey("Validated") ) {
 				throw new ArgumentException("Table contains no Validated column");
 			}
-			if ( Begin < 0 || End < 1 ) throw new IndexOutOfRangeException("Begin/End too low");
+			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
 			return RowsToJObject(Rows, Columns);

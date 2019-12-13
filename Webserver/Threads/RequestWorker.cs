@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -19,9 +20,9 @@ namespace Webserver.Threads {
 	/// Request handlers. Meant to run in a separate thread.
 	/// </summary>
 	public class RequestWorker {
-		private readonly Logger Log;
+		private readonly Logger Log = Program.Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
-		private readonly SQLiteConnection Connection;
+		public SQLiteConnection Connection;
 		private readonly bool Debug;
 
 		/// <summary>
@@ -29,10 +30,9 @@ namespace Webserver.Threads {
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(Logger Log, BlockingCollection<ContextProvider> Queue, bool Debug = false) {
-			this.Log = Log;
+		public RequestWorker(BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
 			this.Queue = Queue;
-			this.Connection = Database.CreateConnection();
+			this.Connection = Connection;
 			this.Debug = Debug;
 		}
 
@@ -42,25 +42,33 @@ namespace Webserver.Threads {
 		public void Run() {
 			do {
 				ContextProvider Context = Queue.Take();
-				DateTime Started = DateTime.Now;
+				Stopwatch S = new Stopwatch();
+				S.Start();
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
 				Log.Debug("Processing "+Request.HttpMethod+" request for " + Request.Url.LocalPath);
 
+				#region Redirect
 				//Resolve redirects, if any
 				string URL = Redirect.Resolve(Request.Url.LocalPath.ToLower());
-				if ( URL.EndsWith('/') && URL.Length > 1) URL = URL.Remove(URL.Length - 1);
-				if ( URL == null ) {
+				//If null is returned, an infinite loop was detected.
+				if (URL == null) {
 					Log.Error("Couldn't resolve URL; infinite redirection loop. URL: " + Request.Url.LocalPath.ToLower());
 					Response.Send(Utils.GetErrorPage(HttpStatusCode.LoopDetected, "An infinite loop was detected while trying to access the specified URL."), HttpStatusCode.LoopDetected);
 					continue;
-				} else if ( URL != Request.Url.LocalPath.ToLower() ) {
+				}
+				//Remove trailing /
+				if (URL.EndsWith('/') && URL.Length > 1) URL = URL.Remove(URL.Length - 1);
+
+				//Redirect if necessary
+				if ( URL != Request.Url.LocalPath.ToLower() ) {
 					Log.Debug("Request redirected to " + URL);
 					Response.Redirect(URL);
 					Response.Send(HttpStatusCode.Redirect);
 					continue;
 				}
+				#endregion
 
 				//Find this request's target
 				Type T = FindEndpoint(Request);
@@ -68,24 +76,15 @@ namespace Webserver.Threads {
 					ProcessEndpoint(T, Context);
 				} else {
 					//No endpoint was found, so see if a resource exists at this address instead.
-					//Add wwwroot to URL
-					string Target = Config.GetValue("WebserverSettings.wwwroot") + Request.Url.LocalPath.ToLower();
-
-					if ( WebFiles.WebPages.Contains(Target) && File.Exists(Target) ) {
-						ProcessResource(Target, Context);
-					} else {
-						//No endpoint or resource was found, so send a 404.
-						Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
-						Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound);
-					}
+					ProcessResource(Request.Url.LocalPath.ToLower(), Context);
 				}
-				double TimeSpent = (int)( DateTime.Now - Started ).TotalMilliseconds;
+				long TimeSpent = S.ElapsedMilliseconds;
 				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
 			} while ( !Debug || Queue.Count != 0);
-			Connection.Close();
+			//Connection.Close();
 		}
 
 		/// <summary>
@@ -241,11 +240,23 @@ namespace Webserver.Threads {
 		public void ProcessResource(string Target, ContextProvider Context) {
 			RequestProvider Request = Context.Request;
 			ResponseProvider Response = Context.Response;
+			string wwwroot = Config.GetValue("WebserverSettings.wwwroot");
+			Target = wwwroot + Target;
+
+			//If target is '/', send index.html if it exists
+			if(Target == wwwroot+"/" && File.Exists(wwwroot + "/index.html")) Target += "index.html";
+
+			//If the file doesn't exist, send a 404
+			if(!WebFiles.WebPages.Contains(Target) || !File.Exists(Target)){
+				Log.Warning("Refused request for " + Request.Url.LocalPath.ToLower() + ": Not Found");
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.NotFound), HttpStatusCode.NotFound, "text/html");
+				return;
+			}
 
 			//Content-type header shouldn't be set for resources
 			if ( Request.ContentType != null ) {
 				Log.Warning("Refused request for resource " + Target + ": Unsupported Media Type (" + Request.ContentType + ")");
-				Response.Send(Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType);
+				Response.Send(Utils.GetErrorPage(HttpStatusCode.UnsupportedMediaType), HttpStatusCode.UnsupportedMediaType, "text/html");
 				return;
 			}
 
@@ -281,7 +292,7 @@ namespace Webserver.Threads {
 				default:
 					//Resources only support the three methods defined above, so send back a 405 Method Not Allowed.
 					Log.Warning("Refused request for resource " + Target + ": Method Not Allowed (" + Request.HttpMethod + ")");
-					Response.Send(Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed);
+					Response.Send(Utils.GetErrorPage(HttpStatusCode.MethodNotAllowed), HttpStatusCode.MethodNotAllowed, "text/html");
 					return;
 			}
 		}

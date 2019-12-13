@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Configurator;
 using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
 using Webserver.Data;
@@ -52,7 +53,12 @@ namespace Webserver.API_Endpoints {
 
 			//Change password if necessary
 			if ( JSON.TryGetValue<string>("Password", out JToken Password) ) {
-				Acc.PasswordHash = User.CreateHash((string)Password, Acc.Email);
+				Regex PasswordRx = new Regex((string)Config.GetValue("AuthenticationSettings.PasswordRegex"));
+				if (!PasswordRx.IsMatch((string)Password) || ((string)Password).Length == 0) {
+					Response.Send("Password does not meet requirements", HttpStatusCode.BadRequest);
+					return;
+				}
+				Acc.ChangePassword(Connection, (string)Password);
 			}
 
 			//Set department permissions if necessary

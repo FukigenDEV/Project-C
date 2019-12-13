@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Text;
 using Configurator;
 using Dapper;
@@ -9,14 +10,15 @@ using Webserver.Data;
 
 namespace Webserver.Threads {
 	internal class MaintenanceThread {
-		public Logger Log;
+		public Logger Log = Program.Log;
 		/// <summary>
 		/// Run all maintenance tasks
 		/// </summary>
 		/// <param name="_"></param>
 		public void Run(object _) {
 			Log.Debug("Executing maintenance tasks.");
-			DateTime Started = DateTime.Now;
+			Stopwatch S = new Stopwatch();
+			S.Start();
 			SQLiteConnection Connection = Database.CreateConnection();
 
 			//Session cleanup
@@ -39,7 +41,7 @@ namespace Webserver.Threads {
 			//Close the database connection
 			Connection.Close();
 
-			Log.Debug("Maintenance complete. Took " + (int)( DateTime.Now - Started ).TotalMilliseconds + "ms");
+			Log.Debug("Maintenance complete. Took " + S.ElapsedMilliseconds + "ms");
 		}
 	}
 }
