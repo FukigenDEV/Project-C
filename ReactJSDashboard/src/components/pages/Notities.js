@@ -79,7 +79,7 @@ class Notities extends Component {
 
 	render() {
 		return (
-			<div className="shadow-sm p-3 mb-5 bg-white rounded">
+			<div className="shadow-sm p-3 bg-white rounded">
 				<h2>Notities</h2>
 				<hr />
 

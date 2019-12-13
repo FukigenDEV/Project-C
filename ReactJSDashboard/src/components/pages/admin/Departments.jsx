@@ -14,7 +14,7 @@ class Departments extends Component {
           </ul>
         </div>
 
-        <div className="shadow-sm p-3 mb-5 bg-white rounded">
+        <div className="shadow-sm p-3 bg-white rounded">
           <Route exact path="/dashboard/Admin/departments" component={addDepartments} />
           <Route exact path="/dashboard/Admin/departments/add" component={addDepartments} />
           <Route exact path="/dashboard/Admin/departments/manage" component={manDepartments} />

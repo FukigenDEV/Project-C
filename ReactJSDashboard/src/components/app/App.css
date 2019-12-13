@@ -18,7 +18,7 @@
 
 .App-link {
   display: block;
-  font-size: 18px;
+  font-size: 1vw;
   font-weight: 600;
   color: #636363 !important;
   text-transform: uppercase;
@@ -32,6 +32,10 @@ a:hover.App-link {
   background-color: #d8d8d8;
   color: #0e1111 !important;
   text-decoration: none;
+}
+
+.App-link h1 {
+  font-size: 2vw; 
 }
 
 .header {
@@ -83,11 +87,11 @@ th, td {
 
 @media only screen and (min-width: 768px) {
   .navvv {
-    background-color: red;
+    width: 20vw;
     height: 100vh;
   }
   .navvv .App-link {
-    padding: 25px 20px;
+    padding: 1.4rem 1rem;
   }
 }
 
@@ -115,30 +119,32 @@ th, td {
 
 .nav ul {
   list-style: none;
-  background-color: #444;
   text-align: center;
   padding: 0;
   margin: 0;
 }
+
 .nav li {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.2em;
-  line-height: 40px;
-  height: 40px;
-  border-bottom: 1px solid #888;
-  display: inline-block;
-  margin-right: -4px;
+  width: auto;
+  background-color: #007bff;
+  border-bottom: none;
+  height: 50px;
+  line-height: 50px;
+  font-size: 1.4em;
+  margin-right: 10px;
+  padding: 0px 20px;
+  float: left;
 }
- 
+
+.nav li:hover {
+  background-color: #0062cc;
+}
+
 .nav a {
   text-decoration: none;
   color: #fff;
   display: block;
   transition: .3s background-color;
-}
- 
-.nav a:hover {
-  background-color: #005f5f;
 }
  
 .nav a.active {
@@ -147,12 +153,21 @@ th, td {
   cursor: default;
 }
 
-@media screen and (min-width: 600px) {
-  .nav li {
-    width: 120px;
-    border-bottom: none;
-    height: 50px;
-    line-height: 50px;
-    font-size: 1.4em;
-  }
+/* New */
+
+.dash-container {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  grid-template-rows: auto auto;
+}
+
+.nav-container {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.content-container {
+  grid-column: 2;
+  grid-row: 1;
+
 }

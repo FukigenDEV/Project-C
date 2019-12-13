@@ -14,7 +14,7 @@ class Company extends Component {
           </ul>
         </div>
 
-        <div className="shadow-sm p-3 mb-5 bg-white rounded">
+        <div className="shadow-sm p-3 bg-white rounded">
           <Route exact path="/dashboard/Admin/company" component={addCompany} />
           <Route exact path="/dashboard/Admin/company/add" component={addCompany} />
           <Route exact path="/dashboard/Admin/company/manage" component={manCompany} />
