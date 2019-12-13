@@ -4,13 +4,13 @@ import { EditDepartments, manDepartments, addDepartments } from '../../../index'
 
 class Departments extends Component {
   render() {
-    const {onRedirect} = this.props;
+    const {getNavClass, onRedirect} = this.props;
     return (
       <React.Fragment>
         <div class="nav">
           <ul>
-            <li class="users"><Link to="/dashboard/Admin/departments/add">Add</Link></li>
-            <li class="departments"><Link to="/dashboard/Admin/departments/manage">Manage</Link></li>
+            <li className={getNavClass('add')}><Link to="/dashboard/Admin/departments/add">Add</Link></li>
+            <li className={getNavClass('manage')}><Link to="/dashboard/Admin/departments/manage">Manage</Link></li>
           </ul>
         </div>
 

@@ -6,31 +6,20 @@ import { throwStatement } from '@babel/types';
 class Admin extends Component {
   constructor(props) {
     super(props)
-    // this.state = {
-    //   navlist = {
-    //     users: {active: false},
-    //     departments: {active: false},
-    //     company: {active: false},
-    //   },
-    // }
   }
 
   getNavClass = (name) => {
     const path = this.props.location.pathname;
-    console.log(path);
     if(name !== 'users') {
-      if(path === `/dashboard/Admin/${name}`) {
-        return `${name} active`;
-      } else {
-        return name;
-      }
+      if(path.includes(`/dashboard/Admin/${name}`)) { return `${name} active` } else { return name }
     } else {
-      if(path === '/dashboard/Admin' || path === '/dashboard/Admin/users') {
-        return 'users active';
-      } else {
-        return 'users';
-      }
+      if(path === '/dashboard/Admin' || path.includes('dashboard/Admin/users')) { return 'users active' } else { return 'users' }
     }
+  }
+
+  getSubNavClass = (name) => {
+    const path = this.props.location.pathname;
+    if(path.includes(name)) { return `${name} active` } else { return name }
   }
 
   render() {
@@ -46,10 +35,10 @@ class Admin extends Component {
         </div>
 
         <div className="shadow-sm p-3 bg-white rounded">
-          <Route exact path="/dashboard/Admin"  render={props => <Users {...props} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/users" render={props => <Users {...props} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/company" render={props => <Company {...props} onRedirect={onRedirect} />} />
+          <Route exact path="/dashboard/Admin"  render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/users" render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/company" render={props => <Company {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
         </div>
       </React.Fragment>
     );
