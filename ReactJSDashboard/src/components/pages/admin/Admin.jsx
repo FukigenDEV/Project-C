@@ -1,25 +1,55 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
 import { Users, Departments, Company } from '../../../index';
+import { throwStatement } from '@babel/types';
 
 class Admin extends Component {
+  constructor(props) {
+    super(props)
+    // this.state = {
+    //   navlist = {
+    //     users: {active: false},
+    //     departments: {active: false},
+    //     company: {active: false},
+    //   },
+    // }
+  }
+
+  getNavClass = (name) => {
+    const path = this.props.location.pathname;
+    console.log(path);
+    if(name !== 'users') {
+      if(path === `/dashboard/Admin/${name}`) {
+        return `${name} active`;
+      } else {
+        return name;
+      }
+    } else {
+      if(path === '/dashboard/Admin' || path === '/dashboard/Admin/users') {
+        return 'users active';
+      } else {
+        return 'users';
+      }
+    }
+  }
+
   render() {
     const {onRedirect} = this.props;
     return (
       <React.Fragment>
         <div class="nav">
           <ul>
-            <li class="users"><Link to="/dashboard/Admin/users">Users</Link></li>
-            <li class="departments"><Link to="/dashboard/Admin/departments">Departments</Link></li>
-            <li class="company"><Link to="/dashboard/Admin/company">Company</Link></li>
+            <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Users</Link></li>
+            <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Departments</Link></li>
+            <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Company</Link></li>
           </ul>
         </div>
 
         <div className="shadow-sm p-3 bg-white rounded">
-          <Route exact path="/dashboard/Admin"  render={() => <Users onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/users" render={() => <Users onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/departments" render={() => <Departments onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/company" render={() => <Company onRedirect={onRedirect} />} />
+          <Route exact path="/dashboard/Admin"  render={props => <Users {...props} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/users" render={props => <Users {...props} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} onRedirect={onRedirect} />} />
+          <Route path="/dashboard/Admin/company" render={props => <Company {...props} onRedirect={onRedirect} />} />
         </div>
       </React.Fragment>
     );
