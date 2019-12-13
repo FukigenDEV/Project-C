@@ -17,52 +17,20 @@ using Webserver.Data;
 namespace Webserver.Data.Tests {
 	[TestClass()]
 	public class GenericDataTable_Tests {
-		/// <summary>
-		/// Database connection. Will be automatically closed upon test completion.
-		/// </summary>
+
 		public static SQLiteConnection Connection;
-		/// <summary>
-		/// Standard testing table.
-		/// </summary>
 		public static GenericDataTable Table;
-		/// <summary>
-		/// SQL transaction
-		/// </summary>
 		public SQLiteTransaction Transaction;
-
 		public TestContext TestContext { get; set; }
-
 		[ClassInitialize]
 		public static void ClassInit(TestContext _) {
-			//Init config
-			Config.AddConfig(new StreamReader(Assembly.LoadFrom("Webserver").GetManifestResourceStream("Webserver.DefaultConfig.json")));
-			Config.SaveDefaultConfig();
-			Config.LoadConfig();
-
-			//Init database and create initial connection + table
-			if (File.Exists("Database.db")) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
 			Connection = Database.Init(true);
 			Table = CreateTestTable(Connection);
 		}
-
 		[TestInitialize()]
-		public void Init() {
-			//Check if init should be skipped
-			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
-
-			Transaction = Connection.BeginTransaction();
-		}
-
-		public class SkipInitCleanup : Attribute { }
-
+		public void Init() => Transaction = Connection.BeginTransaction();
 		[TestCleanup()]
-		public void Cleanup() {
-			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
-
-			Transaction.Rollback();
-			//File.Delete("Database.db");
-		}
-
+		public void Cleanup() => Transaction.Rollback();
 		[ClassCleanup]
 		public static void ClassCleanup() => Connection.Close();
 
@@ -95,7 +63,6 @@ namespace Webserver.Data.Tests {
 		/// <param name="Name"></param>
 		[DataRow("12345")]
 		[DataRow("Users")]
-		[SkipInitCleanup]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void Constructor_ArgumentsCheck(string Name) => CreateTestTable(Connection, Name);

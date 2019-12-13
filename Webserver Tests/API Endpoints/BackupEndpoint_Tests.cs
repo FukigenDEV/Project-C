@@ -24,7 +24,7 @@ namespace Webserver.API_Endpoints.Tests {
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		public void GET_GetList() {
 			POST();
 
@@ -67,7 +67,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <summary>
 		/// Check if we can create a manual backup
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void POST() {
 			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.POST);
 

@@ -58,7 +58,7 @@ namespace Webserver.API_Endpoints {
 					Response.Send("Password does not meet requirements", HttpStatusCode.BadRequest);
 					return;
 				}
-				Acc.PasswordHash = User.CreateHash((string)Password, Acc.Email);
+				Acc.ChangePassword(Connection, (string)Password);
 			}
 
 			//Set department permissions if necessary

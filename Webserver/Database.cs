@@ -107,13 +107,13 @@ namespace Webserver {
 			//If the Administrators department doesn't exist yet, create it.
 			Department AdministratorDept = Connection.Get<Department>(1);
 			if ( AdministratorDept == null ) {
-				Connection.Insert(new Department("Administrators", "Department for Administrators"));
+				new Department(Connection, "Administrators", "Department for Administrators");
 			}
 
 			//If the All Users doesn't exist yet, create it
 			Department UncategorizedDept = Connection.Get<Department>(2);
 			if ( UncategorizedDept == null ) {
-				Connection.Insert(new Department("All Users", "Default Department"));
+				new Department(Connection, "All Users", "Default Department");
 			}
 
 			//If the built-in Administrator account doesn't exist yet, create it. If it does exist, update its password to the
@@ -123,8 +123,7 @@ namespace Webserver {
 				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"), Connection);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 1);
 			} else {
-				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
-				Connection.Update<User>(Administrator);
+				Administrator.ChangePassword(Connection, (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 			}
 
 			return Connection;

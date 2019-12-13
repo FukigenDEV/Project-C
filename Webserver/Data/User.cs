@@ -77,7 +77,10 @@ namespace Webserver.Data {
 		/// Change this user's password. The change will not be applied the object is updated in the database.
 		/// </summary>
 		/// <param name="Password">The new password</param>
-		public void ChangePassword(string Password) => this.PasswordHash = CreateHash(Password, Email);
+		public void ChangePassword(SQLiteConnection Connection, string Password) {
+			this.PasswordHash = CreateHash(Password, Email);
+			Connection.Update<User>(this);
+		}
 
 		/// <summary>
 		/// Get a user's permission level.
@@ -146,8 +149,6 @@ namespace Webserver.Data {
 		/// <param name="Email">The user's email address</param>
 		/// <returns></returns>
 		public static User GetUserByEmail(SQLiteConnection Connection, string Email) => Connection.QueryFirstOrDefault<User>("SELECT * FROM Users WHERE Email = @Email", new { Email });
-
-		public static List<User> GetUsersByEmail(SQLiteConnection Connection, List<string> Emails) => Connection.Query<User>("SELECT * FROM Users WHERE Email IN @Emails",  new[] { Emails }).ToList();
 
 		/// <summary>
 		/// Get a list of all user email addresses.
