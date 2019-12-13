@@ -503,24 +503,34 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
+		/// Returns a list of all generic data tables.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="DepartmentID"></param>
+		/// <returns></returns>
+		public static List<GenericDataTable> GetTables(SQLiteConnection Connection, int DepartmentID = 0) {
+			if ( DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID) ) {
+				throw new ArgumentException("No such department");
+			}
+			return DepartmentID == 0
+				? Connection.Query<GenericDataTable>("SELECT * FROM GenericTableConfigurations").ToList()
+				: Connection.Query<GenericDataTable>("SELECT * FROM GenericTableConfigurations WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+		}
+
+		/// <summary>
 		/// Returns a list of all generic data table names.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="DepartmentID"></param>
 		/// <returns></returns>
 		public static List<string> GetTableNames(SQLiteConnection Connection, int DepartmentID = 0) {
-			if ( DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID) ) {
+			if (DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID)) {
 				throw new ArgumentException("No such department");
 			}
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT Name, Department FROM GenericTableConfigurations", Connection);
-			using SQLiteDataReader Reader = CMD.ExecuteReader();
-			List<string> Rows = new List<string>();
-			while ( Reader.Read() ) {
-				NameValueCollection Row = Reader.GetValues();
-				if ( DepartmentID != 0 && DepartmentID != int.Parse(Row["Department"]) ) continue;
-				Rows.Add(Row["Name"]);
-			}
-			return Rows;
+			return DepartmentID == 0
+				? Connection.Query<string>("SELECT Name FROM GenericTableConfigurations").ToList()
+				: Connection.Query<string>("SELECT Name FROM GenericTableConfigurations WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+
 		}
 	}
 
