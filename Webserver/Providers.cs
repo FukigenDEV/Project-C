@@ -72,6 +72,7 @@ namespace Webserver {
 		private readonly HttpListenerResponse Response;
 
 		public byte[] Data;
+		public string TextData;
 
 		/// <summary>
 		/// Gets or sets the MIME type of the content returned.
@@ -157,6 +158,7 @@ namespace Webserver {
 		/// <param name="Response">The Response object</param>
 		/// <param name="StatusCode">The HttpStatusCode. Defaults to HttpStatusCode.OK (200)</param>
 		public void Send(string Data, HttpStatusCode StatusCode = HttpStatusCode.OK, string ContentType = "text/plain") {
+			TextData = Data;
 			if ( Data == null ) Data = string.Empty;
 			byte[] Buffer = Encoding.UTF8.GetBytes(Data.ToString());
 			Send(Buffer, StatusCode, ContentType);
