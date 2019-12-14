@@ -26,14 +26,13 @@ import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
 import GegevensBekijken from './components/pages/GegevensBekijken';
 import Notities from './components/pages/Notities';
-import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedenis';
+import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
-import Uitloggen from './components/pages/Uitloggen';
+import Logout from './components/pages/Logout';
 import AdminWizard from './components/pages/AdminWizard';
 import Error from './components/pages/Error';
 
 import * as serviceWorker from './serviceWorker';
-import { faOilCan } from '@fortawesome/free-solid-svg-icons';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
@@ -62,9 +61,9 @@ export {
     GegevensRegistreren,
     GegevensBekijken,
     Notities,
-    Activiteitengeschiedenis,
+    Logs,
     Backup,
-    Uitloggen,
+    Logout,
     Error,
 	AdminWizard
 }

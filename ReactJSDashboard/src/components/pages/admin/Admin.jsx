@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
-import { Users, Departments, Company } from '../../../index';
+import { Users, Departments, Company, Logs, AdminWizard, Backup } from '../../../index';
 import { throwStatement } from '@babel/types';
 
 class Admin extends Component {
@@ -28,9 +28,12 @@ class Admin extends Component {
       <React.Fragment>
         <div class="nav">
           <ul>
-            <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Users</Link></li>
-            <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Departments</Link></li>
-            <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Company</Link></li>
+            <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Gebruikers</Link></li>
+            <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Afdelingen</Link></li>
+            <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Bedrijven</Link></li>
+            <li class={this.getNavClass('logs')}><Link to="/dashboard/Admin/logs">Logs</Link></li>
+            <li class={this.getNavClass('wizard')}><Link to="/dashboard/Admin/wizard">Wizard</Link></li>
+            <li class={this.getNavClass('backup')}><Link to="/dashboard/Admin/backup">Backup</Link></li>
           </ul>
         </div>
 
@@ -39,6 +42,9 @@ class Admin extends Component {
           <Route path="/dashboard/Admin/users" render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
           <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
           <Route path="/dashboard/Admin/company" render={props => <Company {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+          <Route exact path="/dashboard/Admin/logs" render={props => <Logs {...props} />} />
+          <Route exact path="/dashboard/Admin/wizard" render={props => <AdminWizard {...props} />} />
+          <Route exact path="/dashboard/Admin/backup" render={props => <Backup {...props} />} />
         </div>
       </React.Fragment>
     );

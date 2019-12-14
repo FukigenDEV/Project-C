@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
 import { createHashHistory } from 'history';
-import { Admin, Uitloggen, Error, Navs} from '../index';
+import { Admin, Logout, Error, Navs} from '../index';
 
 const history = createHashHistory();
 
@@ -22,7 +22,7 @@ class Dashboard extends Component {
               <Switch>
                 <Route path="/dashboard/Admin" render={props => <Admin {...props} onRedirect={onRedirect} />} />
                 {/*dit geeft de value "loggedin" en de method "onRedirect" door aan de uitlogpagina zodat deze daar gebruikt kunnen worden*/}
-                <Route exact path="/dashboard/Uitloggen" render={() => <Uitloggen loggedin={loggedin} onLogout={onRedirect} />} />
+                <Route exact path="/dashboard/logout" render={() => <Logout loggedin={loggedin} onLogout={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }
                 <Route component={Error} />
               </Switch>

@@ -28,6 +28,7 @@ class Nav extends Component {
     let classes = "App-link";
     classes += (this.props.nav.id === 0) ? " header" : "";
     classes += (this.props.nav.active) ? " selected" : "";
+    classes += (this.props.nav.link === "/dashboard/logout") ? " logout" : "";
     return classes;
   }
 }

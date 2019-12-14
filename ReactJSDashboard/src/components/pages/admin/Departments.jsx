@@ -9,8 +9,8 @@ class Departments extends Component {
       <React.Fragment>
         <div class="nav">
           <ul>
-            <li className={getNavClass('add')}><Link to="/dashboard/Admin/departments/add">Add</Link></li>
-            <li className={getNavClass('manage')}><Link to="/dashboard/Admin/departments/manage">Manage</Link></li>
+            <li className={getNavClass('add')}><Link to="/dashboard/Admin/departments/add">Toevoegen</Link></li>
+            <li className={getNavClass('manage')}><Link to="/dashboard/Admin/departments/manage">Beheren</Link></li>
           </ul>
         </div>
 

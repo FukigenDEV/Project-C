@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-class Activiteitengeschiedenis extends Component {
+class Logs extends Component {
   render() {
     return (
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
@@ -9,4 +9,4 @@ class Activiteitengeschiedenis extends Component {
   }
 }
 
-export default Activiteitengeschiedenis;
+export default Logs;
