@@ -68,7 +68,6 @@ class Gegevens extends Component {
 
 	$("#tables_dropdown").on("change", function() {
 		$("#table").empty();
-		$("#message").empty();
 
 		$("#validate_table").hide();
 		$("#add_row").hide();
@@ -158,7 +157,6 @@ class Gegevens extends Component {
 					} else {
 						lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"text\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
 					}
-
 				}
 				lastRowElement += "<tr/>";
 				
@@ -192,6 +190,21 @@ class Gegevens extends Component {
 	});
 
 	$("#add_row").on("click", function() {
+		var valid = true;
+
+		$("#new_row").find("input").each(function() {
+			if ($(this).val() === "") {
+				valid = false;
+				return false;
+			}
+		});
+
+		if (!valid) {
+			$("#error_message").text("Vul alle velden in.");
+
+			return;
+		}
+
 		var tableName = $("#tables_dropdown").find(":selected").text();
 
 		// Build the json string that will be sent
@@ -250,7 +263,10 @@ class Gegevens extends Component {
 		<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Add row</button>
 		<button id="validate_table" style={{'display':'none','float':'right','width':'200px'}}>Validate selected rows</button>
 
-		<p id="message"></p>
+		<br/>
+		<br/>
+
+		<p id="error_message"></p>
       </div>
     );
   }
