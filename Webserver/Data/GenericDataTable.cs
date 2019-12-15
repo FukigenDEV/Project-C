@@ -282,9 +282,10 @@ namespace Webserver.Data {
 		/// <param name="End"></param>
 		/// <returns></returns>
 		public JObject GetRows(int Begin = 0, int End = 25) {
+			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
 			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
-			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
+			
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE rowid BETWEEN " + Begin + " AND " + End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
@@ -297,12 +298,12 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public JObject GetUnvalidatedRows(int Begin = 0, int End = 25) {
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
-			if ( !Columns.ContainsKey("Validated") ) {
-				throw new ArgumentException("Table contains no Validated column");
-			}
+			if ( !Columns.ContainsKey("Validated") ) throw new ArgumentException("Table contains no Validated column");
 			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
-			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
+
+			string SQL = "SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid >= " + Begin + " LIMIT " + End;
+			List<dynamic> Rows = Connection.Query(SQL).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
 

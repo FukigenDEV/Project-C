@@ -10,7 +10,6 @@ namespace Webserver.API_Endpoints {
 	[EndpointURL("/data")]
 	internal partial class Data : APIEndpoint {
 
-		[RequireContentType("application/json")]
 		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
@@ -29,8 +28,9 @@ namespace Webserver.API_Endpoints {
 				int.TryParse(Params["end"][0], out End);
 			}
 			bool isUnvalidated = false;
-			if ( Params.ContainsKey("isvalidated") ) {
-				bool.TryParse(Params["isvalidated"][0], out isUnvalidated);
+			if ( Params.ContainsKey("isunvalidated") ) {
+				string val = Params["isunvalidated"][0];
+				bool.TryParse(val, out isUnvalidated);
 			}
 
 			//Check if all specified tables exist
