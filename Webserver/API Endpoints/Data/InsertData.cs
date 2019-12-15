@@ -33,7 +33,7 @@ namespace Webserver.API_Endpoints {
 			Dictionary<string, dynamic> Dict = new Dictionary<string, dynamic>();
 			foreach ( KeyValuePair<string, JToken> Entry in JSON ) {
 				if ( !Columns.ContainsKey(Entry.Key) ) {
-					Response.Send("No such column: " + Entry.Key);
+					Response.Send("No such column: " + Entry.Key, HttpStatusCode.BadRequest);
 					return;
 				}
 				if ( Entry.Key == "rowid" ) {
