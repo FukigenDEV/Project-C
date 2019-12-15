@@ -6,7 +6,7 @@ using Logging;
 
 namespace Webserver {
 	public static class Redirect {
-		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
+		public static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		public static Logger Log = Program.Log;
 
 		/// <summary>
