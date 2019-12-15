@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component, useReducer } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
-import { Users, Departments, Company, Logs, AdminWizard, Backup } from '../../../index';
-import { throwStatement } from '@babel/types';
+import { Users, Departments, Company, Logs, AdminWizard, Backup, Auth } from '../../../index';
 
 class Admin extends Component {
   constructor(props) {
     super(props)
+    this.state = {
+      admin: null,
+    }
   }
 
   getNavClass = (name) => {
@@ -22,32 +24,53 @@ class Admin extends Component {
     if(path.includes(name)) { return `${name} active` } else { return name }
   }
 
-  render() {
-    const {onRedirect} = this.props;
-    return (
-      <React.Fragment>
-        <div class="nav">
-          <ul>
-            <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Gebruikers</Link></li>
-            <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Afdelingen</Link></li>
-            <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Bedrijven</Link></li>
-            <li class={this.getNavClass('logs')}><Link to="/dashboard/Admin/logs">Logs</Link></li>
-            <li class={this.getNavClass('wizard')}><Link to="/dashboard/Admin/wizard">Wizard</Link></li>
-            <li class={this.getNavClass('backup')}><Link to="/dashboard/Admin/backup">Backup</Link></li>
-          </ul>
-        </div>
+  setAdmin = async () => {
+    const {isAdmin} = this.props;
+    const admin = await isAdmin();
+    this.setState({admin})
+  }
 
-        <div className="shadow-sm p-3 bg-white rounded">
-          <Route exact path="/dashboard/Admin"  render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/users" render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
-          <Route path="/dashboard/Admin/company" render={props => <Company {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
-          <Route exact path="/dashboard/Admin/logs" render={props => <Logs {...props} />} />
-          <Route exact path="/dashboard/Admin/wizard" render={props => <AdminWizard {...props} />} />
-          <Route exact path="/dashboard/Admin/backup" render={props => <Backup {...props} />} />
-        </div>
-      </React.Fragment>
-    );
+  render() {
+    const admin = this.state.admin;
+    const {onRedirect} = this.props;
+
+    console.log(`Admin: ${admin}`);
+
+    if(admin === null) {
+      this.setAdmin();
+      return (
+        <Auth />
+      );
+    } else if(admin !== null && admin === true) {
+      return (
+        <React.Fragment>
+          <div class="nav">
+            <ul>
+              <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Gebruikers</Link></li>
+              <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Afdelingen</Link></li>
+              <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Bedrijven</Link></li>
+              <li class={this.getNavClass('logs')}><Link to="/dashboard/Admin/logs">Logs</Link></li>
+              <li class={this.getNavClass('wizard')}><Link to="/dashboard/Admin/wizard">Wizard</Link></li>
+              <li class={this.getNavClass('backup')}><Link to="/dashboard/Admin/backup">Backup</Link></li>
+            </ul>
+          </div>
+
+          <div className="shadow-sm p-3 bg-white rounded">
+            <Route exact path="/dashboard/Admin"  render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+            <Route path="/dashboard/Admin/users" render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+            <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+            <Route path="/dashboard/Admin/company" render={props => <Company {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
+            <Route exact path="/dashboard/Admin/logs" render={props => <Logs {...props} />} />
+            <Route exact path="/dashboard/Admin/wizard" render={props => <AdminWizard {...props} />} />
+            <Route exact path="/dashboard/Admin/backup" render={props => <Backup {...props} />} />
+          </div>
+        </React.Fragment>
+      );
+    } else if(admin !== null && admin === false) {
+      return (
+        <Auth />
+      );
+    }
   }
 }
 

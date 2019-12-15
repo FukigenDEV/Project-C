@@ -18,7 +18,7 @@
 
 .App-link {
   display: block;
-  font-size: 1vw;
+  font-size: calc(12px + 0.3vw);
   font-weight: 600;
   color: #636363 !important;
   text-transform: uppercase;
@@ -45,7 +45,7 @@ a:hover.App-link {
 }
 
 .App-link h1 {
-  font-size: 2vw; 
+  font-size: 2vw;
 }
 
 .header {
@@ -141,7 +141,7 @@ th, td {
   border-width: 1px 1px 0px 1px;
   height: 50px;
   line-height: 50px;
-  font-size: 1.4em;
+  font-size: calc(12px + 0.3vw);
   text-transform: uppercase;
   margin-right: 10px;
   padding: 0px 20px;
@@ -158,7 +158,7 @@ th, td {
   display: block;
   transition: .3s background-color;
 }
- 
+
 .nav li.active {
   background-color: #fff;
   cursor: default;
@@ -182,3 +182,18 @@ th, td {
   grid-row: 1;
 
 }
+
+/* @media only screen and (max-width: 1200px) {
+  .dash-container {
+    grid-template-columns: auto;
+    grid-template-rows: 85% 15%;
+  }
+
+  .nav-container {
+    grid-row: 2;
+  }
+
+  .content-container {
+    grid-column: 1;
+  }
+} */

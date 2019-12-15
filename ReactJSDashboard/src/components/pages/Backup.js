@@ -19,15 +19,15 @@ class Backup extends Component {
 
   render() {
     return (
-      <div className="shadow-sm p-3 bg-white rounded">
-        <p>Backup</p>
+		<React.Fragment>
+			<p>Backup</p>
 
-		<button id="backup_button">Create a back up.</button><br/>
+			<button id="backup_button">Create a back up.</button><br/>
 
-		<br/>
+			<br/>
 
-		<p id="message"></p>
-      </div>
+			<p id="message"></p>
+		</React.Fragment>
     );
   }
 }

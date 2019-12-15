@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, ThemeConsumer } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
 import { createHashHistory } from 'history';
 import { Dashboard, Home, Admin, GegevensRegistreren, GegevensBekijken, Notities, Logout } from '../../index';
@@ -16,6 +16,7 @@ class App extends Component {
     super(props);
     this.state = {
       loggedin: { value: null },
+      user: null,
       navs: [
         { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
         { id: 1, heading: 'Beheren', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
@@ -57,26 +58,52 @@ class App extends Component {
     this.setState({ navs });
   }
 
+  setUser = async () => {
+    await fetch(`/account?email=CurrentUser`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(body => {
+      return body.json();
+    }).then(data => {
+      const user = data[0];
+      this.setState({user});
+    })
+  }
+
   setLoggedin = () => {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/login", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.status === 200 || xhr.status === 204) {
-        if(this.state.loggedin.value !== true) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin});}
+    fetch('/login', {
+      method: 'POST',
+      body: '{}',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(data => {
+      if(data.status === 200 || data.status === 204) {
+        if(this.state.loggedin.value !== true) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin}); this.setUser();}
       } else {
         if(this.state.loggedin.value !== false) {const loggedin = {...this.state.loggedin}; loggedin.value = false; this.setState({loggedin});}
       }
+    })
+  }
+
+  isAdmin = async () => {
+    await this.setUser();
+    const user = this.state.user;
+    console.log(user['Permissions']);
+    if('Administrators' in user['Permissions']) {
+      console.log('1');
+      return (user['Permissions']['Administrators'] === 'Administrator') ? true : false;
+    } else {
+      console.log('2');
+      return false;
     }
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send("{}");
   }
 
   componentWillUnmount() {
     console.log("UNMOUNTED")
-    // let xhr = new XMLHttpRequest();
-    // xhr.open("DELETE", "/login", true);
-    // xhr.setRequestHeader('Content-Type', 'application/json');
-    // xhr.send("{}");
   }
 
   render() {
@@ -89,7 +116,7 @@ class App extends Component {
           <Background />
           <Router>
             <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
-            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
+            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} isAdmin={this.isAdmin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
           </Router>
         </React.Fragment>
       );

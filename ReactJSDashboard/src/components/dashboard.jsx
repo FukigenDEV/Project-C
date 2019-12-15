@@ -11,7 +11,7 @@ class Dashboard extends Component {
   }
 
   render() {
-    const {navs, loggedin, onSelect, onRedirect, onRender} = this.props;
+    const {navs, loggedin, isAdmin, onSelect, onRedirect, onRender} = this.props;
     onRender();
 
     if(loggedin.value === true) {
@@ -20,7 +20,7 @@ class Dashboard extends Component {
             <Navs navs={navs} onSelect={onSelect} />
             <div className="content-container p-4">
               <Switch>
-                <Route path="/dashboard/Admin" render={props => <Admin {...props} onRedirect={onRedirect} />} />
+                <Route path="/dashboard/Admin" render={props => <Admin {...props} isAdmin={isAdmin} onRedirect={onRedirect} />} />
                 {/*dit geeft de value "loggedin" en de method "onRedirect" door aan de uitlogpagina zodat deze daar gebruikt kunnen worden*/}
                 <Route exact path="/dashboard/logout" render={() => <Logout loggedin={loggedin} onLogout={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }

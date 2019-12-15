@@ -30,7 +30,9 @@ import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
 import Logout from './components/pages/Logout';
 import AdminWizard from './components/pages/AdminWizard';
+
 import Error from './components/pages/Error';
+import Auth from './components/pages/Auth';
 
 import * as serviceWorker from './serviceWorker';
 
@@ -64,6 +66,7 @@ export {
     Logs,
     Backup,
     Logout,
+    AdminWizard,
     Error,
-	AdminWizard
+    Auth,
 }
