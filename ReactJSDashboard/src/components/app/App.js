@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { createGlobalStyle, ThemeConsumer } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
+import Cookies from 'js-cookie';
 import { createHashHistory } from 'history';
 import { Dashboard, Home, Admin, GegevensRegistreren, GegevensBekijken, Notities, Logout } from '../../index';
 import Login from '../login';
@@ -88,33 +89,24 @@ class App extends Component {
       const user = data[0];
       this.setState({user});
     })
+    console.log(this.state.user);
   }
 
   setAdmin = () => {
-    const user = this.state.user;
-    if(this.state.admin === null) {
-      if('Administrators' in user['Permissions']) {
-        const admin = (user['Permissions']['Administrators'] === 'Administrator') ? true : false;
-        this.setState({admin});
-      } else {
-        const navs = this.state.navs.splice(2);
-        this.setState({admin: false, navs});
-      }
+    if('Administrators' in this.state.user['Permissions']) {
+      const admin = (this.state.user['Permissions']['Administrators'] === 'Administrator') ? true : false;
+      this.setState({admin});
+      // console.log(`setadmin true: ${this.state.user['Permissions']}, ${admin}`);
+    } else {
+      const navs = this.state.navs.splice(2);
+      this.setState({admin: false, navs});
+      // console.log(`setadmin false: ${this.state.user['Permissions']}`);
     }
+    // console.log(`setAdmin: ${this.state.admin}`);
   }
 
-  componentDidMount = async () => {
+  componentDidMount() {
     this.setLoggedin();
-    await this.setUser();
-    this.setAdmin();
-  }
-
-  componentDidUpdate = async (prevProps) => {
-    if(this.props.sessionid !== prevProps.sessionid) {
-      this.setLoggedin();
-      await this.setUser();
-      this.setAdmin();
-    }
   }
 
   componentWillUnmount() {
@@ -123,6 +115,7 @@ class App extends Component {
 
   render() {
     if(this.state.loggedin.value === null) {
+      this.setLoggedin();
       return(<div></div>);
     } else {
       return (
@@ -130,7 +123,7 @@ class App extends Component {
           <Background />
           <Router>
             <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
-            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} admin={this.state.admin} setUser={this.setUser} setAdmin={this.setAdmin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
+            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} admin={this.state.admin} setUser={this.setUser} setUser={this.setUser} setAdmin={this.setAdmin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
           </Router>
         </React.Fragment>
       );

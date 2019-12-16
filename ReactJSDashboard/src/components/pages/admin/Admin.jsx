@@ -5,6 +5,10 @@ import { Users, Departments, Company, Logs, AdminWizard, Backup, Auth } from '..
 class Admin extends Component {
   constructor(props) {
     super(props)
+    this.handleAdminPriv = this.handleAdminPriv.bind(this);
+    this.state = {
+      render: false,
+    }
   }
 
   getNavClass = (name) => {
@@ -21,10 +25,19 @@ class Admin extends Component {
     if(path.includes(name)) { return `${name} active` } else { return name }
   }
 
+  handleAdminPriv = async () => {
+    const {setUser, setAdmin} = this.props;
+    await setUser();
+    setAdmin();
+    this.setState({render: true});
+  }
+
   render() {
     const {admin, onRedirect} = this.props;
-
-    console.log(admin);
+    console.log(`admin: ${admin}`);
+    if(this.state.render === false) {
+      this.handleAdminPriv();
+    }
 
     if(admin === null) {
       return (
