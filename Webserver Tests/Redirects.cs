@@ -24,8 +24,8 @@ namespace Webserver_Tests {
 			SB.AppendLine("/a => /b");
 			SB.AppendLine("/c => /a");
 			SB.AppendLine("/e => /e");
-			File.WriteAllText("Redirects.config", SB.ToString());
-			Redirect.ParseRedirectFile("Redirects.config");
+			File.WriteAllText("Redirects1.config", SB.ToString());
+			Redirect.ParseRedirectFile("Redirects1.config");
 			Assert.IsTrue(Redirect.Resolve(Source) == Destination);
 		}
 
@@ -42,8 +42,8 @@ namespace Webserver_Tests {
 			StringBuilder SB = new StringBuilder();
 			SB.AppendLine("/a => /b");
 			SB.AppendLine(Entry);
-			File.WriteAllText("Redirects.config", SB.ToString());
-			Redirect.ParseRedirectFile("Redirects.config");
+			File.WriteAllText("Redirects2.config", SB.ToString());
+			Redirect.ParseRedirectFile("Redirects2.config");
 
 			Assert.IsTrue(Redirect.RedirectionDict.Count == 1);
 			Assert.IsTrue(Redirect.RedirectionDict["/a"] == "/b");

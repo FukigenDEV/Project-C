@@ -18,21 +18,6 @@ namespace Webserver.API_Endpoints.Tests {
 		[TestMethod]
 		public void DELETE_ValidArguments() {
 			GenericDataTable TestTable = CreateTestTable();
-			TestTable.Insert(new List<Dictionary<string, dynamic>> {
-				{new Dictionary<string, dynamic>() {
-					{"StringColumn", "Text1" },
-					{"IntegerColumn", 1 }
-				} },
-				{new Dictionary<string, dynamic>() {
-					{"StringColumn", "Text2" },
-					{"IntegerColumn", 2 }
-				} },
-				{new Dictionary<string, dynamic>() {
-					{"StringColumn", "Text3" },
-					{"IntegerColumn", 3 }
-				} }
-			});
-
 			ResponseProvider Response = ExecuteSimpleRequest("/Data?table=Table1", HttpMethod.DELETE, new JObject() {
 				{"RowIDs", new JArray(){ 1, 2} }
 			});

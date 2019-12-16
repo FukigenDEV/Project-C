@@ -67,7 +67,7 @@ namespace Webserver.Threads {
 				if ( URL != Request.Url.LocalPath.ToLower() ) {
 					Log.Debug("Request redirected to " + URL);
 					Response.Redirect(URL);
-					Response.Send(HttpStatusCode.Redirect);
+					Response.Send(HttpStatusCode.PermanentRedirect);
 					continue;
 				}
 				#endregion
