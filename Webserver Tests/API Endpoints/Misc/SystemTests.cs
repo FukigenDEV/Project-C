@@ -26,11 +26,11 @@ namespace Webserver.API_Endpoints.Tests {
 		}
 
 		[DataRow("/a => /a", "/a", HttpStatusCode.LoopDetected, null)]
-		[DataRow("/ => /index.html", "/", HttpStatusCode.Redirect, "/index.html")]
+		[DataRow("/ => /index.html", "/", HttpStatusCode.PermanentRedirect, "/index.html")]
 		[TestMethod]
 		public void RedirectTest(string Entry, string Source, HttpStatusCode StatusCode, string Destination) {
-			File.WriteAllText("Redirects.config", Entry);
-			Redirect.Init();
+			File.WriteAllText("Redirects3.config", Entry);
+			Redirect.ParseRedirectFile("Redirects3.config");
 
 			ResponseProvider Response = ExecuteSimpleRequest(Source, HttpMethod.GET, null);
 			Assert.IsTrue(Response.StatusCode == StatusCode);

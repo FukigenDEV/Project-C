@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Config\Config.csproj" />
-    <ProjectReference Include="..\Logging\Logging.csproj" />
+    <ProjectReference Include="..\PrettyConsole\PrettyConsole\PrettyConsole.csproj" />
   </ItemGroup>
 
   <ItemGroup>

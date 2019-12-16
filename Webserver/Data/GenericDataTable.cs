@@ -282,9 +282,10 @@ namespace Webserver.Data {
 		/// <param name="End"></param>
 		/// <returns></returns>
 		public JObject GetRows(int Begin = 0, int End = 25) {
+			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
 			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
-			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
+			
 			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE rowid BETWEEN " + Begin + " AND " + End).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
@@ -297,12 +298,12 @@ namespace Webserver.Data {
 		/// <returns></returns>
 		public JObject GetUnvalidatedRows(int Begin = 0, int End = 25) {
 			Dictionary<string, DataType> Columns = GetColumns(Connection, this.Name);
-			if ( !Columns.ContainsKey("Validated") ) {
-				throw new ArgumentException("Table contains no Validated column");
-			}
+			if ( !Columns.ContainsKey("Validated") ) throw new ArgumentException("Table contains no Validated column");
 			if ( Begin < 0 || End < 1 ) throw new ArgumentException("Begin/End too low");
 			if ( Begin > End ) throw new ArgumentException("Begin must be lower than End");
-			List<dynamic> Rows = Connection.Query("SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid > " + Begin + " LIMIT " + End).ToList();
+
+			string SQL = "SELECT " + string.Join(',', Columns.Keys) + " FROM `" + this.Name + "` WHERE Validated = 0 AND rowid >= " + Begin + " LIMIT " + End;
+			List<dynamic> Rows = Connection.Query(SQL).ToList();
 			return RowsToJObject(Rows, Columns);
 		}
 
@@ -503,24 +504,34 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
+		/// Returns a list of all generic data tables.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="DepartmentID"></param>
+		/// <returns></returns>
+		public static List<GenericDataTable> GetTables(SQLiteConnection Connection, int DepartmentID = 0) {
+			if ( DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID) ) {
+				throw new ArgumentException("No such department");
+			}
+			return DepartmentID == 0
+				? Connection.Query<GenericDataTable>("SELECT * FROM GenericTableConfigurations").ToList()
+				: Connection.Query<GenericDataTable>("SELECT * FROM GenericTableConfigurations WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+		}
+
+		/// <summary>
 		/// Returns a list of all generic data table names.
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <param name="DepartmentID"></param>
 		/// <returns></returns>
 		public static List<string> GetTableNames(SQLiteConnection Connection, int DepartmentID = 0) {
-			if ( DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID) ) {
+			if (DepartmentID != 0 && !Data.Department.Exists(Connection, DepartmentID)) {
 				throw new ArgumentException("No such department");
 			}
-			using SQLiteCommand CMD = new SQLiteCommand("SELECT Name, Department FROM GenericTableConfigurations", Connection);
-			using SQLiteDataReader Reader = CMD.ExecuteReader();
-			List<string> Rows = new List<string>();
-			while ( Reader.Read() ) {
-				NameValueCollection Row = Reader.GetValues();
-				if ( DepartmentID != 0 && DepartmentID != int.Parse(Row["Department"]) ) continue;
-				Rows.Add(Row["Name"]);
-			}
-			return Rows;
+			return DepartmentID == 0
+				? Connection.Query<string>("SELECT Name FROM GenericTableConfigurations").ToList()
+				: Connection.Query<string>("SELECT Name FROM GenericTableConfigurations WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+
 		}
 	}
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver.Threads {
 	/// <summary>
