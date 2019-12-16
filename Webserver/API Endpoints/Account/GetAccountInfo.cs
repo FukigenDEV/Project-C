@@ -11,7 +11,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	[EndpointURL("/account")]
 	public partial class AccountEndpoint : APIEndpoint {
-		[PermissionLevel(PermLevel.Manager)]
+		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
 			List<User> Users = new List<User>();
@@ -23,13 +23,20 @@ namespace Webserver.API_Endpoints {
 						Users.Add(RequestUser);
 						continue;
 					}
-
+					if (RequestUserLevel < PermLevel.Manager) {
+						Response.Send(HttpStatusCode.Forbidden);
+						return;
+					}
 					User Acc = User.GetUserByEmail(Connection, Email);
 					if (Acc != null) Users.Add(Acc);
 				}
 
 			//If email is missing, assume all users
 			} else {
+				if(RequestUserLevel < PermLevel.Manager) {
+					Response.Send(HttpStatusCode.Forbidden);
+					return;
+				}
 				Users = User.GetAllUsers(Connection);
 			}
 
