@@ -17,13 +17,14 @@ class App extends Component {
     this.state = {
       loggedin: { value: null },
       user: null,
+      admin: null,
       navs: [
-        { id: 0, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
-        { id: 1, heading: 'Beheren', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
-        { id: 2, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-        { id: 3, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
-        { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
-        { id: 5, heading: 'Uitloggen', link: '/dashboard/logout', path: '/dashboard/logout', component: Logout, active: false, icon: 'sign-out-alt' },
+        { id: 1, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
+        { id: 2, heading: 'Beheren', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
+        { id: 3, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
+        { id: 4, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
+        { id: 5, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
+        { id: 6, heading: 'Uitloggen', link: '/dashboard/logout', path: '/dashboard/logout', component: Logout, active: false, icon: 'sign-out-alt' },
       ]
     };
   }
@@ -58,21 +59,6 @@ class App extends Component {
     this.setState({ navs });
   }
 
-  setUser = async () => {
-    await fetch(`/account?email=CurrentUser`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(body => {
-      return body.json();
-    }).then(data => {
-      const user = data[0];
-      this.setState({user});
-    })
-  }
-
   setLoggedin = () => {
     fetch('/login', {
       method: 'POST',
@@ -89,16 +75,45 @@ class App extends Component {
     })
   }
 
-  isAdmin = async () => {
-    await this.setUser();
+  setUser = async () => {
+    await fetch(`/account?email=CurrentUser`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(body => {
+      return body.json();
+    }).then(data => {
+      const user = data[0];
+      this.setState({user});
+    })
+  }
+
+  setAdmin = () => {
     const user = this.state.user;
-    console.log(user['Permissions']);
-    if('Administrators' in user['Permissions']) {
-      console.log('1');
-      return (user['Permissions']['Administrators'] === 'Administrator') ? true : false;
-    } else {
-      console.log('2');
-      return false;
+    if(this.state.admin === null) {
+      if('Administrators' in user['Permissions']) {
+        const admin = (user['Permissions']['Administrators'] === 'Administrator') ? true : false;
+        this.setState({admin});
+      } else {
+        const navs = this.state.navs.splice(2);
+        this.setState({admin: false, navs});
+      }
+    }
+  }
+
+  componentDidMount = async () => {
+    this.setLoggedin();
+    await this.setUser();
+    this.setAdmin();
+  }
+
+  componentDidUpdate = async (prevProps) => {
+    if(this.props.sessionid !== prevProps.sessionid) {
+      this.setLoggedin();
+      await this.setUser();
+      this.setAdmin();
     }
   }
 
@@ -108,7 +123,6 @@ class App extends Component {
 
   render() {
     if(this.state.loggedin.value === null) {
-      this.setLoggedin();
       return(<div></div>);
     } else {
       return (
@@ -116,7 +130,7 @@ class App extends Component {
           <Background />
           <Router>
             <Route exact path="/" render={() => <Login onLogin={this.handleLogin} loggedin={this.state.loggedin} onMount={this.setLoggedin} onRedirect={this.handleRedirect} />} />
-            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} isAdmin={this.isAdmin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
+            <Route path="/dashboard" render={() => <Dashboard navs={this.state.navs} loggedin={this.state.loggedin} admin={this.state.admin} setUser={this.setUser} setAdmin={this.setAdmin} onSelect={this.handleSelect} onMount={this.setLoggedin} onRedirect={this.handleRedirect} onRender={this.setLoggedin} />} />
           </Router>
         </React.Fragment>
       );

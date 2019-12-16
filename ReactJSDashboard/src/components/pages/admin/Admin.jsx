@@ -5,9 +5,6 @@ import { Users, Departments, Company, Logs, AdminWizard, Backup, Auth } from '..
 class Admin extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      admin: null,
-    }
   }
 
   getNavClass = (name) => {
@@ -24,22 +21,14 @@ class Admin extends Component {
     if(path.includes(name)) { return `${name} active` } else { return name }
   }
 
-  setAdmin = async () => {
-    const {isAdmin} = this.props;
-    const admin = await isAdmin();
-    this.setState({admin})
-  }
-
   render() {
-    const admin = this.state.admin;
-    const {onRedirect} = this.props;
+    const {admin, onRedirect} = this.props;
 
-    console.log(`Admin: ${admin}`);
+    console.log(admin);
 
     if(admin === null) {
-      this.setAdmin();
       return (
-        <Auth />
+        <div></div>
       );
     } else if(admin !== null && admin === true) {
       return (
