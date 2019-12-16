@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-class Error extends Component {
+class Auth extends Component {
   render() {
     return (
       <div className="shadow-sm p-3 bg-white rounded">
-        404
+        Je hebt geen rechten om deze pagina te bekijken.
       </div>
     );
   }
 }
 
-export default Error;
+export default Auth;

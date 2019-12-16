@@ -8,13 +8,18 @@ import json
 # print(response)
 # print("---")
 
-Cookies = dict(SessionID="7xZ5YxF3dE61Eg9p51wcxA==")
+Cookies = dict(SessionID="vDWRTROEh0+YBJJoCdwdEg==")
 
-address = "http://localhost/account?email=Administrator"
+address = "http://localhost/account"
 JSON = {
+	"Email": "test@example.com",
+	"Password": "yeetskeet420",
+	"MemberDepartments": {
+		"All Users": "Manager"
+	}
 }
-response = requests.get(address, json=JSON, cookies=Cookies)
+response = requests.post(address, json=JSON, cookies=Cookies)
 print(response.headers)
-print(json.loads(response.content))
+print(response.content)
 print(response)
 print("---")

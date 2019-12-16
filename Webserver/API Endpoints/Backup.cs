@@ -11,7 +11,7 @@ namespace Webserver.API_Endpoints {
 	/// Endpoint for managing backups
 	/// </summary>
 	[EndpointURL("/backup")]
-	internal class BackupEndpoint : APIEndpoint {
+	public class BackupEndpoint : APIEndpoint {
 		private readonly string BackupDir = (string)Config.GetValue("BackupSettings.BackupFolder");
 
 		/// <summary>

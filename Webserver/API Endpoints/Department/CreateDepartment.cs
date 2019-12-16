@@ -31,10 +31,8 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
-			Department newDepartment = new Department((string)name, (string)description);
-
 			// Store department to database
-			Connection.Insert(newDepartment);
+			new Department(Connection, (string)name, (string)description);
 
 			// Send success message
 			Response.Send(HttpStatusCode.Created);

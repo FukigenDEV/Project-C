@@ -20,9 +20,9 @@ namespace Webserver {
 			Response = new ResponseProvider(Context.Response);
 		}
 
-		public ContextProvider(RequestProvider Request, ResponseProvider Response) {
+		public ContextProvider(RequestProvider Request) {
 			this.Request = Request;
-			this.Response = Response;
+			this.Response = new ResponseProvider();
 		}
 	}
 
@@ -61,6 +61,7 @@ namespace Webserver {
 			this.Url = Url;
 			this.Params = Utils.NameValueToDict(HttpUtility.ParseQueryString(Url.Query));
 			this.HttpMethod = HttpMethod;
+			this.ContentEncoding = Encoding.UTF8;
 		}
 	}
 
@@ -110,7 +111,7 @@ namespace Webserver {
 		public ResponseProvider() {}
 
 		public void AppendHeader(string name, string value) {
-			Response.AppendHeader(name, value);
+			Response?.AppendHeader(name, value);
 			Headers.Add(name, value);
 		}
 
@@ -163,7 +164,7 @@ namespace Webserver {
 
 		public void Redirect(string URL) {
 			RedirectURL = URL;
-			Response.Redirect(URL);
+			Response?.Redirect(URL);
 		}
 	}
 
