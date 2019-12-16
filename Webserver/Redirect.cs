@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver {
 	public static class Redirect {

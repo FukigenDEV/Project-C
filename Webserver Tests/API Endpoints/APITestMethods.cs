@@ -8,7 +8,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Configurator;
-using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Webserver;

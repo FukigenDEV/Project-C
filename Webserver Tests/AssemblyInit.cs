@@ -4,8 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Configurator;
-using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PrettyConsole;
 using Webserver;
 
 namespace Webserver_Tests {
@@ -17,7 +17,8 @@ namespace Webserver_Tests {
 			Config.SaveDefaultConfig();
 			Config.LoadConfig();
 
-			Program.Log = new Logger();
+			LogTab Tab = new LogTab("Test");
+			Program.Log = Tab.GetLogger();
 		}
 	}
 }

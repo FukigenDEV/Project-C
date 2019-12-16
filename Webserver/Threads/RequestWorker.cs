@@ -10,9 +10,9 @@ using System.Net;
 using System.Reflection;
 using Configurator;
 using Dapper.Contrib.Extensions;
-using Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PrettyConsole;
 using Webserver.Data;
 
 namespace Webserver.Threads {
@@ -20,7 +20,8 @@ namespace Webserver.Threads {
 	/// Request handlers. Meant to run in a separate thread.
 	/// </summary>
 	public class RequestWorker {
-		private readonly Logger Log = Program.Log;
+		public static LogTab RequestLoggerTab;
+		private readonly Logger Log;
 		private readonly BlockingCollection<ContextProvider> Queue;
 		public SQLiteConnection Connection;
 		private readonly bool Debug;
@@ -31,6 +32,7 @@ namespace Webserver.Threads {
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
 		public RequestWorker(BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
+			this.Log = RequestLoggerTab.GetLogger();
 			this.Queue = Queue;
 			this.Connection = Connection;
 			this.Debug = Debug;
