@@ -25,7 +25,6 @@ import EditCompany from './components/pages/admin/manage/edit/Company';
 import Navs from './components/navs';
 import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
-import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedenis';
 import Backup from './components/pages/Backup';
 import Uitloggen from './components/pages/Uitloggen';
 import AdminWizard from './components/pages/AdminWizard';
@@ -61,7 +60,6 @@ export {
     EditCompany,
     Gegevens,
     Notities,
-    Activiteitengeschiedenis,
     Backup,
     Uitloggen,
     Error,

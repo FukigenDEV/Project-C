@@ -27,7 +27,7 @@ class Uitloggen extends Component {
         alert.value = xhr.responseText;
         this.setState({alert});
         if(xhr.status === 200) {
-          this.props.onRedirect('/');
+          window.location.reload(false);
         }
         // this.props.history.push('/index.html#')
         this.props.loggedin.value = false;

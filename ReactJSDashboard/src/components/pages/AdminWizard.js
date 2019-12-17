@@ -221,6 +221,9 @@ class AdminWizard extends Component {
 	$("#gdt_next_form").on("submit", function(event) {
 		$("#add_gdt").hide(250);
 		$("#finished").show(250);
+
+		// Local storage should remember that de admin wizard has been completed
+		window.localStorage.setItem("adminWizardDone", "true");
 	});
 
 	///////////////////////////////////////////////////////////////////////////////////////////

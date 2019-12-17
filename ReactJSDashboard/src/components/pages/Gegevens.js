@@ -53,6 +53,20 @@ class Gegevens extends Component {
 
 			if (tables.length === 0) {
 				$("#add_row").hide();
+				$("#table_elements").hide();
+
+				$("#no_table_message").text("Er zijn nog geen tabellen.");
+
+				var user = getLoggedInUser();
+				var role = user["Permissions"]["Administrators"];
+
+				console.log(user);
+				console.log(role);
+				console.log(role === "Administrator");
+
+				if (role === "Administrator") {
+					$("#new_table").show();
+				}
 			}
 
 			// Populate the tables drop down
@@ -86,14 +100,16 @@ class Gegevens extends Component {
 	});
 
 	$("#tables_dropdown").on("change", function() {
+		var tableName = $(this).find(":selected").text();
+
+		if (tableName === "") return;
+
 		$("#table").empty();
 
 		$("#validate_table").hide();
 		$("#add_row").hide();
 		$("#new_table").hide();
 		$("#delete_table").hide();
-
-		var tableName = $(this).find(":selected").text();
 
 		$("#table").attr("data-name", tableName);
 
@@ -272,34 +288,39 @@ class Gegevens extends Component {
 
 		<hr/>
 
+		<p id="no_table_message"></p>
+
 		<div id="new_table" style={{"border-bottom":"15px","display":"none"}}>
-		  <a href="/index.html?#/dashboard/NewTable" style={{"text-decoration":"underline"}}>Nieuwe tabel</a><br/>
-
-		  <br/>
+			<a href="/index.html?#/dashboard/NewTable" style={{"text-decoration":"underline"}}>Nieuwe tabel aanmaken</a>
+			<br/>
 		</div>
 
-		Table:<br/>
-		<div id="tables_dropdown">
-			<select>
-			</select>
-			<button id="delete_table" style={{"float":"right","display":"none","width":"200px"}}>Verwijder tabel</button>
-		</div>
+		<div id="table_elements">
+			<br/>
 
-		<br/>
+			Table:<br/>
+			<div id="tables_dropdown">
+				<select>
+				</select>
+				<button id="delete_table" style={{"float":"right","display":"none","width":"200px"}}>Verwijder tabel</button>
+			</div>
 
-		<p id="permissionInfo"></p>
+			<br/>
+
+			<p id="permissionInfo"></p>
 		
-		<table id="table" style={{width: '100%'}} border="1" data-name=""></table>
+			<table id="table" style={{width: '100%'}} border="1" data-name=""></table>
 
-		<br/>
+			<br/>
 
-		<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Add row</button>
-		<button id="validate_table" style={{'display':'none','float':'right','width':'200px'}}>Validate selected rows</button>
+			<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Add row</button>
+			<button id="validate_table" style={{'display':'none','float':'right','width':'200px'}}>Validate selected rows</button>
 
-		<br/>
-		<br/>
+			<br/>
+			<br/>
 
-		<p id="error_message"></p>
+			<p id="error_message"></p>
+		</div>
       </div>
     );
   }
