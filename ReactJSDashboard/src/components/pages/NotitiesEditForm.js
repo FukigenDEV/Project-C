@@ -48,7 +48,8 @@ class Notities extends Component {
 			console.log(Response.body);
 			console.log(Response.statusText);
 			var test = Response;
-			this.props.reloadNotes(test);
+			// this.props.reloadNotes(test);
+			window.location.reload(true);
 		}
 		);
 	};
