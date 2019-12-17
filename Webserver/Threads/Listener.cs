@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver.Threads {
 	/// <summary>
 	/// Listener object that will create a new HTTPListener and wait for incoming requests
 	/// </summary>
 	internal class Listener {
+		public static Logger Log = Program.Log;
 		/// <summary>
 		/// Start a Listener. Incoming requests will be inserted in the given BlockingCollection, which can then be processed using RequestWorkers
 		/// </summary>
 		/// <param name="Log"></param>
 		/// <param name="Queue"></param>
-		public static void Run(Logger Log, BlockingCollection<ContextProvider> Queue) {
+		public static void Run(BlockingCollection<ContextProvider> Queue) {
 			Log.Info("Starting ListenerThread");
 
 			//Get addresses the server should listen to.

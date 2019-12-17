@@ -5,12 +5,12 @@ using System.Diagnostics;
 using System.Text;
 using Configurator;
 using Dapper;
-using Logging;
+using PrettyConsole;
 using Webserver.Data;
 
 namespace Webserver.Threads {
 	internal class MaintenanceThread {
-		public Logger Log;
+		public Logger Log = Program.Log;
 		/// <summary>
 		/// Run all maintenance tasks
 		/// </summary>

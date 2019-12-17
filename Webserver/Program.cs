@@ -8,7 +8,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using Configurator;
-using Logging;
+using PrettyConsole;
 using Webserver.Threads;
 
 namespace Webserver {
@@ -19,8 +19,8 @@ namespace Webserver {
 
 		public static void Main() {
 			//Initialize logger
-			Logger.Init();
-			Log = new Logger();
+			LogTab Tab = new LogTab("General");
+			Log = Tab.GetLogger();
 			Utils.Log = Log;
 			Log.Info("Server is starting!");
 
@@ -63,15 +63,18 @@ namespace Webserver {
 			//Find all API endpoints
 			DiscoverEndpoints();
 
+			//Create console tabs
+			RequestWorker.RequestLoggerTab = new LogTab("Workers");
+
 			//Create Queue and launch listener
 			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
-			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
+			Thread ListenerThread = new Thread(() => Listener.Run(Queue));
 			ListenerThread.Start();
 
 			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
-				RequestWorker Worker = new RequestWorker(Log, Queue, (SQLiteConnection)Connection.Clone());
+				RequestWorker Worker = new RequestWorker(Queue, (SQLiteConnection)Connection.Clone());
 				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);
@@ -82,8 +85,10 @@ namespace Webserver {
 
 			//Wait for an exit command, then exit.
 			Log.Info("Type 'Exit' to exit.");
-			while ( Console.ReadLine().ToLower() != "exit" ) ;
-			Environment.Exit(0);
+			
+			foreach(Thread Worker in WorkerThreads) {
+				Worker.Join();
+			}
 		}
 
 		public static void DiscoverEndpoints() {

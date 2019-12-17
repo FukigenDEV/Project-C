@@ -29,9 +29,10 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Name"></param>
 		/// <param name="Description"></param>
-		public Department(string Name, string Description = null) {
+		public Department(SQLiteConnection Connection, string Name, string Description = null) {
 			this.Name = Name;
 			this.Description = Description;
+			Connection.Insert(this);
 		}
 
 		/// <summary>

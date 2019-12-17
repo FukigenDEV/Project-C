@@ -2,12 +2,12 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver {
 	public static class Redirect {
-		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
-		private static readonly Logger Log = Program.Log;
+		public static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
+		public static Logger Log = Program.Log;
 
 		/// <summary>
 		///	Initialize the redirect system.
@@ -16,12 +16,7 @@ namespace Webserver {
 
 			//If no Redirects file exists yet, create a default one.
 			if ( !File.Exists("Redirects.config") ) {
-				StreamWriter RedirectsFile = File.CreateText("Redirects.config");
-				//If wwwroot contains an index.html file, add it to redirects.
-				if (File.Exists((string)Configurator.Config.GetValue("WebserverSettings.wwwroot") + "/index.html") ) {
-					RedirectsFile.WriteLine("/ => /index.html");
-				}
-				RedirectsFile.Close();
+				File.CreateText("Redirects.config");
 			}
 
 			ParseRedirectFile("Redirects.config");
@@ -51,7 +46,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="Path"></param>
 		public static void ParseRedirectFile(string Path) {
-			//string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
+			RedirectionDict.Clear();
 
 			if ( !File.Exists(Path) ) {
 				throw new FileNotFoundException();
@@ -71,13 +66,19 @@ namespace Webserver {
 				//Check if the source URI is valid
 				Regex ex = new Regex("^(\\/{1}[A-z0-9-._~:?#[\\]@!$&'()*+,;=]{1,}){1,}$");
 				if ( !ex.IsMatch(LineContents[0]) && LineContents[0] != "/" ) {
-					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URI");
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect source URL");
 					continue;
 				}
 
 				//Check if the destination is valid
 				if ( !ex.IsMatch(LineContents[1]) && LineContents[1] != "/" ) {
-					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URI");
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Incorrect destination URL");
+					continue;
+				}
+
+				//Check if the entry is a duplicate
+				if (RedirectionDict.ContainsKey(LineContents[0])) {
+					Log.Warning("Skipping invalid redirection in " + Path + " (line: " + LineCount + "): Duplicate source URL");
 					continue;
 				}
 

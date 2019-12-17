@@ -23,12 +23,12 @@ namespace Webserver.API_Endpoints.Tests {
 				Directory.Delete("Backups", true);
 			}
 		}
-		
-		[TestMethod()]
+
+		[TestMethod]
 		public void GET_GetList() {
 			POST();
 
-			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -45,12 +45,12 @@ namespace Webserver.API_Endpoints.Tests {
 			POST();
 
 			//Create mock request
-			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=Backup_" + Timestamp + "_0", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=Backup_" + Timestamp + "_0", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
 			Assert.IsTrue(Response.ContentType == "application/zip");
-			Assert.IsTrue(Response.Headers.Get("Content-disposition") == "attachment; filename=Backup_"+Timestamp+"_0.zip");
+			Assert.IsTrue(Response.Headers.Get("Content-disposition") == "attachment; filename=Backup_" + Timestamp + "_0.zip");
 		}
 
 		/// <summary>
@@ -58,7 +58,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_GetInvalidFile() {
-			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=SomeFile", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/backup?name=SomeFile", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.NotFound);
@@ -67,9 +67,9 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <summary>
 		/// Check if we can create a manual backup
 		/// </summary>
-		[TestMethod()]
+		[TestMethod]
 		public void POST() {
-			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.POST).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/backup", HttpMethod.POST);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);

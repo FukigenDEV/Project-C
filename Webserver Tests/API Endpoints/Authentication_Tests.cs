@@ -20,7 +20,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void Authentication_LoggedOut() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator", HttpMethod.GET, Login: false).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator", HttpMethod.GET, Login: false);
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.Unauthorized);
 		}
 	}

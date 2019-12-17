@@ -17,62 +17,30 @@ using Webserver.Data;
 namespace Webserver.Data.Tests {
 	[TestClass()]
 	public class GenericDataTable_Tests {
-		/// <summary>
-		/// Database connection. Will be automatically closed upon test completion.
-		/// </summary>
+
 		public static SQLiteConnection Connection;
-		/// <summary>
-		/// Standard testing table.
-		/// </summary>
 		public static GenericDataTable Table;
-		/// <summary>
-		/// SQL transaction
-		/// </summary>
 		public SQLiteTransaction Transaction;
-
 		public TestContext TestContext { get; set; }
-
 		[ClassInitialize]
 		public static void ClassInit(TestContext _) {
-			//Init config
-			Config.AddConfig(new StreamReader(Assembly.LoadFrom("Webserver").GetManifestResourceStream("Webserver.DefaultConfig.json")));
-			Config.SaveDefaultConfig();
-			Config.LoadConfig();
-
-			//Init database and create initial connection + table
-			if (File.Exists("Database.db")) File.Delete("Database.db"); //Database doesn't always get wiped after debugging a failed test.
 			Connection = Database.Init(true);
-			Table = CreateTestTable(Connection);
+			Table = CreateTestTable();
 		}
-
 		[TestInitialize()]
-		public void Init() {
-			//Check if init should be skipped
-			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
-
-			Transaction = Connection.BeginTransaction();
-		}
-
-		public class SkipInitCleanup : Attribute { }
-
+		public void Init() => Transaction = Connection.BeginTransaction();
 		[TestCleanup()]
-		public void Cleanup() {
-			if (GetType().GetMethod(TestContext.TestName).GetCustomAttributes<SkipInitCleanup>().Any()) return;
-
-			Transaction.Rollback();
-			//File.Delete("Database.db");
-		}
-
+		public void Cleanup() => Transaction.Rollback();
 		[ClassCleanup]
 		public static void ClassCleanup() => Connection.Close();
 
 		/// <summary>
 		/// Create a datatable for testing purposes. Should be deleted after use.
-		/// The name of the table will be "UnitTestTable", and it will have 4 columns (one for each datatype)
+		/// The name of the table will be "Table1", and it will have 2 columns (StringColumn and IntegerColumn)
 		/// </summary>
 		/// <param name="Connection"></param>
 		/// <returns></returns>
-		private static GenericDataTable CreateTestTable(SQLiteConnection Connection, string Name = "Table1", Dictionary<string, DataType> Columns = null, int DepartmentID = 1, bool ReqValidation = true) {
+		private static GenericDataTable CreateTestTable(string Name = "Table1", Dictionary<string, DataType> Columns = null, int DepartmentID = 1, bool ReqValidation = true) {
 			if ( Columns == null ) {
 				Columns = new Dictionary<string, DataType>() {
 					{"StringColumn", DataType.String },
@@ -95,10 +63,9 @@ namespace Webserver.Data.Tests {
 		/// <param name="Name"></param>
 		[DataRow("12345")]
 		[DataRow("Users")]
-		[SkipInitCleanup]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ArgumentsCheck(string Name) => CreateTestTable(Connection, Name);
+		public void Constructor_ArgumentsCheck(string Name) => CreateTestTable(Name);
 
 		/// <summary>
 		/// Check if the column count check is working.
@@ -106,7 +73,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ColumnCountCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>());
+		public void Constructor_ColumnCountCheck() => CreateTestTable(Columns: new Dictionary<string, DataType>());
 
 		/// <summary>
 		/// Check if the reserved column name check is working.
@@ -114,7 +81,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "Validated", DataType.Integer } });
+		public void Constructor_ReservedColumnNameCheck() => CreateTestTable(Columns: new Dictionary<string, DataType>() { { "Validated", DataType.Integer } });
 
 		/// <summary>
 		/// Check if the column name regex check is working.
@@ -122,7 +89,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_ColumnNameRegexCheck() => CreateTestTable(Connection, Columns: new Dictionary<string, DataType>() { { "12345", DataType.Integer } });
+		public void Constructor_ColumnNameRegexCheck() => CreateTestTable(Columns: new Dictionary<string, DataType>() { { "12345", DataType.Integer } });
 
 		/// <summary>
 		/// Check if the department existence check is working.
@@ -130,14 +97,14 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[DataTestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_DepartmentCheck() => CreateTestTable(Connection, DepartmentID: 100);
+		public void Constructor_DepartmentCheck() => CreateTestTable(DepartmentID: 100);
 
 		/// <summary>
 		/// Check if the table existence check is working
 		/// </summary>
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
-		public void Constructor_AlreadyExistsCheck() => CreateTestTable(Connection);
+		public void Constructor_AlreadyExistsCheck() => CreateTestTable();
 
 		/// <summary>
 		/// Check if the AddColumn function works when given valid arguments
@@ -175,7 +142,7 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		public void AddValidatedColumn_Valid() {
-			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			GenericDataTable Table2 = CreateTestTable("Table2", ReqValidation: false);
 			Table2.AddValidatedColumn();
 		}
 
@@ -185,7 +152,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void AddValidatedColumn_Invalid1() {
-			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			GenericDataTable Table2 = CreateTestTable("Table2", ReqValidation: false);
 			Table2.AddValidatedColumn();
 			Table2.AddValidatedColumn();
 		}
@@ -399,7 +366,7 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check succeeded when it shouldn't")]
 		public void GetUnvalidatedRows_Columnheck() {
-			GenericDataTable Table2 = CreateTestTable(Connection, "Table2", ReqValidation: false);
+			GenericDataTable Table2 = CreateTestTable("Table2", ReqValidation: false);
 			Table2.GetUnvalidatedRows();
 		}
 
@@ -585,8 +552,8 @@ namespace Webserver.Data.Tests {
 		[TestMethod]
 		public void GetTableNames_ValidArgs() {
 			//Table1 is created during init
-			CreateTestTable(Connection, "Table2");
-			CreateTestTable(Connection, "Table3");
+			CreateTestTable("Table2");
+			CreateTestTable("Table3");
 
 			List<string> FunctionResult = GenericDataTable.GetTableNames(Connection);
 			List<string> TableNames = new List<string>() { "Table1", "Table2", "Table3" };
@@ -598,17 +565,50 @@ namespace Webserver.Data.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GetTableNames_ValidDepartment() {
-			CreateTestTable(Connection, "Table2");
+			CreateTestTable("Table2");
 			Assert.IsTrue(GenericDataTable.GetTableNames(Connection, 2).Count == 0);
-			CreateTestTable(Connection, "Table3", DepartmentID: 2);
+			CreateTestTable("Table3", DepartmentID: 2);
 			Assert.IsTrue(GenericDataTable.GetTableNames(Connection, 2).Count == 1);
 		}
 
 		/// <summary>
-		/// Check if we can retrieve a list of table names if we provide invalid arguments
+		///Check if we can retrieve a list of table names if we provide invalid arguments
 		/// </summary>
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException), "Argument check passed when it shouldn't")]
-		public void GetTableNames_InvalidArgs() => GenericDataTable.GetTableNames(Connection, 12345);
+		public void GetTableNames_InvalidDepartment() => GenericDataTable.GetTableNames(Connection, 100);
+
+		/// <summary>
+		/// Check if we can retrieve a list of tables if we provide valid arguments
+		/// </summary>
+		[TestMethod]
+		public void GetTables_ValidArgs() {
+			//Table1 is created during init
+			GenericDataTable Table2 = CreateTestTable("Table2");
+			GenericDataTable Table3 = CreateTestTable("Table3");
+
+			List<GenericDataTable> FunctionResult = GenericDataTable.GetTables(Connection);
+			List<GenericDataTable> Tables = new List<GenericDataTable>() { Table, Table2, Table3 };
+			Assert.IsTrue(FunctionResult.Count == Tables.Count);
+			Assert.IsTrue((Tables.SelectMany(Entry1 => FunctionResult.Where(Entry2 => Entry1.Name == Entry2.Name).Select(Entry2 => Entry1))).Count() == Tables.Count);
+		}
+
+		/// <summary>
+		/// Check if we can retrieve a list of tables, filtered by department
+		/// </summary>
+		[TestMethod]
+		public void GetTables_ValidDepartment() {
+			Assert.IsTrue(GenericDataTable.GetTables(Connection, 2).Count == 0);
+			CreateTestTable("Table3", DepartmentID: 2);
+			Assert.IsTrue(GenericDataTable.GetTables(Connection, 2).Count == 1);
+		}
+
+		/// <summary>
+		/// Check if we can retrieve a list of tables if we provide invalid arguments
+		/// </summary>
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException), "Argument check passed when it shouldn't")]
+		public void GetTables_InvalidDepartment() => GenericDataTable.GetTables(Connection, 12345);
+
 	}
 }

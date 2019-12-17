@@ -7,8 +7,8 @@ using System.Linq;
 using Configurator;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Logging;
 using Newtonsoft.Json.Linq;
+using PrettyConsole;
 using Webserver.Data;
 using static Dapper.SqlMapper;
 
@@ -32,11 +32,6 @@ namespace Webserver {
 			SQLiteConnection Connection = CreateConnection(InMemory);
 
 			//Create tables if they don't already exist.
-			//Functions table
-			Connection.Execute("CREATE TABLE IF NOT EXISTS Functions (" +
-				"Name				STRING PRIMARY KEY" +
-			")");
-
 			//Company table
 			Connection.Execute("CREATE TABLE IF NOT EXISTS Companies (" +
 			"ID					INTEGER PRIMARY KEY," +
@@ -88,8 +83,7 @@ namespace Webserver {
 				 "Birthday			STRING," +
 				 "Country			STRING," +
 				 "Address			STRING," +
-				 "Postcode			STRING," +
-				 "FOREIGN KEY(Function) REFERENCES Functions(Name) ON UPDATE CASCADE" +
+				 "Postcode			STRING" +
 			")");
 
 			//Sessions table
@@ -113,13 +107,13 @@ namespace Webserver {
 			//If the Administrators department doesn't exist yet, create it.
 			Department AdministratorDept = Connection.Get<Department>(1);
 			if ( AdministratorDept == null ) {
-				Connection.Insert(new Department("Administrators", "Department for Administrators"));
+				new Department(Connection, "Administrators", "Department for Administrators");
 			}
 
 			//If the All Users doesn't exist yet, create it
 			Department UncategorizedDept = Connection.Get<Department>(2);
 			if ( UncategorizedDept == null ) {
-				Connection.Insert(new Department("All Users", "Default Department"));
+				new Department(Connection, "All Users", "Default Department");
 			}
 
 			//If the built-in Administrator account doesn't exist yet, create it. If it does exist, update its password to the
@@ -129,8 +123,7 @@ namespace Webserver {
 				Administrator = new User("Administrator", (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"), Connection);
 				Administrator.SetPermissionLevel(Connection, PermLevel.Administrator, 1);
 			} else {
-				Administrator.ChangePassword((string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
-				Connection.Update<User>(Administrator);
+				Administrator.ChangePassword(Connection, (string)Config.GetValue("AuthenticationSettings.AdministratorPassword"));
 			}
 
 			return Connection;

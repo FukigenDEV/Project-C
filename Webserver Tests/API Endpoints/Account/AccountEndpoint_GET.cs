@@ -46,7 +46,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_ValidArguments() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -66,7 +66,7 @@ namespace Webserver.API_Endpoints.Tests {
 			new User("TestUser1@example.com", "TestPassword1", Connection);
 			new User("TestUser2@example.com", "TestPassword2", Connection);
 
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,TestUser1@example.com", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,TestUser1@example.com", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -86,7 +86,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_InvalidArguments() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -99,7 +99,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_BulkInvalidArguments() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount,SomeOtherAccount", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=SomeAccount,SomeOtherAccount", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -112,7 +112,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		[TestMethod]
 		public void GET_MixedArguments() {
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,SomeUser", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=Administrator,SomeUser", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -127,7 +127,7 @@ namespace Webserver.API_Endpoints.Tests {
 		[TestMethod]
 		public void GET_CurrentUser() {
 			//Create mock request
-			ResponseProvider Response = ExecuteSimpleRequest("/account?email=CurrentUser", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account?email=CurrentUser", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);
@@ -146,7 +146,7 @@ namespace Webserver.API_Endpoints.Tests {
 			new User("TestUser2@example.com", "TestPassword2", Connection);
 
 			//Create mock request
-			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.GET).Response;
+			ResponseProvider Response = ExecuteSimpleRequest("/account", HttpMethod.GET);
 
 			//Verify results
 			Assert.IsTrue(Response.StatusCode == HttpStatusCode.OK);

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver {
 	public static class WebFiles {

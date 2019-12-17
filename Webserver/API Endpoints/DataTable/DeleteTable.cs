@@ -11,14 +11,14 @@ namespace Webserver.API_Endpoints {
 		public override void DELETE() {
 			// Get all required values
 			if ( !Params.ContainsKey("table") ) {
-				Response.Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//If table exists, delete it
 			GenericDataTable Table = GenericDataTable.GetTableByName(Connection, Params["table"][0]);
 			if ( Table == null ) {
-				Response.Send("No such table", HttpStatusCode.BadRequest);
+				Response.Send("No such table", HttpStatusCode.NotFound);
 				return;
 			} else {
 				Table.DropTable();

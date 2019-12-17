@@ -8,7 +8,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Configurator;
-using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Webserver;
@@ -31,8 +30,6 @@ namespace Webserver.API_Endpoints.Tests {
 		/// </summary>
 		public static SQLiteConnection Connection;
 
-		public static Logger Log = Program.Log = new Logger();
-
 		public TestContext TestContext { get; set; }
 
 		[ClassInitialize]
@@ -54,21 +51,25 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <summary>
 		/// Sends a simple request to a RequestWorker
 		/// </summary>
-		public ContextProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JObject JSON = null, bool Login = true) {
+		public ResponseProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JToken JSON = null, bool Login = true, Cookie C = null) {
 			RequestProvider Request = new RequestProvider(new Uri("http://localhost"+URL), Method);
 			if(Login) Request.Cookies.Add(CreateSession());
-			if ( JSON != null ) Request.InputStream.Write(Encoding.UTF8.GetBytes(JSON.ToString()));
+			if (C != null) Request.Cookies.Add(C);
+			if (JSON != null) {
+				Request.ContentEncoding = Encoding.UTF8;
+				Request.InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JSON.ToString()));
+			}
 			ContextProvider Context = new ContextProvider(Request);
 			Queue.Add(Context);
 			ExecuteQueue();
-			return Context;
+			return Context.Response;
 		}
 
 		/// <summary>
 		/// Creates a RequestWorker and runs it. The RequestWorker will continue to run until all requests in the queue have been processed.
 		/// </summary>
 		public void ExecuteQueue() {
-			RequestWorker Worker = new RequestWorker(Log, Queue, Connection, true);
+			RequestWorker Worker = new RequestWorker(Queue, Connection, true);
 			Worker.Run();
 		}
 
