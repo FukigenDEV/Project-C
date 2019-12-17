@@ -16,3 +16,9 @@
     top: 0.5rem;
     right: 0.5rem;
 }
+
+.note_edit {
+    position: absolute;
+    top: 0.8rem;
+    right: 2rem;
+}

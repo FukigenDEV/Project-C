@@ -26,6 +26,7 @@ import Navs from './components/navs';
 import GegevensRegistreren from './components/pages/GegevensRegistreren';
 import GegevensBekijken from './components/pages/GegevensBekijken';
 import Notities from './components/pages/Notities';
+import NotitiesEditForm from './components/pages/NotitiesEditForm';
 import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
 import Logout from './components/pages/Logout';
@@ -69,4 +70,5 @@ export {
     AdminWizard,
     Error,
     Auth,
+    NotitiesEditForm,
 }
