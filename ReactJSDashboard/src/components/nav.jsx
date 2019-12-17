@@ -19,6 +19,7 @@ class Nav extends Component {
   render() {
     const heading = (this.props.nav.id === 0) ? <h2>{this.props.nav.heading}</h2> : this.props.nav.heading;
     const icon = (this.props.nav.id !== 0) ? <div className="nav-icon">{<FontAwesomeIcon icon={['fas', this.props.nav.icon]} />}</div> : <div></div>;
+    if (this.props.nav.id === 9) return null;
     return (
       <Link onClick={() => this.props.onSelect(this.props.nav)} className={this.getClassesNav()} to={this.props.nav.link}>{icon} {heading}</Link>
     );

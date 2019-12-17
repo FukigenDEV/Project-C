@@ -66,11 +66,32 @@ class Gegevens extends Component {
 
 	xhr.send();
 
+	$("#delete_table").on("click", function() {
+		var tableName = $("#tables_dropdown").find(":selected").text();
+
+		if (window.confirm("Weet u zeker dat de tabel " + tableName + " wilt verwijderen?")) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("DELETE", "/datatable?table=" + tableName, true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+				
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4) {
+					// Hard refresh the page
+					window.location.reload(true);
+				}
+			}
+
+			xhr.send();
+		}
+	});
+
 	$("#tables_dropdown").on("change", function() {
 		$("#table").empty();
 
 		$("#validate_table").hide();
 		$("#add_row").hide();
+		$("#new_table").hide();
+		$("#delete_table").hide();
 
 		var tableName = $(this).find(":selected").text();
 
@@ -93,9 +114,14 @@ class Gegevens extends Component {
 				  return;
 				} else if (userRole === "DeptMember") {
 				  $("#permissionInfo").text("You can view and change this table.");
-				} else if (userRole === "Administrator" || userRole === "Manager") {
+				} else if (userRole === "Manager") {
 				  $("#permissionInfo").text("You can view, change and validate this table.");
 				  $("#validate_table").show();
+				} else if (userRole === "Administrator") {
+				  $("#permissionInfo").text("You can view, change and validate and delete this table.");
+				  $("#validate_table").show();
+				  $("#new_table").show();
+				  $("#delete_table").show();
 				}
 
 				$("#add_row").show();
@@ -246,10 +272,17 @@ class Gegevens extends Component {
 
 		<hr/>
 
+		<div id="new_table" style={{"border-bottom":"15px","display":"none"}}>
+		  <a href="/index.html?#/dashboard/NewTable" style={{"text-decoration":"underline"}}>Nieuwe tabel</a><br/>
+
+		  <br/>
+		</div>
+
 		Table:<br/>
 		<div id="tables_dropdown">
 			<select>
 			</select>
+			<button id="delete_table" style={{"float":"right","display":"none","width":"200px"}}>Verwijder tabel</button>
 		</div>
 
 		<br/>

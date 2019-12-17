@@ -29,6 +29,7 @@ import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedeni
 import Backup from './components/pages/Backup';
 import Uitloggen from './components/pages/Uitloggen';
 import AdminWizard from './components/pages/AdminWizard';
+import NewTable from './components/pages/NewTable';
 import Error from './components/pages/Error';
 
 import * as serviceWorker from './serviceWorker';
@@ -64,5 +65,6 @@ export {
     Backup,
     Uitloggen,
     Error,
-	AdminWizard
+	AdminWizard,
+    NewTable
 }

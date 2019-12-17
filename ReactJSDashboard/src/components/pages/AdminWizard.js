@@ -147,7 +147,11 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#gdt_message").html(xhr.responseText);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#gdt_message").text("De tabel is succesvol aangemaakt");	
+				} else {
+					$("#gdt_message").text(xhr.responseText);
+				}
 			}
 		}
 
@@ -380,6 +384,8 @@ class AdminWizard extends Component {
 
 				<br/>
 				<input type="submit" value="Add"/><br/>
+
+				<br/>
 
 				<p id="gdt_message"></p>
 			</form>
