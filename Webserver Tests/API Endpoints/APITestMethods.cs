@@ -8,7 +8,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Configurator;
-using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Webserver;
@@ -52,7 +51,7 @@ namespace Webserver.API_Endpoints.Tests {
 		/// <summary>
 		/// Sends a simple request to a RequestWorker
 		/// </summary>
-		public ResponseProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JObject JSON = null, bool Login = true, Cookie C = null) {
+		public ResponseProvider ExecuteSimpleRequest(string URL, HttpMethod Method, JToken JSON = null, bool Login = true, Cookie C = null) {
 			RequestProvider Request = new RequestProvider(new Uri("http://localhost"+URL), Method);
 			if(Login) Request.Cookies.Add(CreateSession());
 			if (C != null) Request.Cookies.Add(C);

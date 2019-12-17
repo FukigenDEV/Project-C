@@ -47,11 +47,11 @@ namespace Webserver.API_Endpoints {
 			Dictionary<string, DataType> ColumnDict = new Dictionary<string, DataType>();
 			foreach ( KeyValuePair<string, JToken> Entry in (JObject)Columns ) {
 				if ( GenericDataTable.ReservedColumns.Contains(Entry.Key) || !Regex.IsMatch(Entry.Key, RX) ) {
-					Response.Send("Invalid or reserved column name");
+					Response.Send("Invalid or reserved column name", HttpStatusCode.BadRequest);
 					return;
 				}
-				if ( !Enum.TryParse<DataType>((string)Entry.Value, out DataType DT) ) {
-					Response.Send("Invalid column type. Type must be either Integer, String, Real, or Blob");
+				if ( !Enum.TryParse((string)Entry.Value, out DataType DT) ) {
+					Response.Send("Invalid column type. Type must be either Integer, String, Real, or Blob", HttpStatusCode.BadRequest);
 					return;
 				}
 				ColumnDict.Add(Entry.Key, DT);

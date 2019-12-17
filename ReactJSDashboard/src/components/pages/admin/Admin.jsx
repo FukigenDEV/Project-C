@@ -5,8 +5,9 @@ import { Users, Departments, Company, Logs, AdminWizard, Backup, Auth } from '..
 class Admin extends Component {
   constructor(props) {
     super(props)
+    this.handleAdminPriv = this.handleAdminPriv.bind(this);
     this.state = {
-      admin: null,
+      render: false,
     }
   }
 
@@ -24,22 +25,23 @@ class Admin extends Component {
     if(path.includes(name)) { return `${name} active` } else { return name }
   }
 
-  setAdmin = async () => {
-    const {isAdmin} = this.props;
-    const admin = await isAdmin();
-    this.setState({admin})
+  handleAdminPriv = async () => {
+    const {setUser, setAdmin} = this.props;
+    await setUser();
+    setAdmin();
+    this.setState({render: true});
   }
 
   render() {
-    const admin = this.state.admin;
-    const {onRedirect} = this.props;
-
-    console.log(`Admin: ${admin}`);
+    const {admin, onRedirect} = this.props;
+    console.log(`admin: ${admin}`);
+    if(this.state.render === false) {
+      this.handleAdminPriv();
+    }
 
     if(admin === null) {
-      this.setAdmin();
       return (
-        <Auth />
+        <div></div>
       );
     } else if(admin !== null && admin === true) {
       return (

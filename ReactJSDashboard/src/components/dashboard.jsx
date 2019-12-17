@@ -3,15 +3,9 @@ import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-ro
 import { createHashHistory } from 'history';
 import { Admin, Logout, Error, Navs} from '../index';
 
-const history = createHashHistory();
-
 class Dashboard extends Component {
-  componentDidMount() {
-    this.props.onMount();
-  }
-
   render() {
-    const {navs, loggedin, isAdmin, onSelect, onRedirect, onRender} = this.props;
+    const {navs, loggedin, admin, setUser, setAdmin, onSelect, onRedirect, onRender} = this.props;
     onRender();
 
     if(loggedin.value === true) {
@@ -20,7 +14,7 @@ class Dashboard extends Component {
             <Navs navs={navs} onSelect={onSelect} />
             <div className="content-container p-4">
               <Switch>
-                <Route path="/dashboard/Admin" render={props => <Admin {...props} isAdmin={isAdmin} onRedirect={onRedirect} />} />
+                <Route path="/dashboard/Admin" render={props => <Admin {...props} admin={admin} setUser={setUser} setAdmin={setAdmin} onRedirect={onRedirect} />} />
                 {/*dit geeft de value "loggedin" en de method "onRedirect" door aan de uitlogpagina zodat deze daar gebruikt kunnen worden*/}
                 <Route exact path="/dashboard/logout" render={() => <Logout loggedin={loggedin} onLogout={onRedirect} />} />
                 { navs.filter(nav => (nav.heading !== "Admin" && nav.heading !== "Uitloggen")).map(nav => (<Route exact path={nav.path} component={nav.component} />)) }

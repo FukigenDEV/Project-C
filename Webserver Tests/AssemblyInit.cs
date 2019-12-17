@@ -4,9 +4,10 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Configurator;
-using Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PrettyConsole;
 using Webserver;
+using Webserver.Threads;
 
 namespace Webserver_Tests {
 	[TestClass]
@@ -17,7 +18,10 @@ namespace Webserver_Tests {
 			Config.SaveDefaultConfig();
 			Config.LoadConfig();
 
-			Program.Log = new Logger();
+			LogTab Tab = new LogTab("General");
+			Program.Log = Tab.GetLogger();
+			RequestWorker.RequestLoggerTab = new LogTab("Worker");
+
 		}
 	}
 }

@@ -2,11 +2,11 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver {
 	public static class Redirect {
-		private static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
+		public static readonly Dictionary<string, string> RedirectionDict = new Dictionary<string, string>();
 		public static Logger Log = Program.Log;
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Webserver {
 		/// </summary>
 		/// <param name="Path"></param>
 		public static void ParseRedirectFile(string Path) {
-			//string wwwroot = (string)Config.GetValue("WebserverSettings.wwwroot");
+			RedirectionDict.Clear();
 
 			if ( !File.Exists(Path) ) {
 				throw new FileNotFoundException();

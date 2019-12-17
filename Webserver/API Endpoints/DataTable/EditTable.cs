@@ -43,11 +43,14 @@ namespace Webserver.API_Endpoints {
 			if ( FoundAdd ) {
 				JObject Add = (JObject)AddValue;
 				foreach ( KeyValuePair<string, JToken> Entry in Add ) {
-					if ( Entry.Key == "Validated" ) {
+					if ( Entry.Key.ToLower() == "validated" ) {
 						Table.AddValidatedColumn();
 						continue;
 					}
-					if ( Columns.ContainsKey(Entry.Key) || !Regex.IsMatch(Entry.Key, GenericDataTable.RX) ) {
+					if ( Columns.ContainsKey(Entry.Key) || 
+						!Regex.IsMatch(Entry.Key, GenericDataTable.RX) || 
+						((string)Entry.Key).ToLower() == "rowid"
+					) {
 						Response.Send("Invalid entry in Add (" + Entry.Key + ")", HttpStatusCode.BadRequest);
 						return;
 					}
@@ -63,7 +66,10 @@ namespace Webserver.API_Endpoints {
 			if ( FoundDelete ) {
 				JArray Delete = (JArray)DeleteValue;
 				foreach ( JToken Entry in Delete ) {
-					if ( Entry.Type != JTokenType.String || !Columns.ContainsKey((string)Entry) ) {
+					if ( Entry.Type != JTokenType.String || 
+						!Columns.ContainsKey((string)Entry) || 
+						((string)Entry).ToLower() == "rowid"
+					) {
 						Response.Send("Invalid entry in Delete (" + Entry + ")", HttpStatusCode.BadRequest);
 						return;
 					}
@@ -75,7 +81,16 @@ namespace Webserver.API_Endpoints {
 			if ( FoundRename ) {
 				JObject Rename = (JObject)RenameValue;
 				foreach ( KeyValuePair<string, JToken> Entry in Rename ) {
-					if ( Entry.Value.Type != JTokenType.String || Columns.ContainsKey((string)Entry.Value) || !Columns.ContainsKey(Entry.Key) || !Regex.IsMatch((string)Entry.Value, GenericDataTable.RX) ) {
+					if (
+						Entry.Value.Type != JTokenType.String || 
+						((string)Entry.Value).ToLower() == "validated" || 
+						((string)Entry.Value).ToLower() == "rowid" ||
+						((string)Entry.Key).ToLower() == "validated" ||
+						((string)Entry.Key).ToLower() == "rowid" ||
+						Columns.ContainsKey((string)Entry.Value) || 
+						!Columns.ContainsKey(Entry.Key) || 
+						!Regex.IsMatch((string)Entry.Value, GenericDataTable.RX)
+					) {
 						Response.Send("Invalid entry in Rename (" + Entry.Key + ")", HttpStatusCode.BadRequest);
 						return;
 					}

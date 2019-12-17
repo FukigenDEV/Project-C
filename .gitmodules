@@ -1,0 +1,3 @@
+[submodule "PrettyConsole"]
+	path = PrettyConsole
+	url = https://github.com/TehNolz/PrettyConsole
