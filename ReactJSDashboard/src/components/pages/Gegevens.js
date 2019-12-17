@@ -126,15 +126,15 @@ class Gegevens extends Component {
 				var userRole = getRoleInDepartment(user, tableDepartment);
 
 				if (userRole === "User") {
-				  $("#permissionInfo").text("You do not have the permission to view this table");
+				  $("#permissionInfo").text("U hebt niet de permissie om deze tabel te bekijken.");
 				  return;
 				} else if (userRole === "DeptMember") {
-				  $("#permissionInfo").text("You can view and change this table.");
+				  $("#permissionInfo").text("U kunt deze tabel zien en aanpassen.");
 				} else if (userRole === "Manager") {
-				  $("#permissionInfo").text("You can view, change and validate this table.");
+				  $("#permissionInfo").text("U kunt deze tabel zien, aanpassen en valideren.");
 				  $("#validate_table").show();
-				} else if (userRole === "Administrator") {
-				  $("#permissionInfo").text("You can view, change and validate and delete this table.");
+				} else if (userRole === "Administrator" || user["Email"] === "Administrator") {
+				  $("#permissionInfo").text("U kunt deze tabel zien, aanpassen, valideren en verwijderen.");
 				  $("#validate_table").show();
 				  $("#new_table").show();
 				  $("#delete_table").show();
@@ -174,7 +174,7 @@ class Gegevens extends Component {
 						}
 
 						// If it's the "Validated" row, with value "Nee", and the user is either Administrator or Manager
-						if (text === "Nee" && el === row.length - 1 && (userRole === "Administrator" || userRole === "Manager")) {
+						if (text === "Nee" && el === row.length - 1 && (userRole === "Administrator" || user["Email"] === "Administrator") || userRole === "Manager") {
 						  rowElement += "<td>" + text + "<input class=\"checkboxValidated\" type=\"checkbox\" style=\"float: right; width: 25px; height: 25px;\"/></td>";
 						} else {
 						  rowElement += "<td>" + text + "</td>";
@@ -291,14 +291,12 @@ class Gegevens extends Component {
 		<p id="no_table_message"></p>
 
 		<div id="new_table" style={{"border-bottom":"15px","display":"none"}}>
-			<a href="/index.html?#/dashboard/NewTable" style={{"text-decoration":"underline"}}>Nieuwe tabel aanmaken</a>
+			<a href="/index.html?#/dashboard/NewTable" style={{"text-decoration":"underline"}}>Nieuwe tabel aanmaken</a><br/>
 			<br/>
 		</div>
 
 		<div id="table_elements">
-			<br/>
-
-			Table:<br/>
+			Tabel:<br/>
 			<div id="tables_dropdown">
 				<select>
 				</select>
@@ -313,8 +311,8 @@ class Gegevens extends Component {
 
 			<br/>
 
-			<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Add row</button>
-			<button id="validate_table" style={{'display':'none','float':'right','width':'200px'}}>Validate selected rows</button>
+			<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Rij toevoegen</button>
+			<button id="validate_table" style={{'display':'none','float':'right','width':'250px'}}>Valideer geselecteerde rijen</button>
 
 			<br/>
 			<br/>
