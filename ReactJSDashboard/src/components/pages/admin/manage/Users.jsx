@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import { AdminModal} from '../../../../index';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class ManUsers extends Component {
@@ -29,8 +30,8 @@ class ManUsers extends Component {
     this.getUsers();
   }
 
-  getUsers = () => {
-    fetch('/account')
+  getUsers = async () => {
+    await fetch('/account')
     .then(users => {
       return users.json();
     }).then(data => {
@@ -39,12 +40,14 @@ class ManUsers extends Component {
   }
 
   render() {
+    let userid = -1;
     const userlist =
       this.state.data.map(user => (
+        userid = userid + 1,
         <tr>
           <th scope="row">{user.ID}</th>
           <td>{user.Email}</td>
-          <td><Link to={`/dashboard/Admin/users/manage/details/${user.Email}`}>Details</Link></td>
+          <td><AdminModal id={userid} data={this.state.data} modalTitle={'Gebruiker details'} buttonLabel='Details' /></td>
           <td><Link to={`/dashboard/Admin/users/manage/edit/${user.Email}`}>Edit</Link></td>
           <td><a href onClick={() => this.handleDelete(user.Email)}>Delete</a></td>
         </tr>
@@ -66,6 +69,7 @@ class ManUsers extends Component {
           {userlist}
           </tbody>
         </table>
+
       </React.Fragment>
     );
   }

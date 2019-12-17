@@ -6,6 +6,7 @@ import './index.css';
 import App from "./components/app/App";
 import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
+import AdminModal from './components/modal';
 
 import Admin from './components/pages/admin/Admin';
 
@@ -49,6 +50,7 @@ serviceWorker.unregister();
 export {
     Dashboard,
     Navs,
+    AdminModal,
     Home,
     Admin,
     Users,
