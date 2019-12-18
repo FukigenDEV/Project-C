@@ -35,10 +35,12 @@ const AdminModal = (props) => {
       <Modal isOpen={modal} toggle={toggle} className={className}>
         <ModalHeader toggle={toggle}>{modalTitle}</ModalHeader>
         <ModalBody>
-          <table>
-            {listData().map(row => (
-              <tr><td>{row.key}</td><td>{row.value}</td></tr>
-            ))}
+          <table class="table table-hover">
+            <tbody>
+              {listData().map(row => (
+                <tr><th>{row.key}</th><td>{row.value}</td></tr>
+              ))}
+            </tbody>
           </table>
         </ModalBody>
         {/* <ModalFooter>
