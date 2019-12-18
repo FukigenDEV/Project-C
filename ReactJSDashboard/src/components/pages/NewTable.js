@@ -18,7 +18,7 @@ class NewTable extends Component {
 				if (xhr.status >= 200 && xhr.status < 300) {
 					$("#gdt_message").text("De tabel is succesvol aangemaakt");
 				} else {
-					$("#gdt_message").text(xhr.responseText);
+					$("#gdt_message").text("Er is iets fout gegaan bij het aanmaken van de tabel.");
 				}
 			}
 		}
@@ -28,7 +28,7 @@ class NewTable extends Component {
 			var innerDiv = $(this);
 
 			var name = innerDiv.children("input").val();
-			var dataType = innerDiv.children("select").find(":selected").text();
+			var dataType = innerDiv.children("select").find(":selected").val();
 
 			var pair = '"' + name + '":"' + dataType + '"';
 			jsonString += pair;
@@ -49,10 +49,10 @@ class NewTable extends Component {
 
 		var childString = "<div>" +
 			"<select>" +
-				"<option value=\"integer\">Integer</option>" +
-				"<option value=\"string\">String</option>" +
-				"<option value=\"real\">Real</option>" +
-				"<option value=\"blob\">Blob</option>" +
+				"<option value=\"Integer\">Getal</option>" +
+				"<option value=\"String\">Woord</option>" +
+				"<option value=\"Real\">Decimaal</option>" +
+				"<option value=\"Blob\">Bestand</option>" +
 			"</select>" +
 			"<input type=\"text\" name=\"gdt_column_name\">" +
 			"<button class=\"remove_column\" style=\"width: 30px;\">-</button>" +
@@ -92,21 +92,25 @@ class NewTable extends Component {
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
 		<h2>Nieuwe tabel</h2>
 
+		<hr/>
+
+		<p>Maak een nieuwe tabel aan.</p>
+
 		<div id="add_gdt">
 			<form id="add_gdt_form" method="POST">
-				Name: <input id="gdt_name" type="text" name="gdt_name"/><br/>
+				Naam: <input id="gdt_name" type="text" name="gdt_name"/><br/>
 
 				<br/>
 
-				Columns:
+				Kolommen:
 
 				<template id="column_template">
 					<div>
 						<select>
-							<option value="integer">Integer</option>
-							<option value="string">String</option>
-							<option value="real">Real</option>
-							<option value="blob">Blob</option>
+							<option value="Integer">Getal</option>
+							<option value="String">Woord</option>
+							<option value="Real">Decimaal</option>
+							<option value="Blob">Bestand</option>
 						</select>
 						<input type="text" name="gdt_column_name"/>
 						<button id="remove_column" onclick="removeColumn(event, this);">-</button>
@@ -116,10 +120,10 @@ class NewTable extends Component {
 				<div id="columns">
 					<div>
 						<select>
-							<option value="integer">Integer</option>
-							<option value="string">String</option>
-							<option value="real">Real</option>
-							<option value="blob">Blob</option>
+							<option value="Integer">Getal</option>
+							<option value="String">Woord</option>
+							<option value="Real">Decimaal</option>
+							<option value="Blob">Bestand</option>
 						</select>
 						<input type="text" name="gdt_column_name"/>
 					</div>
@@ -127,11 +131,11 @@ class NewTable extends Component {
 
 				<br/>
 
-				<button id="add_column" style={{width: "200px"}}>+ Add column</button><br/>
+				<button id="add_column" style={{width: "200px"}}>+ Kolom toevoegen</button><br/>
 
 				<br/>
 
-				Department:<br/>
+				Afdeling:<br/>
 				<div id="departments_dropdown_gdt">
 					<select>
 					</select>
@@ -139,11 +143,14 @@ class NewTable extends Component {
 		
 				<br/>
 
-				Require validation: <input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"/><br/>
+				<input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"/> Goedkeuring vereist
+
+				<p style={{"font-size":"12px"}}>Als u dit aanvinkt, kunnen managers de geregistreerde gegevens goedkeuren.</p>
 
 				<br/>
-				<input type="submit" value="Add"/><br/>
 
+				<input type="submit" value="Toevoegen"/>
+				
 				<br/>
 
 				<p id="gdt_message"></p>

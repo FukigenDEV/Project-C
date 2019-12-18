@@ -197,7 +197,20 @@ class Gegevens extends Component {
 					if (lastColumnName === "Validated") {
 						lastRowElement += "<td style=\"border: 1px solid transparent;\"></td>";
 					} else {
-						lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"text\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
+						switch (json[tableName]["Columns"][lastColumnName]) {
+							case "Integer":
+								lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"number\" min=\"0\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
+								break;
+							case "String":
+								lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"text\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
+								break;
+							case "Real":
+								lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"number\" min=\"0\" step=\"any\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
+								break;
+							case "Blob":
+								lastRowElement += "<td style=\"border: 1px solid transparent;\"><input type=\"file\" id=\"" + lastColumnName + "\" placeholder=\"" + lastColumnName + "\"></td>";
+								break;
+						}
 					}
 				}
 				lastRowElement += "<tr/>";
@@ -272,8 +285,13 @@ class Gegevens extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				// Update the table
-				$("#tables_dropdown").change();
+				if (xhr.status >= 200 && xhr.status < 300) {
+					// Update the table
+					$("#error_message").text("");
+					$("#tables_dropdown").change();
+				} else {
+					$("#error_message").text(xhr.responseText);
+				}
 			}
 		}
 
