@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using Configurator;
 using Dapper.Contrib.Extensions;
 using Newtonsoft.Json;
@@ -42,6 +43,8 @@ namespace Webserver.Threads {
 		/// Start this RequestWorker. Meant to run in a separate thread.
 		/// </summary>
 		public void Run() {
+			Log.Info(Thread.CurrentThread.Name + " now running.");
+
 			do {
 				ContextProvider Context = Queue.Take();
 				Stopwatch S = new Stopwatch();
@@ -49,7 +52,7 @@ namespace Webserver.Threads {
 				RequestProvider Request = Context.Request;
 				ResponseProvider Response = Context.Response;
 
-				Log.Debug("Processing "+Request.HttpMethod+" request for " + Request.Url.LocalPath);
+				Log.Info("Processing "+Request.HttpMethod+" request for " + Request.Url.LocalPath);
 
 				#region Redirect
 				//Resolve redirects, if any
@@ -65,7 +68,7 @@ namespace Webserver.Threads {
 
 				//Redirect if necessary
 				if ( URL != Request.Url.LocalPath.ToLower() ) {
-					Log.Debug("Request redirected to " + URL);
+					Log.Info("Request redirected to " + URL);
 					Response.Redirect(URL);
 					Response.Send(HttpStatusCode.PermanentRedirect);
 					continue;
@@ -81,7 +84,7 @@ namespace Webserver.Threads {
 					ProcessResource(Request.Url.LocalPath.ToLower(), Context);
 				}
 				long TimeSpent = S.ElapsedMilliseconds;
-				Log.Debug("Operation complete. Took " + TimeSpent + "ms");
+				Log.Info("Operation complete. Took " + TimeSpent + "ms");
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
