@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import './index.css';
 
+import NewTable from './components/pages/NewTable';
+
 import App from "./components/app/App";
 import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
@@ -26,8 +28,7 @@ import manCompany from './components/pages/admin/manage/Company';
 import EditCompany from './components/pages/admin/manage/edit/Company';
 
 import Navs from './components/navs';
-import GegevensRegistreren from './components/pages/GegevensRegistreren';
-import GegevensBekijken from './components/pages/GegevensBekijken';
+import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
 import NotitiesEditForm from './components/pages/NotitiesEditForm';
 import Logs from './components/pages/Logs';
@@ -65,8 +66,6 @@ export {
     addCompany,
     manCompany,
     EditCompany,
-    GegevensRegistreren,
-    GegevensBekijken,
     Notities,
     Logs,
     Backup,
@@ -75,4 +74,6 @@ export {
     Error,
     Auth,
     NotitiesEditForm,
+    Gegevens,
+    NewTable
 }

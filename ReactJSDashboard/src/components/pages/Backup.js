@@ -9,7 +9,7 @@ class Backup extends Component {
 		
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#message").text("Back up successfully performed.");
+				$("#message").text("De back-up is succesvol uitgevoerd.");
 			}
 		}
 		
@@ -19,15 +19,17 @@ class Backup extends Component {
 
   render() {
     return (
-		<React.Fragment>
-			<p>Backup</p>
+      <div className="shadow-sm p-3 mb-5 bg-white rounded">
+		<h2>Back-up</h2>
 
-			<button id="backup_button">Create a back up.</button><br/>
+		<hr/>
 
-			<br/>
+		<button id="backup_button">Back-up maken</button><br/>
 
-			<p id="message"></p>
-		</React.Fragment>
+		<br/>
+
+		<p id="message"></p>
+      </div>
     );
   }
 }

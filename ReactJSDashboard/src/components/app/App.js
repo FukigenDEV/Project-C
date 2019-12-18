@@ -3,7 +3,7 @@ import { createGlobalStyle, ThemeConsumer } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
 import Cookies from 'js-cookie';
 import { createHashHistory } from 'history';
-import { Dashboard, Home, Admin, GegevensRegistreren, GegevensBekijken, Notities, Logout } from '../../index';
+import { Dashboard, Home, Admin, Gegevens, Notities, Logout, NewTable } from '../../index';
 import Login from '../login';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,10 +22,10 @@ class App extends Component {
       navs: [
         { id: 1, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
         { id: 2, heading: 'Beheren', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
-        { id: 3, heading: 'Gegevens bekijken', link: '/dashboard/GegevensBekijken', path: '/dashboard/GegevensBekijken', component: GegevensBekijken, active: false, icon: 'file-signature' },
-        { id: 4, heading: 'Gegevens Registreren', link: '/dashboard/GegevensRegistreren', path: '/dashboard/GegevensRegistreren', component: GegevensRegistreren, active: false, icon: 'file' },
-        { id: 5, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
-        { id: 6, heading: 'Uitloggen', link: '/dashboard/logout', path: '/dashboard/logout', component: Logout, active: false, icon: 'sign-out-alt' },
+        { id: 3, heading: 'Gegevens', link: '/dashboard/Gegevens', path: '/dashboard/Gegevens', component: Gegevens, active: false, icon: 'file-signature' },
+        { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },
+        { id: 5, heading: 'Uitloggen', link: '/dashboard/logout', path: '/dashboard/logout', component: Logout, active: false, icon: 'sign-out-alt' },
+        { id: 9, heading: 'NewTable', link: '/dashboard/NewTable', path: '/dashboard/NewTable', component: NewTable, active: false, icon: 'clipboard' },
       ]
     };
   }
