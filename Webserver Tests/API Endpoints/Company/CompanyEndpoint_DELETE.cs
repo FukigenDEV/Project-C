@@ -19,7 +19,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void DELETE_ValidArguments()
         {
-            new Company("SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+            new Company(Connection, "SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
 
             ResponseProvider response = ExecuteSimpleRequest("/company", HttpMethod.DELETE, new JObject() {
                 {"Name", "SomeCompany"},

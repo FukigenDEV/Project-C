@@ -37,51 +37,23 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void GET_ValidArguments()
         {
+            new Company(Connection, "SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+
             ResponseProvider response = ExecuteSimpleRequest("/company?name=SomeCompany", HttpMethod.GET);
 
             //Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
+            JObject data = JObject.Parse(Encoding.UTF8.GetString(response.Data));
             JArray expected = new JArray() {
                 infoTemplate
             };
 
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
+            Assert.IsTrue(JToken.DeepEquals(data, JObject.Parse(expected[0].ToString())));
         }
 
         /// <summary>
-        /// Check if we can retrieve multiple companies when given valid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkValidArguments()
-        {
-            // Create test companies
-            new Company("SomeCompany1", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
-            new Company("SomeCompany2", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
-
-            ResponseProvider response = ExecuteSimpleRequest("/department=SomeCompany1,SomeCompany2", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate };
-            expected[0]["ID"] = 1;
-            expected[0]["Name"] = "SomeCompany1";
-            expected[0]["Street"] = "SomeStreet";
-            expected[0]["HouseNumber"] = 1;
-            expected[0]["PostCode"] = "1234AB";
-            expected[0]["City"] = "SomeCity";
-            expected[0]["Country"] = "SomeCountry";
-            expected[0]["PhoneNumber"] = "SomePhoneNumber";
-            expected[0]["Email"] = "SomeEmail";
-
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
-        }
-
-        /// <summary>
-        /// Check if we get no results when given invalid params
+        /// Check if we get a 404 when given invalid params
         /// </summary>
         [TestMethod]
         public void GET_InvalidArguments()
@@ -89,46 +61,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
             ResponseProvider response = ExecuteSimpleRequest("/company?name=SomeDepartment", HttpMethod.GET);
 
             // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(data.Count == 0);
-        }
-
-        /// <summary>
-        /// Check if we get no results when given multiple invalid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkInvalidArguments()
-        {
-            ResponseProvider response = ExecuteSimpleRequest("/company?name=SomeDepartment,SomeOtherDepartment", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray Data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(Data.Count == 0);
-        }
-
-        /// <summary>
-        /// Check if we get one result when given one valid and one invalid param
-        /// </summary>
-        [TestMethod]
-        public void GET_MixedArguments()
-        {
-            new Company("SomeCompany1", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
-
-            ResponseProvider response = ExecuteSimpleRequest("/company?name=SomeCompany,SomeOtherCompany", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate };
-
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
+            Assert.IsTrue(response.StatusCode == HttpStatusCode.NotFound);
         }
 
         /// <summary>
@@ -138,17 +71,17 @@ namespace Webserver_Tests.API_Endpoints.Tests
         public void GET_AllCompanies()
         {
             // Create test companies
-            new Company("SomeCompany1", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
-            new Company("SomeCompany2", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+            new Company(Connection, "SomeCompany1", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+            new Company(Connection, "SomeCompany2", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
 
             // Create mock request
-            ResponseProvider response = ExecuteSimpleRequest("/company", HttpMethod.GET);
+            ResponseProvider response = ExecuteSimpleRequest("/company?name=", HttpMethod.GET);
 
             // Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
             JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate, infoTemplate };
+            JArray expected = new JArray() { infoTemplate, infoTemplate };
 
             expected[0]["ID"] = 1;
             expected[0]["Name"] = "SomeCompany1";

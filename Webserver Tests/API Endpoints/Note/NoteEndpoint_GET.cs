@@ -31,45 +31,23 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void GET_ValidArguments()
         {
+            new Note(Connection, "SomeTitle", "SomeText");
+
             ResponseProvider response = ExecuteSimpleRequest("/note?title=SomeTitle", HttpMethod.GET);
 
             //Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
+            JObject data = JObject.Parse(Encoding.UTF8.GetString(response.Data));
             JArray expected = new JArray() {
                 infoTemplate
             };
 
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
+            Assert.IsTrue(JToken.DeepEquals(data, JObject.Parse(expected[0].ToString())));
         }
 
         /// <summary>
-        /// Check if we can retrieve multiple notes when given valid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkValidArguments()
-        {
-            // Create test departments
-            new Note("SomeTitle1", "SomeText1");
-            new Note("SomeTitle2", "SomeText2");
-
-            ResponseProvider response = ExecuteSimpleRequest("/note?=SomeTitle1,SomeTitle2", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate };
-            expected[0]["ID"] = 1;
-            expected[0]["Title"] = "SomeTitle";
-            expected[0]["Text"] = "SomeText";
-
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
-        }
-
-        /// <summary>
-        /// Check if we get no results when given invalid params
+        /// Check if we get a 404 when given invalid params
         /// </summary>
         [TestMethod]
         public void GET_InvalidArguments()
@@ -77,46 +55,26 @@ namespace Webserver_Tests.API_Endpoints.Tests
             ResponseProvider response = ExecuteSimpleRequest("/note?title=SomeTitle", HttpMethod.GET);
 
             // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(data.Count == 0);
+            Assert.IsTrue(response.StatusCode == HttpStatusCode.NotFound);
         }
 
         /// <summary>
-        /// Check if we get no results when given multiple invalid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkInvalidArguments()
-        {
-            ResponseProvider response = ExecuteSimpleRequest("/note?title=SomeTitle,SomeOtherTitle", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray Data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(Data.Count == 0);
-        }
-
-        /// <summary>
-        /// Check if we get one result when given one valid and one invalid param
+        /// Check if we get a 404 when given one valid and one invalid param
         /// </summary>
         [TestMethod]
         public void GET_MixedArguments()
         {
-            new Note("SomeTitle", "SomeText");
+            new Note(Connection, "SomeTitle", "SomeText");
 
             ResponseProvider response = ExecuteSimpleRequest("/note?title=SomeTitle,SomeOtherTitle", HttpMethod.GET);
 
             // Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
+            JObject data = JObject.Parse(Encoding.UTF8.GetString(response.Data));
             JArray expected = new JArray() { infoTemplate };
 
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
+            Assert.IsTrue(JToken.DeepEquals(data, JObject.Parse(expected[0].ToString())));
         }
 
         /// <summary>
@@ -126,23 +84,23 @@ namespace Webserver_Tests.API_Endpoints.Tests
         public void GET_AllNotes()
         {
             // Create test departments
-            new Note("SomeTitle1", "SomeText1");
-            new Note("SomeTitle2", "SomeText2");
+            new Note(Connection, "SomeTitle1", "SomeText1");
+            new Note(Connection, "SomeTitle2", "SomeText2");
 
             // Create mock request
-            ResponseProvider response = ExecuteSimpleRequest("/note", HttpMethod.GET);
+            ResponseProvider response = ExecuteSimpleRequest("/note?title=", HttpMethod.GET);
 
             // Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
             JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate, infoTemplate };
+            JArray expected = new JArray() { infoTemplate, infoTemplate };
 
             expected[0]["ID"] = 1;
             expected[0]["Title"] = "SomeTitle1";
             expected[0]["Text"] = "SomeText1";
 
-            expected[1]["ID"] = 1;
+            expected[1]["ID"] = 2;
             expected[1]["Title"] = "SomeTitle2";
             expected[1]["Text"] = "SomeText2";
 

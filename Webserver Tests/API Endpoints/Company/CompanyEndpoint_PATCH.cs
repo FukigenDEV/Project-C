@@ -16,7 +16,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void EDIT_ValidArguments()
         {
-            new Company("SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+            new Company(Connection, "SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
 
             ResponseProvider response = ExecuteSimpleRequest("/company?name=SomeCompany", HttpMethod.PATCH, new JObject() {
                 {"Name", "SomeCoolCompany" },
@@ -69,7 +69,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [DynamicData("InvalidPatchTestData")]
         public void EDIT_InvalidArguments(JObject JSON, string URL, HttpStatusCode statusCode, string responseMessage)
         {
-            new Company("SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
+            new Company(Connection, "SomeCompany", "SomeStreet", 1, "1234AB", "SomeCity", "SomeCountry", "SomePhoneNumber", "SomeEmail");
 
             ResponseProvider response = ExecuteSimpleRequest(URL, HttpMethod.PATCH, JSON);
 

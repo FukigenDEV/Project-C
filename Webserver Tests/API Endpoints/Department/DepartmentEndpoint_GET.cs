@@ -19,8 +19,20 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [ClassInitialize]
         public new static void ClassInit(TestContext c) => APITestMethods.ClassInit(c);
 
-        private readonly JObject infoTemplate = new JObject() {
+        private readonly JObject infoTemplate1 = new JObject() {
             {"ID", 1 },
+            {"Name", "Administrators" },
+            {"Description", "Department for Administrators" }
+        };
+
+        private readonly JObject infoTemplate2 = new JObject() {
+            {"ID", 2 },
+            {"Name", "All Users" },
+            {"Description", "Default Department" }
+        };
+
+        private readonly JObject infoTemplate3 = new JObject() {
+            {"ID", 3 },
             {"Name", "SomeDepartment" },
             {"Description", "A department to test the application" }
         };
@@ -31,45 +43,23 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void GET_ValidArguments()
         {
+            new Department(Connection, "SomeDepartment", "A department to test the application");
+
             ResponseProvider response = ExecuteSimpleRequest("/department?name=SomeDepartment", HttpMethod.GET);
 
             //Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
+            JObject data = JObject.Parse(Encoding.UTF8.GetString(response.Data));
             JArray expected = new JArray() {
-                infoTemplate
+                infoTemplate3
             };
 
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
+            Assert.IsTrue(JToken.DeepEquals(data, JObject.Parse(expected[0].ToString())));
         }
 
         /// <summary>
-        /// Check if we can retrieve multiple departments when given valid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkValidArguments()
-        {
-            // Create test departments
-            new Department(Connection, "SomeDepartment1", "A department to test the application (1)");
-            new Department(Connection, "SomeDepartment2", "A department to test the application (2)");
-
-            ResponseProvider response = ExecuteSimpleRequest("/department=SomeDepartment1,SomeDepartment2", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate };
-            expected[2]["ID"] = 3;
-            expected[2]["Name"] = "SomeDepartment1";
-            expected[2]["Description"] = "A department to test the application (1)";
-
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
-        }
-
-        /// <summary>
-        /// Check if we get no results when given invalid params
+        /// Check if we get a 404 when given invalid params
         /// </summary>
         [TestMethod]
         public void GET_InvalidArguments()
@@ -77,27 +67,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
             ResponseProvider response = ExecuteSimpleRequest("/department?name=SomeDepartment", HttpMethod.GET);
 
             // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(data.Count == 0);
-        }
-
-        /// <summary>
-        /// Check if we get no results when given multiple invalid params
-        /// </summary>
-        [TestMethod]
-        public void GET_BulkInvalidArguments()
-        {
-            ResponseProvider response = ExecuteSimpleRequest("/department?name=SomeDepartment,SomeOtherDepartment", HttpMethod.GET);
-
-            // Verify results
-            Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray Data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-
-            Assert.IsTrue(Data.Count == 0);
+            Assert.IsTrue(response.StatusCode == HttpStatusCode.NotFound);
         }
 
         /// <summary>
@@ -110,11 +80,6 @@ namespace Webserver_Tests.API_Endpoints.Tests
 
             // Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
-
-            JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate };
-
-            Assert.IsTrue(JToken.DeepEquals(data, JArray.Parse(expected.ToString())));
         }
 
         /// <summary>
@@ -128,13 +93,13 @@ namespace Webserver_Tests.API_Endpoints.Tests
             new Department(Connection, "SomeDepartment2", "A department to test the application (2)");
 
             // Create mock request
-            ResponseProvider response = ExecuteSimpleRequest("/department", HttpMethod.GET);
+            ResponseProvider response = ExecuteSimpleRequest("/department?name=", HttpMethod.GET);
 
             // Verify results
             Assert.IsTrue(response.StatusCode == HttpStatusCode.OK);
 
             JArray data = JArray.Parse(Encoding.UTF8.GetString(response.Data));
-            JArray expected = new JArray() { infoTemplate, infoTemplate, infoTemplate };
+            JArray expected = new JArray() { infoTemplate1, infoTemplate2, infoTemplate3, infoTemplate3 };
 
             expected[2]["ID"] = 3;
             expected[2]["Name"] = "SomeDepartment1";
