@@ -9,6 +9,7 @@ using Webserver.Data;
 namespace Webserver.API_Endpoints {
 	[EndpointURL("/department")]
 	internal partial class DepartmentEndPoint : APIEndpoint {
+		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			// Get required fields
 			if ( !Params.ContainsKey("name") ) {
@@ -23,14 +24,23 @@ namespace Webserver.API_Endpoints {
 			}
 
 			// Check if the specified department exists. If it doesn't, send a 404 Not Found
-			Department department = Department.GetByName(Connection, Params["name"][0]);
-			if ( department == null ) {
+			Department Dept = Department.GetByName(Connection, Params["name"][0]);
+			if ( Dept == null ) {
 				Response.Send("No such department", HttpStatusCode.NotFound);
 				return;
 			}
 
-			// Build and send response
-			JObject JSON = JObject.FromObject(department);
+			// Get department data
+			JObject JSON = JObject.FromObject(Dept);
+
+			//Get all users who belong to this department
+			List<User> Users = User.GetUsersByDepartment(Connection, Dept);
+			JObject Perms = new JObject();
+			foreach(User Acc in Users) {
+				Perms.Add(Acc.Email, Acc.GetPermissionLevel(Connection, Dept).ToString());
+			}
+			JSON.Add("Users", Perms);
+
 			Response.Send(JSON, HttpStatusCode.OK);
 		}
 	}

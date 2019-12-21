@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -75,7 +76,9 @@ namespace Webserver {
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
 				RequestWorker Worker = new RequestWorker(Queue, (SQLiteConnection)Connection.Clone());
-				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
+				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run)) {
+					Name = "RequestWorker" + i
+				};
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);
 			}
@@ -83,9 +86,7 @@ namespace Webserver {
 			//Launch maintenance thread
 			Timer Maintenance = new Timer(new MaintenanceThread { Log = Log }.Run, null, 0, 3600 * 1000);
 
-			//Wait for an exit command, then exit.
-			Log.Info("Type 'Exit' to exit.");
-			
+			//Wait for an exit command, then exit.			
 			foreach(Thread Worker in WorkerThreads) {
 				Worker.Join();
 			}
