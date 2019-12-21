@@ -39,6 +39,45 @@ function getRoleInDepartment(user, department) {
   return user["Permissions"][department];
 }
 
+function addOptionEvents() {
+	$(".validate_row").each(function (i, obj) {
+		$(this).on("click", function() {
+			var element = $(this)[0];
+
+			var rowId = element.parentElement.parentElement.getAttribute("data-rowid");
+			var tableName = $("#table").attr("data-name");
+		
+			var xhr = new XMLHttpRequest();
+			xhr.open("PATCH", "/data?table=" + tableName, false);
+			xhr.setRequestHeader("Content-Type", "application/json");
+		
+			var json = "{" + rowId + ": {\"Validated\": 1}}";
+			xhr.send(json);
+
+			$("#tables_dropdown").change();
+		});
+	});
+	
+	$('.delete_row').each(function() {
+		$(this).on("click", function() {
+			var element = $(this)[0];
+
+			var rowId = element.parentElement.parentElement.getAttribute("data-rowid");
+			var tableName = $("#table").attr("data-name");
+		
+			var xhr = new XMLHttpRequest();
+			xhr.open("DELETE", "/data?table=" + tableName, false);
+			xhr.setRequestHeader("Content-Type", "application/json");
+		
+			var json = "{ RowIDs: [ " + rowId + " ] }";
+			
+			xhr.send(json);
+	  
+			$("#tables_dropdown").change();
+		});
+	});
+}
+
 class Gegevens extends Component {
   componentDidMount() {
 	var xhr = new XMLHttpRequest();
@@ -106,7 +145,6 @@ class Gegevens extends Component {
 
 		$("#table").empty();
 
-		$("#validate_table").hide();
 		$("#add_row").hide();
 		$("#new_table").hide();
 		$("#delete_table").hide();
@@ -132,10 +170,8 @@ class Gegevens extends Component {
 				  $("#permissionInfo").text("U kunt deze tabel zien en aanpassen.");
 				} else if (userRole === "Manager") {
 				  $("#permissionInfo").text("U kunt deze tabel zien, aanpassen en valideren.");
-				  $("#validate_table").show();
 				} else if (userRole === "Administrator" || user["Email"] === "Administrator") {
 				  $("#permissionInfo").text("U kunt deze tabel zien, aanpassen, valideren en verwijderen.");
-				  $("#validate_table").show();
 				  $("#new_table").show();
 				  $("#delete_table").show();
 				}
@@ -155,12 +191,20 @@ class Gegevens extends Component {
 
 					columnElement += "<th>" + columnName + "</th>";
 				}
+				
+				// If user is admin or manager, show the options column
+				if ((userRole === "Administrator" || user["Email"] === "Administrator") || userRole === "Manager") {
+					columnElement += "<th style=\"width: 200px;\">Opties</th>";
+				}
+
 				columnElement += "</tr>";
 				
 				$("#table").append(columnElement);
 
 				// Build the rows with the entries
 				for (var r = 0; r < json[tableName]["Rows"].length; r++) {
+					var validated = false;
+
 					var row = json[tableName]["Rows"][r];
 
 					var rowElement = "<tr data-rowid=\"" + row[0] + "\">";
@@ -170,16 +214,29 @@ class Gegevens extends Component {
 
 						// Change 0/1 to Nee/Ja
 						if (el === row.length - 1) {
-						  text = (text === 0 ? "Nee" : "Ja");
+						  if (text === 0) {
+						  	  text = "Nee";
+						  } else {
+						  	  text = "Ja";
+							  validated = true;
+						  }
 						}
 
-						// If it's the "Validated" row, with value "Nee", and the user is either Administrator or Manager
-						if (text === "Nee" && el === row.length - 1 && (userRole === "Administrator" || user["Email"] === "Administrator") || userRole === "Manager") {
-						  rowElement += "<td>" + text + "<input class=\"checkboxValidated\" type=\"checkbox\" style=\"float: right; width: 25px; height: 25px;\"/></td>";
+						rowElement += "<td>" + text + "</td>";
+					}
+					
+					// If user is admin or manager, show the buttons in the options rows
+					if ((userRole === "Administrator" || user["Email"] === "Administrator") || userRole === "Manager") {
+						var validatePart = "<span class=\"validate_row\" style=\"text-decoration: underline; color: #007BFF; cursor: pointer;\">Valideren</span>";
+						var deletePart = "<span class=\"delete_row\" style=\"text-decoration: underline; color: #007BFF; cursor: pointer;\">Verwijderen</span>";
+
+						if (validated) {
+							rowElement += "<td>" + deletePart + "</td>";
 						} else {
-						  rowElement += "<td>" + text + "</td>";
+							rowElement += "<td>" + validatePart + " | " + deletePart + "</td>";
 						}
 					}
+
 					rowElement += "</tr>";
 
 					$("#table").append(rowElement);
@@ -213,35 +270,21 @@ class Gegevens extends Component {
 						}
 					}
 				}
+
+				// If user is admin or manager, show one more row for the options column
+				if ((userRole === "Administrator" || user["Email"] === "Administrator") || userRole === "Manager") {
+					lastRowElement += "<td style=\"border: 1px solid transparent;\"></td>";
+				}
+
 				lastRowElement += "<tr/>";
 				
 				$("#table").append(lastRowElement);
+
+				addOptionEvents();
 			}
 		}
 
 		xhr.send();
-	});
-
-	$("#validate_table").on("click", function() {
-	  $('.checkboxValidated').each(function() {
-	    var checkbox = $(this)[0];
-
-		if (!checkbox.checked) {
-			return;
-		}
-
-		var rowId = checkbox.parentElement.parentElement.getAttribute("data-rowid");
-		var tableName = $("#table").attr("data-name");
-		
-		var xhr = new XMLHttpRequest();
-		xhr.open("PATCH", "/data?table=" + tableName, false);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		
-		var json = "{" + rowId + ": {\"Validated\": 1}}";
-		xhr.send(json);
-	  });
-	  
-	  $("#tables_dropdown").change();
 	});
 
 	$("#add_row").on("click", function() {
@@ -330,7 +373,6 @@ class Gegevens extends Component {
 			<br/>
 
 			<button id="add_row" style={{'display':'none','width':'300px','height':'50px'}}>Rij toevoegen</button>
-			<button id="validate_table" style={{'display':'none','float':'right','width':'250px'}}>Valideer geselecteerde rijen</button>
 
 			<br/>
 			<br/>
