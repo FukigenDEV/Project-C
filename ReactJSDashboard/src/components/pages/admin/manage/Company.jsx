@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import { AdminModal} from '../../../../index';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class manCompany extends Component {
@@ -23,8 +24,8 @@ class manCompany extends Component {
     this.getCompanies();
   }
 
-  getCompanies = () => {
-    fetch('/company?name=')
+  getCompanies = async () => {
+    await fetch('/company?name=')
     .then(companies => {
       return companies.json();
     }).then(data => {
@@ -34,12 +35,14 @@ class manCompany extends Component {
   }
 
   render() {
+    let id = -1;
     const companylist = (this.state.data.length !== 0) ?
       this.state.data.map(company => (
+        id = id + 1,
         <tr>
           <th scope="row">{company.ID}</th>
           <td>{company.Name}</td>
-          <td><Link to={`/dashboard/Admin/company/manage/details/${company.ID}`}>Details</Link></td>
+          <td><AdminModal id={id} data={this.state.data} modalTitle={'Bedrijf details'} buttonLabel='Details' /></td>
           <td><Link to={`/dashboard/Admin/company/manage/edit/${company.Name}`}>Edit</Link></td>
           <td><a href onClick={() => this.handleDelete(company.Name)}>Delete</a></td>
         </tr>

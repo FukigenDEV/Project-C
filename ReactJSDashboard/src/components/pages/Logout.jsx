@@ -58,7 +58,7 @@ class Uitloggen extends Component {
   render() {
 
     return (
-      <div className="col-sm-12 shadow-sm p-3 mb-5 bg-white rounded">
+      <div className="col-sm-12 shadow-sm p-3 bg-white rounded">
         Weet je zeker dat je wilt uitloggen?
         <br/><br/><br/>
         {/*Wanneer er iets foutgaat bij uitloggen geeft hij deze melding*/}

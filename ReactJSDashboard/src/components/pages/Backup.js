@@ -9,7 +9,7 @@ class Backup extends Component {
 		
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#message").text("Back up successfully performed.");
+				$("#message").text("De back-up is succesvol uitgevoerd.");
 			}
 		}
 		
@@ -20,9 +20,11 @@ class Backup extends Component {
   render() {
     return (
       <div className="shadow-sm p-3 mb-5 bg-white rounded">
-        <p>Backup</p>
+		<h2>Back-up</h2>
 
-		<button id="backup_button">Create a back up.</button><br/>
+		<hr/>
+
+		<button id="backup_button">Back-up maken</button><br/>
 
 		<br/>
 

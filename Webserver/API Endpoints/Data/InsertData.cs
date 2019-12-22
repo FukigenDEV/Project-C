@@ -40,6 +40,14 @@ namespace Webserver.API_Endpoints {
 					Response.Send("Can't set row ID", HttpStatusCode.BadRequest);
 					return;
 				}
+				if (Columns[Entry.Key] == DataType.Integer) {
+					try {
+						int input = (int)Entry.Value;
+					} catch {
+						Response.Send("Invalid row value at " + Entry.Key, HttpStatusCode.BadRequest);
+						return;
+					}
+				}
 				Dict.Add(Entry.Key, Columns[Entry.Key] == DataType.Integer ? (int)Entry.Value : (dynamic)Entry.Value);
 			}
 
