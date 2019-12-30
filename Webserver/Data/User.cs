@@ -41,6 +41,13 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
+		/// Deletes this user account
+		/// </summary>
+		/// <param name="Connection"></param>
+		public void Delete(SQLiteConnection Connection) => Delete(Connection, this);
+		public static void Delete(SQLiteConnection Connection, User Acc) => Connection.Delete(Acc);
+
+		/// <summary>
 		/// Dapper-only constructor for deserializing database rows into user objects. Do not use.
 		/// </summary>
 		public User(
