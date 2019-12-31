@@ -23,18 +23,18 @@ namespace Webserver.Threads {
 	public class RequestWorker {
 		public static LogTab RequestLoggerTab;
 		private readonly Logger Log;
-		private readonly BlockingCollection<ContextProvider> Queue;
+		public static BlockingCollection<ContextProvider> Queue { get; set; } = new BlockingCollection<ContextProvider>();
 		public SQLiteConnection Connection;
 		private readonly bool Debug;
+		public static NumWatcher RequestTimeWatcher;
 
 		/// <summary>
 		/// Create a new RequestWorker, which processes incoming HttpListener requests. Meant to run in a separate thread.
 		/// </summary>
 		/// <param name="Log">A Logger object</param>
 		/// <param name="Queue">A BlockingCollection queue that will contain all incoming requests.</param>
-		public RequestWorker(BlockingCollection<ContextProvider> Queue, SQLiteConnection Connection, bool Debug = false) {
+		public RequestWorker(SQLiteConnection Connection, bool Debug = false) {
 			this.Log = RequestLoggerTab.GetLogger();
-			this.Queue = Queue;
 			this.Connection = Connection;
 			this.Debug = Debug;
 		}
@@ -88,6 +88,8 @@ namespace Webserver.Threads {
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
+				RequestTimeWatcher.Update(TimeSpent);
+				Listener.QueueSizeWatcher.Update(RequestWorker.Queue.Count);
 			} while ( !Debug || Queue.Count != 0);
 			//Connection.Close();
 		}

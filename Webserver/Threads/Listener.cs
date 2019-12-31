@@ -12,12 +12,14 @@ namespace Webserver.Threads {
 	/// </summary>
 	internal class Listener {
 		public static Logger Log = Program.Log;
+		public static NumWatcher QueueSizeWatcher;
+
 		/// <summary>
 		/// Start a Listener. Incoming requests will be inserted in the given BlockingCollection, which can then be processed using RequestWorkers
 		/// </summary>
 		/// <param name="Log"></param>
 		/// <param name="Queue"></param>
-		public static void Run(BlockingCollection<ContextProvider> Queue) {
+		public static void Run() {
 			Log.Info("Starting ListenerThread");
 
 			//Get addresses the server should listen to.
@@ -52,7 +54,8 @@ namespace Webserver.Threads {
 			//Listen for incoming requests and add them to the queue.
 			Log.Info("Now listening!");
 			while ( true ) {
-				Queue.Add(new ContextProvider(Listener.GetContext()));
+				RequestWorker.Queue.Add(new ContextProvider(Listener.GetContext()));
+				QueueSizeWatcher.Update(RequestWorker.Queue.Count);
 			}
 		}
 	}

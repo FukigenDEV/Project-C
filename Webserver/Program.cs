@@ -14,7 +14,7 @@ using Webserver.Threads;
 
 namespace Webserver {
 	public static class Program {
-		public static Logger Log;
+		public static Logger Log { get; set; }
 		public static List<Type> Endpoints;
 		public static List<string> CORSAddresses = new List<string>();
 
@@ -22,7 +22,7 @@ namespace Webserver {
 			//Initialize logger
 			LogTab Tab = new LogTab("General");
 			Log = Tab.GetLogger();
-			Utils.Log = Log;
+			RequestWorker.RequestLoggerTab = new LogTab("Workers");
 			Log.Info("Server is starting!");
 
 			//Create default config
@@ -64,18 +64,19 @@ namespace Webserver {
 			//Find all API endpoints
 			DiscoverEndpoints();
 
-			//Create console tabs
-			RequestWorker.RequestLoggerTab = new LogTab("Workers");
-
 			//Create Queue and launch listener
-			using BlockingCollection<ContextProvider> Queue = new BlockingCollection<ContextProvider>();
-			Thread ListenerThread = new Thread(() => Listener.Run(Queue));
+			Thread ListenerThread = new Thread(() => Listener.Run());
 			ListenerThread.Start();
+
+			//Create performance tab + watchers
+			MonitorTab pTab = new MonitorTab("PerfMon");
+			RequestWorker.RequestTimeWatcher = pTab.CreateNumWatcher("Request time", ShowMin: true, ShowAverage: true, ShowMax: true);
+			Listener.QueueSizeWatcher = pTab.CreateNumWatcher("Queue size", ShowMax: true);
 
 			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
-				RequestWorker Worker = new RequestWorker(Queue, (SQLiteConnection)Connection.Clone());
+				RequestWorker Worker = new RequestWorker((SQLiteConnection)Connection.Clone());
 				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run)) {
 					Name = "RequestWorker" + i
 				};
