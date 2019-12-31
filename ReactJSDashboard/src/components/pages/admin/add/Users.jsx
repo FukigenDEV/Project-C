@@ -12,8 +12,10 @@ class AddUsers extends Component {
       form: {
         'Email': '',
         'Password': '',
-        'AccountType': '',
-        'MemberOf': ''
+        'MemberDepartments': {"_d1" : "User"},
+      },
+      depts: {
+        "_d1" : "_d1",
       },
       data: [],
     }
@@ -26,8 +28,19 @@ class AddUsers extends Component {
   handleChange = (event) => {
     event.preventDefault();
     const form = {...this.state.form};
-    form[event.target.name] = event.target.value;
-    this.setState({form});
+    const depts = {...this.state.depts};
+    if(event.target.name.startsWith("_d")) {
+      const item_key = depts[event.target.name];
+      form["MemberDepartments"][event.target.value] = form["MemberDepartments"][item_key];
+      depts[event.target.name] = event.target.value;
+      delete form["MemberDepartments"][item_key];
+    } else if(event.target.name.startsWith("_a")) {
+      const item_key = depts[`_d${event.target.name[2]}`];
+      form["MemberDepartments"][item_key] = event.target.value;
+    } else {
+      form[event.target.name] = event.target.value;
+    }
+    this.setState({form, depts});
   }
 
   handleSubmit = (event) => {
@@ -66,38 +79,60 @@ class AddUsers extends Component {
     })
   }
 
+  addDept = (event) => {
+    event.preventDefault();
+    const depts = {...this.state.depts};
+    const form = {...this.state.form};
+    const dept_amount = Object.keys(depts).length + 1;
+    const name = "_d" + dept_amount;
+    depts[name] = name;
+    form["MemberDepartments"][name] = "User";
+    this.setState({form, depts});
+  }
+
   render() {
+    console.log(this.state.form);
+    console.log(this.state.depts);
+    console.log(Object.keys(this.state.form["MemberDepartments"]));
     return (
       <div>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <div class="form-group">
-            <label for="Email">Email address</label>
-            <input onChange={this.handleChange} type="text" name="Email" class="form-control" id="Email" placeholder="Enter email" />
+            <label for="Email">E-mailadres</label>
+            <input onChange={this.handleChange} type="text" name="Email" class="form-control" id="Email" placeholder="E-mailadres" />
           </div>
 
           <div class="form-group">
-            <label for="Password">Password</label>
-            <input onChange={this.handleChange} type="password" name="Password" class="form-control" id="Password" placeholder="Enter password" />
+            <label for="Password">Wachtwoord</label>
+            <input onChange={this.handleChange} type="password" name="Password" class="form-control" id="Password" placeholder="Wachtwoord" />
           </div>
 
           <div class="form-group">
-            <label for="Type">Department</label>
-            <select onChange={this.handleChange} name="MemberOf" class="form-control" id="Department">
-              <option value="">Select department...</option>
-              {this.state.data.map(department => (<option value={department.Name}>{department.Name}</option>))}
-            </select>
+            <a href onClick={this.addDept.bind(this)}>Meer departments toevoegen</a>
           </div>
 
-          <div class="form-group">
-            <label for="Type">Account type</label>
-            <select onChange={this.handleChange} name="AccountType" class="form-control" id="Type">
-              <option value="">Select type...</option>
-              <option value="Administrator">Administrator</option>
-              <option value="Manager">Manager</option>
-              <option value="DeptMember">Department Member</option>
-              <option value="User">User</option>
-            </select>
-          </div>
+          {Object.keys(this.state.depts).map(dept => (
+            <React.Fragment>
+              <div class="form-group float-left dept">
+                <label for="Type">Afdeling</label>
+                <select onChange={this.handleChange} name={dept} class="form-control" id="Department">
+                  <option value="">Selecteer afdeling...</option>
+                  {this.state.data.map(department => (<option value={department.Name}>{department.Name}</option>))}
+                </select>
+              </div>
+
+              <div class="form-group float-right dept">
+                <label for="Type">Autorisatie</label>
+                <select onChange={this.handleChange} name={`_a${dept[2]}`} class="form-control" id="Type">
+                  <option value="">Selecteer autorisatie...</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Manager">Manager</option>
+                  <option value="DeptMember">Department Member</option>
+                  <option value="User">User</option>
+                </select>
+              </div>
+            </React.Fragment>
+          ))}
 
           <button type="submit" class="btn btn-primary">Add user</button>
         </form>
