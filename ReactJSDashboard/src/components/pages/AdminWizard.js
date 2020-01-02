@@ -60,7 +60,12 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#department_message").html(xhr.responseText);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#department_message").html("Afdeling is succesvol aangemaakt.");
+				} else {
+					$("#department_message").html("De afdeling kon niet worden aangemaakt.");
+				}
+
 				$('#department_message').css({"display": "block"});
 				$('#department_message').delay(2000).fadeOut(300);
 
@@ -109,7 +114,12 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#user_message").html(xhr.responseText);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#user_message").html("De gebruiker is succesvol aangemaakt.");
+				} else {
+					$("#user_message").html("De gebruiker kon niet worden aangemaakt.");
+				}
+
 				$('#user_message').css({"display": "block"});
 				$('#user_message').delay(2000).fadeOut(300);
 
@@ -148,9 +158,9 @@ class AdminWizard extends Component {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
 				if (xhr.status >= 200 && xhr.status < 300) {
-					$("#gdt_message").text("De tabel is succesvol aangemaakt");	
+					$("#gdt_message").text("De tabel is succesvol aangemaakt.");	
 				} else {
-					$("#gdt_message").text(xhr.responseText);
+					$("#gdt_message").text("De tabel kon niet worden aangemaakt.");
 				}
 			}
 		}

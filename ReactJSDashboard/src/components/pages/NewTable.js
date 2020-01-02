@@ -145,11 +145,11 @@ class NewTable extends Component {
 
 				<input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"/> Goedkeuring vereist
 
-				<p style={{"font-size":"12px"}}>Als u dit aanvinkt, kunnen managers de geregistreerde gegevens goedkeuren.</p>
+				<p style={{"font-size":"12px"}}>Als u dit aanvinkt, kunnen administrators en managers de geregistreerde gegevens goedkeuren.</p>
 
 				<br/>
 
-				<input type="submit" value="Toevoegen"/>
+				<input type="submit" value="Toevoegen"/><br/>
 				
 				<br/>
 

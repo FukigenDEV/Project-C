@@ -333,7 +333,7 @@ class Gegevens extends Component {
 					$("#error_message").text("");
 					$("#tables_dropdown").change();
 				} else {
-					$("#error_message").text(xhr.responseText);
+					$("#error_message").text("De row kon niet worden aangemaakt.");
 				}
 			}
 		}

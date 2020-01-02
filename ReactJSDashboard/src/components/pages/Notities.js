@@ -59,7 +59,7 @@ class Notities extends Component {
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState === 4) {
 					if (xhr.status === 200) {
-						$("#message").html(xhr.responseText);
+						$("#message").html("De notitie is succesvol aangemaakt.");
 					}
 				}
 			}
