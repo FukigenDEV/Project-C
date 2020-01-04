@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { createGlobalStyle, ThemeConsumer } from 'styled-components';
 import { HashRouter as Router, Route, Redirect, withRouter } from "react-router-dom";
-import Cookies from 'js-cookie';
 import { createHashHistory } from 'history';
 import { Dashboard, Home, Admin, Gegevens, Notities, Logout, NewTable } from '../../index';
 import Login from '../login';

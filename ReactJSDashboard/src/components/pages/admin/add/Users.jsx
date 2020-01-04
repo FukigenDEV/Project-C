@@ -1,28 +1,44 @@
 import React, { Component } from 'react';
+import Form from '../../../form/form';
+import { standard, email } from '../../../form/fieldcheck';
 
 class AddUsers extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      alert: {
-        type: 0,
-        value: ''
-      },
-
+      complete: false,
       form: {
-        'Email': '',
-        'Password': '',
         'MemberDepartments': {"_d1" : "User"},
       },
       depts: {
         "_d1" : "_d1",
       },
       data: [],
+      forms: [
+        {fieldname: 'E-mailadres', name: 'Email', type: 'text', placeholder: 'E-mailadres invullen...', check: email},
+        {fieldname: 'Wachtwoord', name: 'Password', type: 'password', placeholder: 'Wachtwoord invullen...', check: standard},
+      ],
+      action: 'POST',
+      api: '/account',
+      buttonname: 'Gebruiker toevoegen',
     }
   }
 
   componentDidMount() {
     this.getDepartments();
+  }
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const {action, api} = this.state;
+    const {onRedirect} = this.props;
+    await fetch(api, {
+      method: action,
+      body: JSON.stringify(this.state.form),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 
   handleChange = (event) => {
@@ -41,33 +57,6 @@ class AddUsers extends Component {
       form[event.target.name] = event.target.value;
     }
     this.setState({form, depts});
-  }
-
-  handleSubmit = (event) => {
-    event.preventDefault();
-    const obj = this.state.form;
-    const data = JSON.stringify(obj);
-
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/account", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.readyState === 4) {
-        if(xhr.status === 200) {
-          const alert = {...this.state.alert};
-          alert.type = 200;
-          alert.value = 'User succesfully created';
-          this.setState({alert});
-        } else {
-          const alert = {...this.state.alert};
-          alert.type = xhr.status;
-          alert.value = xhr.responseText;
-          this.setState({alert});
-        }
-      }
-    }
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(data);
   }
 
   getDepartments = () => {
@@ -90,29 +79,38 @@ class AddUsers extends Component {
     this.setState({form, depts});
   }
 
+  setForm = ext_form => {
+    const form = {...this.state.form};
+    Object.keys(ext_form).forEach(key => {
+      form[key] = ext_form[key];
+    });
+    this.setState({form});
+    console.log(this.state.form);
+  }
+
+  setComplete = ext_bool => {
+    const complete = ext_bool;
+    this.setState({complete});
+  }
+
   render() {
     console.log(this.state.form);
-    console.log(this.state.depts);
-    console.log(Object.keys(this.state.form["MemberDepartments"]));
-    return (
-      <div>
+    const {action, api, form, forms, buttonname} = this.state;
+
+    if (typeof(forms) === 'object') {
+      return (
         <form onSubmit={this.handleSubmit.bind(this)}>
-          <div class="form-group">
-            <label for="Email">E-mailadres</label>
-            <input onChange={this.handleChange} type="text" name="Email" class="form-control" id="Email" placeholder="E-mailadres" />
-          </div>
-
-          <div class="form-group">
-            <label for="Password">Wachtwoord</label>
-            <input onChange={this.handleChange} type="password" name="Password" class="form-control" id="Password" placeholder="Wachtwoord" />
-          </div>
-
-          <div class="form-group">
-            <a href onClick={this.addDept.bind(this)}>Meer departments toevoegen</a>
-          </div>
+          <Form
+            action={action}
+            api={api}
+            forms={forms}
+            buttonname={buttonname}
+            setForm={this.setForm}
+            setComplete={this.setComplete}
+          />
 
           {Object.keys(this.state.depts).map(dept => (
-            <React.Fragment>
+            <>
               <div class="form-group float-left dept">
                 <label for="Type">Afdeling</label>
                 <select onChange={this.handleChange} name={dept} class="form-control" id="Department">
@@ -122,7 +120,7 @@ class AddUsers extends Component {
               </div>
 
               <div class="form-group float-right dept">
-                <label for="Type">Autorisatie</label>
+                <label for="Type">Autorisatie</label><a href onClick={this.addDept.bind(this)} class="float-right">+</a>
                 <select onChange={this.handleChange} name={`_a${dept[2]}`} class="form-control" id="Type">
                   <option value="">Selecteer autorisatie...</option>
                   <option value="Administrator">Administrator</option>
@@ -131,13 +129,15 @@ class AddUsers extends Component {
                   <option value="User">User</option>
                 </select>
               </div>
-            </React.Fragment>
+            </>
           ))}
 
-          <button type="submit" class="btn btn-primary">Add user</button>
+          <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
         </form>
-      </div>
-    );
+      );
+    } else {
+      return <></>;
+    }
   }
 }
 

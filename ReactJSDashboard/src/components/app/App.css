@@ -215,3 +215,11 @@ th, td {
 .dept {
   width: 49%;
 }
+
+.tooltip-arrow,
+.tooltip > .tooltip-inner {background-color: #f00;}
+
+.form-group span {
+  color: #F00;
+  float: right;
+}

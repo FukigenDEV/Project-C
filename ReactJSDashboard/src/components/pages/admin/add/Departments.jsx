@@ -1,84 +1,68 @@
 import React, { Component } from 'react';
+import { Form } from '../../../../index';
+import { standard } from '../../../form/fieldcheck';
 
 class addDepartments extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      alert: {
-        type: 0,
-        value: ''
-      },
-
-      form: {
-        'name': '',
-        'description': ''
-      }
+      complete: false,
+      action: 'POST',
+      api: '/department',
+      forms: [
+      {fieldname: 'Naam van afdeling', name: 'name', type: 'text', placeholder: 'Naam invullen...', check: standard},
+      {fieldname: 'Beschrijving', name: 'description', type: 'text', placeholder: 'Beschrijving invullen...', check: standard}
+      ],
+      buttonname: 'Afdeling toevoegen',
     }
   }
 
-  handleChange = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
+    const {action, api} = this.state;
+    const {onRedirect} = this.props;
+    await fetch(api, {
+      method: action,
+      body: JSON.stringify(this.state.form),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
+  setForm = ext_form => {
     const form = {...this.state.form};
-    form[event.target.name] = event.target.value;
+    Object.keys(ext_form).forEach(key => {
+      form[key] = ext_form[key];
+    });
     this.setState({form});
+    console.log(this.state.form);
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-    const obj = this.state.form;
-    const data = JSON.stringify(obj);
-
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/department", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.readyState === 4) {
-        if(xhr.status >= 200 && xhr.status < 300) {
-          const alert = {...this.state.alert};
-          alert.type = 200;
-          alert.value = 'Department succesfully added';
-          this.setState({alert});
-        } else {
-          const alert = {...this.state.alert};
-          alert.type = xhr.status;
-          alert.value = xhr.responseText;
-          this.setState({alert});
-        }
-      }
-    }
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(data);
-  }
-  // Zorgt weer voor de balk die een groene melding laat zien (goed) of een rode melding (error)
-  getBadgeClasses = () => {
-    let classes = 'alert mr-3 ml-3 ';
-    classes += (this.state.alert.type >= 200 && this.state.alert.type < 300) ? "alert-success" : "alert-danger";
-    classes += (this.state.alert.type === 0) ? " d-none" : " d-block";
-    return classes;
+  setComplete = ext_bool => {
+    const complete = ext_bool;
+    this.setState({complete});
   }
 
   render() {
-    console.log(this.state.form);
-    console.log(this.state.alert);
-    return (
-      <div>
+    const {action, api, forms, buttonname} = this.state;
+    if(typeof(forms) === 'object') {
+      return (
         <form onSubmit={this.handleSubmit.bind(this)}>
-          <div class="form-group">
-            <label for="department">Department name</label>
-            <input onChange={this.handleChange} type="text" name="name" class="form-control" id="department" placeholder="Enter department name" />
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description</label>
-            <input onChange={this.handleChange} type="text" name="description" class="form-control" id="description" placeholder="Enter description" />
-          </div>
-          {/*Laat de melding zien van als het is gelukt of als er iets fout is gegaan, die komen uit backend*/}
-          <div className={this.getBadgeClasses()}>{this.state.alert.value}</div>
-
-          <button type="submit" class="btn btn-primary">Add department</button>
+            <Form
+              action={action}
+              api={api}
+              forms={forms}
+              buttonname={buttonname}
+              setForm={this.setForm}
+              setComplete={this.setComplete}
+            />
+            <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
         </form>
-      </div>
-    );
+      );
+    } else {
+      return <></>;
+    }
   }
 }
 
