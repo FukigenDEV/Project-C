@@ -1,57 +1,60 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
+using Dapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Webserver.Data;
 
 namespace Webserver.API_Endpoints {
 	[EndpointURL("/account")]
-	internal partial class AccountEndpoint : APIEndpoint {
-		[PermissionLevel(PermLevel.Manager)]
-		[RequireContentType("application/json")]
+	public partial class AccountEndpoint : APIEndpoint {
+		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
 			List<User> Users = new List<User>();
-			if ( RequestParams.ContainsKey("email") ) {
+			if (Params.ContainsKey("email")) {
 
-				//Check if the specified user exists. If it doesn't, send a 404 Not Found
-				User Acc = User.GetUserByEmail(Connection, RequestParams["email"][0]);
-				if ( Acc == null ) {
-					Send("No such user", HttpStatusCode.NotFound);
+				//Get all user objects
+				foreach(string Email in Params["email"]) {
+					if (Email == "CurrentUser") {
+						Users.Add(RequestUser);
+						continue;
+					}
+					if (RequestUserLevel < PermLevel.Manager) {
+						Response.Send(HttpStatusCode.Forbidden);
+						return;
+					}
+					User Acc = User.GetUserByEmail(Connection, Email);
+					if (Acc != null) Users.Add(Acc);
+				}
+
+			//If email is missing, assume all users
+			} else {
+				if(RequestUserLevel < PermLevel.Manager) {
+					Response.Send(HttpStatusCode.Forbidden);
 					return;
 				}
-				Users.Add(Acc);
-
-			} else {
 				Users = User.GetAllUsers(Connection);
 			}
 
-			//If a department was specified, only return permission level and department
-			JArray JSON = new JArray();
-			if ( RequestParams.ContainsKey("department") ) {
-				//Get department. If no department is found, return a 404
-				Department Dept = Department.GetByName(Connection, RequestParams["department"][0]);
-				if ( Dept == null ) {
-					Send("No such department", HttpStatusCode.NotFound);
-					return;
+			//Convert to JSON and add permissionlevels
+			List<Department> Departments = Department.GetAllDepartments(Connection);
+			JArray JSON = JArray.FromObject(Users);
+			foreach (JObject Entry in JSON) {
+				Entry.Remove("PasswordHash"); //Security
+				JObject PermissionInfo = new JObject();
+				foreach(Department Dept in Departments) {
+					PermissionInfo.Add(Dept.Name, User.GetPermissionLevel(Connection, (int)Entry["ID"], Dept.ID).ToString());
 				}
 
-				foreach(User Acc in Users ) {
-
-					JSON.Add(new JObject() { { "Email", Acc.Email }, { "Level", Acc.GetPermissionLevel(Connection, Dept).ToString() } });
-				}
-
-			} else {
-				//Convert user objects to JSON
-				foreach ( User Acc in Users ) {
-					JObject UserObject = JObject.FromObject(Acc);
-					UserObject.Remove("PasswordHash"); //Security
-					JSON.Add(UserObject);
-				}
+				Entry.Add("Permissions", PermissionInfo);
 			}
 
 			//Send response
-			Send(JSON, HttpStatusCode.OK);
+			Response.Send(JSON);
 		}
 	}
 }

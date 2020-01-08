@@ -4,19 +4,22 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver.Threads {
 	/// <summary>
 	/// Listener object that will create a new HTTPListener and wait for incoming requests
 	/// </summary>
 	internal class Listener {
+		public static Logger Log = Program.Log;
+		public static NumWatcher QueueSizeWatcher;
+
 		/// <summary>
 		/// Start a Listener. Incoming requests will be inserted in the given BlockingCollection, which can then be processed using RequestWorkers
 		/// </summary>
 		/// <param name="Log"></param>
 		/// <param name="Queue"></param>
-		public static void Run(Logger Log, BlockingCollection<HttpListenerContext> Queue) {
+		public static void Run() {
 			Log.Info("Starting ListenerThread");
 
 			//Get addresses the server should listen to.
@@ -43,6 +46,7 @@ namespace Webserver.Threads {
 			} catch ( HttpListenerException e ) {
 				Log.Fatal("An exception occured. The server did not start.");
 				Log.Fatal(e.GetType().Name + ": " + e.Message);
+				Log.Fatal("Press the any key to exit.");
 				Console.ReadKey();
 				Environment.Exit(-1);
 			}
@@ -50,7 +54,8 @@ namespace Webserver.Threads {
 			//Listen for incoming requests and add them to the queue.
 			Log.Info("Now listening!");
 			while ( true ) {
-				Queue.Add(Listener.GetContext());
+				RequestWorker.Queue.Add(new ContextProvider(Listener.GetContext()));
+				QueueSizeWatcher.Update(RequestWorker.Queue.Count);
 			}
 		}
 	}

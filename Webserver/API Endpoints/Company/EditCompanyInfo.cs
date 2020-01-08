@@ -14,15 +14,15 @@ namespace Webserver.API_Endpoints {
 		[RequireContentType("application/json")]
 		public override void PATCH() {
 			// Get required fields
-			if ( !RequestParams.ContainsKey("name") ) {
-				Send("Missing params", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("name") ) {
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the specified company exists. If it doesn't, send a 404 Not Found
-			Company company = Company.GetCompanyByName(Connection, RequestParams["name"][0]);
+			Company company = Company.GetCompanyByName(Connection, Params["name"][0]);
 			if ( company == null ) {
-				Send("No such company", HttpStatusCode.NotFound);
+				Response.Send("No such company", HttpStatusCode.NotFound);
 				return;
 			}
 
@@ -46,7 +46,7 @@ namespace Webserver.API_Endpoints {
 
 			// Update DB row
 			Connection.Update<Company>(company);
-			Send("Company has successfully been edited.", StatusCode: HttpStatusCode.OK);
+			Response.Send("Company has successfully been edited.", StatusCode: HttpStatusCode.OK);
 		}
 	}
 }

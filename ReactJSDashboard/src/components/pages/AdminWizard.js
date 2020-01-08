@@ -101,7 +101,7 @@ class AdminWizard extends Component {
 		var address = $("#user_address").val();
 		var postCode = $("#user_post_code").val();
 		var accountType = $("input[name=user_account_type]:checked").val();
-		var department = $("#departments_dropdown option:selected").text();
+		var department = $("#departments_dropdown_user option:selected").text();
 
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "/account", true);
@@ -138,8 +138,8 @@ class AdminWizard extends Component {
 		event.preventDefault();
 
 		var name = $("#gdt_name").val();
-		var department = $("#departments_dropdown option:selected").text();
-		var requireValidation = $("#gdt_require_validation").val() === "on" ? true : false;
+		var department = $("#departments_dropdown_gdt").find("option:selected").text();
+		var requireValidation = $("#gdt_require_validation").is(":checked") ? true : false;
 
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "/datatable", true);
@@ -147,7 +147,11 @@ class AdminWizard extends Component {
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				$("#gdt_message").html(xhr.responseText);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#gdt_message").text("De tabel is succesvol aangemaakt");	
+				} else {
+					$("#gdt_message").text(xhr.responseText);
+				}
 			}
 		}
 
@@ -202,11 +206,12 @@ class AdminWizard extends Component {
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status === 200) {
+		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 			var departments = JSON.parse(xhr.responseText);
 
 			for (var i = 0; i < departments.length; i++) {
-				$("#departments_dropdown select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
+				$("#departments_dropdown_gdt select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
+				$("#departments_dropdown_user select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
 			}
 		}
 	}
@@ -216,29 +221,14 @@ class AdminWizard extends Component {
 	$("#gdt_next_form").on("submit", function(event) {
 		$("#add_gdt").hide(250);
 		$("#finished").show(250);
+
+		// Local storage should remember that de admin wizard has been completed
+		window.localStorage.setItem("adminWizardDone", "true");
 	});
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////// End of Generic data table code ///////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
-
-	xhr = new XMLHttpRequest();
-	url = "/department?name=";
-	xhr.open("GET", url, true);
-
-	xhr.setRequestHeader("Content-Type", "application/json");
-
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
-			var departments = JSON.parse(xhr.responseText);
-
-			for (var i = 0; i < departments.length; i++) {
-				$("#departments_dropdown select").append("<option value=" + i + ">" + departments[i].Name + "</option>");
-			}
-		}
-	}
-
-	xhr.send();
   }
 
   render() {
@@ -249,46 +239,46 @@ class AdminWizard extends Component {
 		<hr/>
 
 		<div id="intro" style={{display: "block"}}>
-			<p><strong>The admin wizard will walk you through the following steps:</strong><br/>
-			- Adding a Company<br/>
-			- Adding Departments<br/>
-			- Adding Users<br/>
-			- Adding Generic data tables</p>
+			<p><strong>De admin wizard zal u door het volgende heen leiden:</strong><br/>
+			- Uw bedrijf toevoegen<br/>
+			- Afdelingen toevoegen<br/>
+			- Gebruikers toevoegen<br/>
+			- Tabellen met kolommen toevoegen</p>
 
-			<p>The admin wizard will take a few minutes. You can immediately start using the application after finishing.</p>
+			<p>De admin wizard zal een paar minuten duren. U kunt meteen de applicatie gebruiken als uw het heeft afgerond.</p>
 
-			<button id="begin_button">Begin</button>
+			<button id="begin_button">Beginnen</button>
 		</div>
 		
 		<div id="add_company" style={{display: "none"}}>
-			<p><b>Step 1: Add a Company</b><br/>
-			Add your company to the application. You can only add 1 company.</p>
+			<p><b>Stap 1: Uw bedrijf toevoegen</b><br/>
+			Voeg uw bedrijf toe aan de applicatie. U kunt slechts één bedrijf toevoegen.</p>
 
 			<form id="add_company_form" method="POST">
-				Name: <input id="company_name" type="text" name="company_name"/><br/>
-				Street: <input id="company_street" type="text" name="company_street"/><br/>
-				House number: <input id="company_house_number" type="number" name="company_house_number"/><br/>
-				Post code: <input id="company_post_code" type="text" name="company_post_code"/><br/>
-				City: <input id="company_city" type="text" name="company_city"/><br/>
-				Country: <input id="company_country" type="text" name="company_country"/><br/>
-				Phone number: <input id="company_phone_number" type="text" name="company_phone_number"/><br/>
-				Email: <input id="company_email" type="email" name="company_email"/><br/>
+				Naam: <input id="company_name" type="text" name="company_name"/><br/>
+				Straatnaam: <input id="company_street" type="text" name="company_street"/><br/>
+				Huisnummer: <input id="company_house_number" type="number" name="company_house_number"/><br/>
+				Postcode: <input id="company_post_code" type="text" name="company_post_code"/><br/>
+				Woonplaats: <input id="company_city" type="text" name="company_city"/><br/>
+				Land: <input id="company_country" type="text" name="company_country"/><br/>
+				Telefoonnummer: <input id="company_phone_number" type="text" name="company_phone_number"/><br/>
+				E-mailadres: <input id="company_email" type="email" name="company_email"/><br/>
 				<br/>
-				<input type="submit" value="Add"/><br/>
+				<input type="submit" value="Toevoegen"/><br/>
 
 				<p id="company_message"></p>
 			</form>
 		</div>
 
 		<div id="add_department" style={{display: "none"}}>
-			<p><b>Step 2: Add Departments</b><br/>
-			Add some departments to your company.</p>
+			<p><b>Stap 2: Afdelingen toevoegen</b><br/>
+			Voeg afdelingen toe aan uw bedrijf.</p>
 
 			<form id="add_department_form" method="POST">
-				Department name: <input id="department_name" type="text" name="department_name"/><br/>
-				Department description: <input id="department_description" type="text" name="department_description"/><br/>
+				Naam van afdeling: <input id="department_name" type="text" name="department_name"/><br/>
+				Omschrijving van afdeling: <input id="department_description" type="text" name="department_description"/><br/>
 				<br/>
-				<input type="submit" value="Add"/><br/>
+				<input type="submit" value="Toevoegen"/><br/>
 
 				<p id="department_message"></p>
 			</form>
@@ -296,42 +286,42 @@ class AdminWizard extends Component {
 			<hr/>
 
 			<form id="department_next_form">
-				<input type="submit" value="Next"/><br/>
+				<input type="submit" value="Volgende"/><br/>
 			</form>
 		</div>
 
 		<div id="add_user" style={{display: "none"}}>
-			<p><b>Step 3: Add Users</b><br/>
-			Add some users to your company.</p>
+			<p><b>Stap 3: Gebruikers toevoegen</b><br/>
+			Voeg gebruikers toe aan uw bedrijf.</p>
 
 			<form id="add_user_form" method="POST">
-				Email: <input id="user_email" type="email" name="user_email"/><br/>
-				Password: <input id="user_password" type="password" name="user_password"/><br/>
-				First name: <input id="user_first_name" type="text" name="user_first_name"/><br/>
-				Middle initial: <input id="user_middle_initial" type="text" name="user_middle_initial"/><br/>
-				Last name: <input id="user_last_name" type="text" name="user_last_name"/><br/>
-				Function: <input id="user_function" type="text" name="user_function"/><br/>
-				Phone number (work): <input id="user_phone_number_work" type="number" name="user_phone_number_work"/><br/>
-				Phone number (private): <input id="user_phone_number_private" type="number" name="user_phone_number_private"/><br/>
-				Date of birth: <input id="user_date_of_birth" type="date" name="user_date_of_birth"/><br/>
-				Country: <input id="user_country" type="text" name="user_country"/><br/>
-				Address: <input id="user_address" type="text" name="user_address"/><br/>
-				Post code: <input id="user_post_code" type="text" name="user_post_code"/><br/>
+				E-mailadres: <input id="user_email" type="email" name="user_email"/><br/>
+				Wachtwoord: <input id="user_password" type="password" name="user_password"/><br/>
+				Voornaam: <input id="user_first_name" type="text" name="user_first_name"/><br/>
+				Tussenvoegsel: <input id="user_middle_initial" type="text" name="user_middle_initial"/><br/>
+				Achternaam: <input id="user_last_name" type="text" name="user_last_name"/><br/>
+				Functie: <input id="user_function" type="text" name="user_function"/><br/>
+				Telefoonnummer (werk): <input id="user_phone_number_work" type="number" name="user_phone_number_work"/><br/>
+				Telefoonnummer (privé): <input id="user_phone_number_private" type="number" name="user_phone_number_private"/><br/>
+				Geboortedatum: <input id="user_date_of_birth" type="date" name="user_date_of_birth"/><br/>
+				Land: <input id="user_country" type="text" name="user_country"/><br/>
+				Adres: <input id="user_address" type="text" name="user_address"/><br/>
+				Postcode: <input id="user_post_code" type="text" name="user_post_code"/><br/>
 
-				Account type:<br/>
+				Accounttype:<br/>
 				<input id="user_account_type_administrator" type="radio" name="user_account_type" value="Administrator"/>Administrator<br/>
 				<input id="user_account_type_manager" type="radio" name="user_account_type" value="Manager"/>Manager<br/>
-				<input id="user_account_type_department_member" type="radio" name="user_account_type" value="DeptMember"/>Department member<br/>
-				<input id="user_account_type_user" type="radio" name="user_account_type"  value="User" checked/>User<br/>
+				<input id="user_account_type_department_member" type="radio" name="user_account_type" value="Lid van Afdeling"/>Department member<br/>
+				<input id="user_account_type_user" type="radio" name="user_account_type"  value="Gebuiker" checked/>User<br/>
 
-				Department:<br/>
-				<div id="departments_dropdown">
+				Afdeling:<br/>
+				<div id="departments_dropdown_user">
 					<select>
 					</select>
 				</div>
 
 				<br/>
-				<input type="submit" value="Add"/><br/>
+				<input type="submit" value="Toevoegen"/><br/>
 
 				<p id="user_message"></p>
 			</form>
@@ -339,28 +329,28 @@ class AdminWizard extends Component {
 			<hr/>
 
 			<form id="user_next_form">
-				<input type="submit" value="Next"/><br/>
+				<input type="submit" value="Volgende"/><br/>
 			</form>
 		</div>
 
 		<div id="add_gdt" style={{display: "none"}}>
-			<p><b>Step 4: Add Generic data tables</b><br/>
-			By adding generic data tables, you can save and keep track of data in your application.</p>
+			<p><b>Stap 4: Tabellen met kolommen toevoegen</b><br/>
+			Door het toevoegen van tabellen kunnen de gebruikers van de applicatie gegevens registreren.</p>
 
 			<form id="add_gdt_form" method="POST">
-				Name: <input id="gdt_name" type="text" name="gdt_name"/><br/>
+				Naam: <input id="gdt_name" type="text" name="gdt_name"/><br/>
 
 				<br/>
 
-				Columns:
+				Kolommen:
 
 				<template id="column_template">
 					<div>
 						<select>
-							<option value="integer">Integer</option>
-							<option value="string">String</option>
-							<option value="real">Real</option>
-							<option value="blob">Blob</option>
+							<option value="integer">Getal</option>
+							<option value="string">Woord</option>
+							<option value="real">Decimaal</option>
+							<option value="blob">Bestand</option>
 						</select>
 						<input type="text" name="gdt_column_name"/>
 						<button id="remove_column" onclick="removeColumn(event, this);">-</button>
@@ -370,10 +360,10 @@ class AdminWizard extends Component {
 				<div id="columns">
 					<div>
 						<select>
-							<option value="integer">Integer</option>
-							<option value="string">String</option>
-							<option value="real">Real</option>
-							<option value="blob">Blob</option>
+							<option value="integer">Getal</option>
+							<option value="string">Woord</option>
+							<option value="real">Decimaal</option>
+							<option value="blob">Bestand</option>
 						</select>
 						<input type="text" name="gdt_column_name"/>
 					</div>
@@ -381,22 +371,24 @@ class AdminWizard extends Component {
 
 				<br/>
 
-				<button id="add_column" style={{width: "200px"}}>+ Add column</button><br/>
+				<button id="add_column" style={{width: "200px"}}>+ Kolom toevoegen</button><br/>
 
 				<br/>
 
-				Department:<br/>
-				<div id="departments_dropdown">
+				Afdeling:<br/>
+				<div id="departments_dropdown_gdt">
 					<select>
 					</select>
 				</div>
 		
 				<br/>
 
-				Require validation: <input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"/><br/>
+				Goedkeuring vereist: <input id="gdt_require_validation" type="checkbox" name="gdt_require_validation"/><br/>
 
 				<br/>
-				<input type="submit" value="Add"/><br/>
+				<input type="submit" value="Toevoegen"/><br/>
+
+				<br/>
 
 				<p id="gdt_message"></p>
 			</form>
@@ -404,12 +396,12 @@ class AdminWizard extends Component {
 			<hr/>
 
 			<form id="gdt_next_form">
-				<input type="submit" value="Next"/><br/>
+				<input type="submit" value="Volgende"/><br/>
 			</form>
 		</div>
 
 		<div id="finished" style={{display: "none"}}>
-			<p><b>You finished the admin wizard</b></p>
+			<p><b>U hebt de admin wizard afgerond.</b></p>
 		</div>
       </div>
     );

@@ -15,14 +15,14 @@ namespace Webserver.API_Endpoints {
 		public override void PATCH() {
 			// Get required fields
 			if ( !JSON.TryGetValue<string>("title", out JToken title) ) {
-				Send("Missing fields", HttpStatusCode.BadRequest);
+				Response.Send("Missing fields", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			// Check if the specified note exists. If it doesn't, send a 404 Not Found
 			Note note = Note.GetNoteByTitle(Connection, (string)title);
 			if ( note == null ) {
-				Send("No such note", HttpStatusCode.NotFound);
+				Response.Send("No such note", HttpStatusCode.NotFound);
 				return;
 			}
 
@@ -38,7 +38,7 @@ namespace Webserver.API_Endpoints {
 
 			// Update DB row
 			Connection.Update<Note>(note);
-			Send("Note has successfully been edited.", StatusCode: HttpStatusCode.OK);
+			Response.Send("Note has successfully been edited.", StatusCode: HttpStatusCode.OK);
 		}
 	}
 }

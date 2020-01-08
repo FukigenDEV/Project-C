@@ -1,15 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.css';
+
+import NewTable from './components/pages/NewTable';
+
 import App from "./components/app/App";
 import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
+import AdminModal from './components/modal';
 
 import Admin from './components/pages/admin/Admin';
 
 import Users from './components/pages/admin/Users';
 import AddUsers from './components/pages/admin/add/Users';
 import ManUsers from './components/pages/admin/manage/Users';
+import EditUsers from './components/pages/admin/manage/edit/Users';
 
 import Departments from './components/pages/admin/Departments';
 import addDepartments from './components/pages/admin/add/Departments';
@@ -22,14 +28,16 @@ import manCompany from './components/pages/admin/manage/Company';
 import EditCompany from './components/pages/admin/manage/edit/Company';
 
 import Navs from './components/navs';
-import GegevensRegistreren from './components/pages/GegevensRegistreren';
-import GegevensBekijken from './components/pages/GegevensBekijken';
+import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
-import Activiteitengeschiedenis from './components/pages/Activiteitengeschiedenis';
+import NotitiesEditForm from './components/pages/NotitiesEditForm';
+import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
-import Uitloggen from './components/pages/Uitloggen';
+import Logout from './components/pages/Logout';
 import AdminWizard from './components/pages/AdminWizard';
+
 import Error from './components/pages/Error';
+import Auth from './components/pages/Auth';
 
 import * as serviceWorker from './serviceWorker';
 
@@ -43,11 +51,13 @@ serviceWorker.unregister();
 export {
     Dashboard,
     Navs,
+    AdminModal,
     Home,
     Admin,
     Users,
     AddUsers,
     ManUsers,
+    EditUsers,
     Departments,
     addDepartments,
     manDepartments,
@@ -56,12 +66,14 @@ export {
     addCompany,
     manCompany,
     EditCompany,
-    GegevensRegistreren,
-    GegevensBekijken,
     Notities,
-    Activiteitengeschiedenis,
+    Logs,
     Backup,
-    Uitloggen,
+    Logout,
+    AdminWizard,
     Error,
-	AdminWizard
+    Auth,
+    NotitiesEditForm,
+    Gegevens,
+    NewTable
 }

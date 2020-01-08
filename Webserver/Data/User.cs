@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace Webserver.Data {
 	/// <summary>
@@ -33,10 +34,18 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="Email">The user's email address</param>
 		/// <param name="Password">The user's password. This will be converted into a salted hash and stored in the PasswordHash field.</param>
-		public User(string Email, string Password) {
+		public User(string Email, string Password, SQLiteConnection Connection) {
 			this.Email = Email;
 			this.PasswordHash = CreateHash(Password, Email);
+			Connection.Insert<User>(this);
 		}
+
+		/// <summary>
+		/// Deletes this user account
+		/// </summary>
+		/// <param name="Connection"></param>
+		public void Delete(SQLiteConnection Connection) => Delete(Connection, this);
+		public static void Delete(SQLiteConnection Connection, User Acc) => Connection.Delete(Acc);
 
 		/// <summary>
 		/// Dapper-only constructor for deserializing database rows into user objects. Do not use.
@@ -75,7 +84,10 @@ namespace Webserver.Data {
 		/// Change this user's password. The change will not be applied the object is updated in the database.
 		/// </summary>
 		/// <param name="Password">The new password</param>
-		public void ChangePassword(string Password) => this.PasswordHash = CreateHash(Password, Email);
+		public void ChangePassword(SQLiteConnection Connection, string Password) {
+			this.PasswordHash = CreateHash(Password, Email);
+			Connection.Update<User>(this);
+		}
 
 		/// <summary>
 		/// Get a user's permission level.
@@ -90,10 +102,18 @@ namespace Webserver.Data {
 		/// <param name="Connection"></param>
 		/// <param name="Department"></param>
 		/// <returns></returns>
-		public PermLevel GetPermissionLevel(SQLiteConnection Connection, int Department) => (PermLevel)Math.Max(
-			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE User = @ID AND Department = @Department", new { this.ID, Department }),
-			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @ID AND Permission = 3", new { this.ID })
-		);
+		public PermLevel GetPermissionLevel(SQLiteConnection Connection, int Department) => GetPermissionLevel(Connection, this.ID, Department);
+
+		public static PermLevel GetPermissionLevel(SQLiteConnection Connection, int User, int Department) => (PermLevel)Math.Max(
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE User = @User AND Department = @Department", new { User, Department }),
+			Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @User AND Permission = 3", new { User }));
+
+		/// <summary>
+		/// Returns True if the user is an Administrator
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <returns></returns>
+		public bool IsAdmin(SQLiteConnection Connection) => (PermLevel)Connection.QueryFirstOrDefault<int>("SELECT Permission FROM Permissions WHERE USER = @ID AND Permission = 3", new { this.ID }) == PermLevel.Administrator;
 
 		/// <summary>
 		/// Sets a user permission level.
@@ -143,6 +163,24 @@ namespace Webserver.Data {
 		/// <param name="Connection"></param>
 		/// <returns></returns>
 		public static List<string> GetAllEmails(SQLiteConnection Connection) => Connection.Query<string>("SELECT Email FROM Users").AsList();
+
+		/// <summary>
+		/// Get the users that belong to the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Dept"></param>
+		/// <returns></returns>
+		public static List<User> GetUsersByDepartment(SQLiteConnection Connection, Department Dept) => GetUsersByDepartment(Connection, Dept.ID);
+
+		/// <summary>
+		/// Get the users that belong to the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Dept"></param>
+		public static List<User> GetUsersByDepartment(SQLiteConnection Connection, int DepartmentID) {
+			List<int> IDs = Connection.Query<int>("SELECT User FROM Permissions WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+			return Connection.Query<User>("SELECT * FROM Users WHERE ID in (@IDs)", new { IDs }).ToList();
+		}
 
 		/// <summary>
 		/// Get a list of all users.

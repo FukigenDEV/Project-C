@@ -16,28 +16,26 @@ namespace Webserver.API_Endpoints {
 				JSON.TryGetValue<string>("description", out JToken description) ) {
 				//Check if values are at least 1 character
 				if ( ( (string)name ).Length < 1 || ( (string)description ).Length < 1 ) {
-					Send("Please fill in all fields", HttpStatusCode.BadRequest);
+					Response.Send("Please fill in all fields", HttpStatusCode.BadRequest);
 					return;
 				}
 			} else {
-				Send("Expected a string", HttpStatusCode.BadRequest);
+				Response.Send("Expected a string", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//Check if the specified department exists. If it doesn't, send a 404 Not Found
 			Department department = Department.GetByName(Connection, (string)name);
 			if ( department != null ) {
-				Send("Department already exists", HttpStatusCode.BadRequest);
+				Response.Send("Department already exists", HttpStatusCode.BadRequest);
 				return;
 			}
 
-			Department newDepartment = new Department((string)name, (string)description);
-
 			// Store department to database
-			Connection.Insert(newDepartment);
+			new Department(Connection, (string)name, (string)description);
 
 			// Send success message
-			Send("Department successfully created", HttpStatusCode.Created);
+			Response.Send(HttpStatusCode.Created);
 		}
 	}
 }

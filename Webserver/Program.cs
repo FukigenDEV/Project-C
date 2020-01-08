@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
 using Configurator;
-using Logging;
+using PrettyConsole;
 using Webserver.Threads;
 
 namespace Webserver {
-	internal class Program {
-		public static Logger Log;
+	public static class Program {
+		public static Logger Log { get; set; }
 		public static List<Type> Endpoints;
 		public static List<string> CORSAddresses = new List<string>();
 
 		public static void Main() {
 			//Initialize logger
-			Logger.Init();
-			Log = new Logger();
-			Utils.Log = Log;
+			LogTab Tab = new LogTab("General");
+			Log = Tab.GetLogger();
+			RequestWorker.RequestLoggerTab = new LogTab("Workers");
 			Log.Info("Server is starting!");
 
 			//Create default config
@@ -55,28 +57,29 @@ namespace Webserver {
 			CORSAddresses = CORSAddresses.Concat(Addresses).ToList();
 
 			//Run inits
-			Database.Init();
+			SQLiteConnection Connection = Database.Init();
 			WebFiles.Init();
 			Redirect.Init();
 
 			//Find all API endpoints
-			Endpoints = new List<Type>();
-			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
-				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
-					Endpoints.Add(type);
-				}
-			}
+			DiscoverEndpoints();
 
 			//Create Queue and launch listener
-			using BlockingCollection<HttpListenerContext> Queue = new BlockingCollection<HttpListenerContext>();
-			Thread ListenerThread = new Thread(() => Listener.Run(Log, Queue));
+			Thread ListenerThread = new Thread(() => Listener.Run());
 			ListenerThread.Start();
+
+			//Create performance tab + watchers
+			MonitorTab pTab = new MonitorTab("PerfMon");
+			RequestWorker.RequestTimeWatcher = pTab.CreateNumWatcher("Request time", ShowMin: true, ShowAverage: true, ShowMax: true);
+			Listener.QueueSizeWatcher = pTab.CreateNumWatcher("Queue size", ShowMax: true);
 
 			//Launch worker threads
 			List<Thread> WorkerThreads = new List<Thread>();
 			for ( int i = 0; i < (int)Config.GetValue("PerformanceSettings.WorkerThreadCount"); i++ ) {
-				RequestWorker Worker = new RequestWorker(Log, Queue);
-				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run));
+				RequestWorker Worker = new RequestWorker((SQLiteConnection)Connection.Clone());
+				Thread WorkerThread = new Thread(new ThreadStart(Worker.Run)) {
+					Name = "RequestWorker" + i
+				};
 				WorkerThread.Start();
 				WorkerThreads.Add(WorkerThread);
 			}
@@ -84,10 +87,19 @@ namespace Webserver {
 			//Launch maintenance thread
 			Timer Maintenance = new Timer(new MaintenanceThread { Log = Log }.Run, null, 0, 3600 * 1000);
 
-			//Wait for an exit command, then exit.
-			Log.Info("Type 'Exit' to exit.");
-			while ( Console.ReadLine().ToLower() != "exit" ) ;
-			Environment.Exit(0);
+			//Wait for an exit command, then exit.			
+			foreach(Thread Worker in WorkerThreads) {
+				Worker.Join();
+			}
+		}
+
+		public static void DiscoverEndpoints() {
+			Endpoints = new List<Type>();
+			foreach ( Type type in Assembly.GetExecutingAssembly().GetTypes() ) {
+				if ( typeof(APIEndpoint).IsAssignableFrom(type) && !type.IsAbstract ) {
+					Endpoints.Add(type);
+				}
+			}
 		}
 	}
 }

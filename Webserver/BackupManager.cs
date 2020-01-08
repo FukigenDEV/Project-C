@@ -6,14 +6,14 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using Configurator;
-using Logging;
+using PrettyConsole;
 
 namespace Webserver {
 	public static class BackupManager {
 		/// <summary>
 		/// DateTime string format
 		/// </summary>
-		private const string Format = "yyyy-MM-dd_HH-mm";
+		public const string Format = "yyyy-MM-dd_HH-mm";
 		private static readonly Logger Log = Program.Log;
 
 		/// <summary>

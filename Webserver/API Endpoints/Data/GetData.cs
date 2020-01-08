@@ -10,43 +10,43 @@ namespace Webserver.API_Endpoints {
 	[EndpointURL("/data")]
 	internal partial class Data : APIEndpoint {
 
-		[RequireContentType("application/json")]
 		[PermissionLevel(PermLevel.User)]
 		public override void GET() {
 			//Get required fields
-			if ( !RequestParams.ContainsKey("table") ) {
-				Send("Missing params", HttpStatusCode.BadRequest);
+			if ( !Params.ContainsKey("table") ) {
+				Response.Send("Missing params", HttpStatusCode.BadRequest);
 				return;
 			}
 
 			//If any optional parameters were given, overwrite the default values with those specified by the parameters
 			int Begin = 0;
-			if ( RequestParams.ContainsKey("begin") ) {
-				int.TryParse(RequestParams["begin"][0], out Begin);
+			if ( Params.ContainsKey("begin") ) {
+				int.TryParse(Params["begin"][0], out Begin);
 			}
 			int End = 25;
-			if ( RequestParams.ContainsKey("end") ) {
-				int.TryParse(RequestParams["end"][0], out End);
+			if ( Params.ContainsKey("end") ) {
+				int.TryParse(Params["end"][0], out End);
 			}
 			bool isUnvalidated = false;
-			if ( RequestParams.ContainsKey("isvalidated") ) {
-				bool.TryParse(RequestParams["isvalidated"][0], out isUnvalidated);
+			if ( Params.ContainsKey("isunvalidated") ) {
+				string val = Params["isunvalidated"][0];
+				bool.TryParse(val, out isUnvalidated);
 			}
 
 			//Check if all specified tables exist
-			if ( !GenericDataTable.Exists(Connection, RequestParams["table"]) ) {
-				Send("No such table", HttpStatusCode.NotFound);
+			if ( !GenericDataTable.Exists(Connection, Params["table"]) ) {
+				Response.Send("No such table", HttpStatusCode.NotFound);
 				return;
 			}
 
 			//Create response JSON
-			JObject Response = new JObject();
-			foreach ( string TableName in RequestParams["table"] ) {
+			JObject Result = new JObject();
+			foreach ( string TableName in Params["table"] ) {
 				GenericDataTable Table = GenericDataTable.GetTableByName(Connection, TableName);
-				Response.Add(TableName, isUnvalidated ? Table.GetUnvalidatedRows(Begin, End) : Table.GetRows(Begin, End));
+				Result.Add(TableName, isUnvalidated ? Table.GetUnvalidatedRows(Begin, End) : Table.GetRows(Begin, End));
 			}
 
-			Send(Response, HttpStatusCode.OK);
+			Response.Send(Result, HttpStatusCode.OK);
 		}
 	}
 }
