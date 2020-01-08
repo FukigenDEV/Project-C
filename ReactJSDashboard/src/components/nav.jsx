@@ -19,15 +19,9 @@ class Nav extends Component {
   render() {
     const heading = (this.props.nav.id === 1) ? <h1>{this.props.nav.heading}</h1> : this.props.nav.heading;
     const icon = (this.props.nav.id !== 1) ? <div className="nav-icon">{<FontAwesomeIcon icon={['fas', this.props.nav.icon]} />}</div> : <div></div>;
-    var user = getLoggedInUser();
-    var role = user["Permissions"]["Administrators"];
-    var isAdmin = role === "Administrator";
-    if (this.props.nav.id === 1) {
-      if (!isAdmin) {
-        return null;
-	  }
-	}
     if (this.props.nav.id === 9) return null;
+    if (this.props.nav.link === "/dashboard/Admin" && this.props.admin === false) return null;
+    console.log(`nav admin: ${this.props.admin}`);
     return (
       <Link onClick={() => this.props.onSelect(this.props.nav)} className={this.getClassesNav()} to={this.props.nav.link}>{icon} <span class="nav-text">{heading}</span></Link>
     );
@@ -40,22 +34,6 @@ class Nav extends Component {
     classes += (this.props.nav.link === "/dashboard/logout") ? " logout" : "";
     return classes;
   }
-}
-
-function getLoggedInUser() {
-  var returnValue;
-
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "/account?email=CurrentUser", false);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  
-  xhr.onreadystatechange = function() {
-      returnValue = JSON.parse(xhr.responseText)[0];
-  }
-
-  xhr.send();
-
-  return returnValue;
 }
 
 export default Nav;

@@ -1,15 +1,3 @@
-// class FieldCheck extends Component {
-//   export const standard = (field) => (
-//     const fieldkey = Object.keys(field)[0];
-//     const fieldvalue = field[fieldkey];
-//     if(fieldvalue === undefined || fieldvalue === "") {
-//       return "Dit veld moet worden ingevuld!";
-//     } else {
-//       return false;
-//     }
-//   );
-// }
-
 function standard(field) {
   if(field === undefined || field === "") {
     return "Dit veld moet worden ingevuld!";
@@ -29,12 +17,7 @@ function email(field) {
   }
 }
 
-function isComplete(fields) {
-  return;
-}
-
 export {
   standard,
   email,
-  isComplete,
 }

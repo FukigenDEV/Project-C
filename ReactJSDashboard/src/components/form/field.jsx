@@ -8,12 +8,12 @@ class Field extends Component {
   }
 
   render() {
-    const {fieldname, name, type, placeholder, data, handleChange} = this.props;
+    const {name, type, value, placeholder, handleChange} = this.props;
     switch(type) {
       case 'password':
       case 'text':
         return (
-          <input onChange={handleChange} type={type} name={name} class="form-control" id={name} placeholder={placeholder} />
+          <input onChange={handleChange} type={type} name={name} class="form-control" id={name} value={value} placeholder={placeholder} />
         );
       default:
         return (

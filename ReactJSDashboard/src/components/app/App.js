@@ -68,7 +68,7 @@ class App extends Component {
       }
     }).then(data => {
       if(data.status === 200 || data.status === 204) {
-        if(this.state.loggedin.value !== true) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin}); this.setUser();}
+        if(this.state.loggedin.value !== true) {const loggedin = {...this.state.loggedin}; loggedin.value = true; this.setState({loggedin}); this.setAdmin(); this.setUser();}
       } else {
         if(this.state.loggedin.value !== false) {const loggedin = {...this.state.loggedin}; loggedin.value = false; this.setState({loggedin});}
       }
@@ -94,14 +94,12 @@ class App extends Component {
   setAdmin = () => {
     if('Administrators' in this.state.user['Permissions']) {
       const admin = (this.state.user['Permissions']['Administrators'] === 'Administrator') ? true : false;
-      this.setState({admin});
-      // console.log(`setadmin true: ${this.state.user['Permissions']}, ${admin}`);
-    } else {
-      const navs = this.state.navs.splice(2);
-      this.setState({admin: false, navs});
-      // console.log(`setadmin false: ${this.state.user['Permissions']}`);
+      if(admin === false) {
+        this.setState({admin: false});
+      } else {
+        this.setState({admin});
+      }
     }
-    // console.log(`setAdmin: ${this.state.admin}`);
   }
 
   componentDidMount() {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Field } from '../../index';
+import { standard } from './fieldcheck';
 
 class Form extends Component {
   constructor(props) {
@@ -7,6 +8,8 @@ class Form extends Component {
     this.state = {
       alert: {},
       alert_type: {},
+      form: {},
+      compare: [],
     }
   }
 
@@ -18,18 +21,32 @@ class Form extends Component {
     })
   }
 
-  handleChange = (event) => {
+  handleChange = async (event) => {
     event.preventDefault();
     const {setForm, setComplete} = this.props;
     const form = {...this.state.form};
     const alert = {...this.state.alert};
-    form[event.target.name] = event.target.value;
-    if(this.state.alert_type[event.target.name] !== undefined) {
-      alert[event.target.name] = this.state.alert_type[event.target.name](event.target.value);
+    const {name, value} = event.target;
+    const func = this.state.alert_type[name];
+    form[name] = value;
+    this.setState({form});
+
+    if(func !== undefined && func !== "compare") {
+      alert[name] = func(value);
     }
-    setForm(form);
+
+    await setForm(form);
+
+    if(func === "compare") {
+      const dict = {};
+      const comp_name = (name[0] === "_") ? name.slice(1, name.length) : name;
+      dict[comp_name] = value;
+      alert[comp_name] = this.compare(dict);
+      alert[name] = this.compare(dict);
+    }
+    
     this.setState({alert});
-    return Promise.resolve(alert).then(() => {
+    Promise.resolve(alert).then(() => {
       setComplete(this.isComplete());
     })
   }
@@ -65,8 +82,17 @@ class Form extends Component {
     return true;
   }
 
+  compare(dict) {
+    const dictkey = Object.keys(dict)[0];
+    const comparekey = `_${dictkey}`;
+    const form = this.props.form;
+    if(standard(form[dictkey]) !== false || standard(form[comparekey]) !== false) { return "Wachtwoord velden moeten worden ingevuld!" }
+    if(form[dictkey] !== form[comparekey]) { return "Wachtwoord moet gelijk zijn aan elkaar!" }
+    return false;
+  }
+
   render() {
-    const {forms, buttonname} = this.props;
+    const {forms} = this.props;
     console.log(forms);
     console.log(this.state.alert_type);
     console.log(this.state.alert);
@@ -81,6 +107,7 @@ class Form extends Component {
               fieldname={form['fieldname']}
               name={form['name']}
               type={form['type']}
+              value={form['value']}
               placeholder={form['placeholder']}
               data={form['data']}
             />

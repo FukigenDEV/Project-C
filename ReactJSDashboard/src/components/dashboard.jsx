@@ -7,11 +7,12 @@ class Dashboard extends Component {
   render() {
     const {navs, loggedin, admin, setUser, setAdmin, onSelect, onRedirect, onRender} = this.props;
     onRender();
+    console.log(admin);
 
     if(loggedin.value === true) {
       return (
         <div className="dash-container">
-            <Navs navs={navs} onSelect={onSelect} />
+            <Navs navs={navs} admin={admin} onSelect={onSelect} />
             <div className="content-container p-4">
               <Switch>
                 <Route path="/dashboard/Admin" render={props => <Admin {...props} admin={admin} setUser={setUser} setAdmin={setAdmin} onRedirect={onRedirect} />} />

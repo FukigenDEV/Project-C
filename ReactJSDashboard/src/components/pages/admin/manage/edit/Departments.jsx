@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
+import { standard } from '../../../../form/fieldcheck';
+import { Form } from '../../../../../index';
 
 class EditDepartments extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      alert: {
-        type: 0,
-        value: ''
-      },
-
+      action: "PATCH",
+      forms: [
+        {fieldname: 'Naam afdeling', name: 'newName', type: 'text', placeholder: false, check: standard},
+        {fieldname: 'Beschrijving', name: 'NewDescription', type: 'text', placeholder: false, check: standard},
+      ],
+      buttonname: "Afdeling bewerken",
       form: [],
-      data: []
+      data: [],
     }
   }
 
@@ -27,9 +30,10 @@ class EditDepartments extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
+    const {action} = this.state;
     const {onRedirect} = this.props;
     await fetch(`/department?name=${this.props.match.params.name}`, {
-      method: 'PATCH',
+      method: action,
       body: JSON.stringify(this.state.form),
       headers: {
         'Content-Type': 'application/json'
@@ -43,38 +47,61 @@ class EditDepartments extends Component {
     this.getDepartment(dept);
   }
 
+  setForm = ext_form => {
+    const form = {...this.state.form};
+    Object.keys(ext_form).forEach(key => {
+      form[key] = ext_form[key];
+    });
+    this.setState({form});
+    console.log(this.state.form);
+  }
+
+  setComplete = ext_bool => {
+    const complete = ext_bool;
+    this.setState({complete});
+  }
+
   getDepartment = dept => {
     const name = (dept) ? dept : this.props.match.params.name;
     fetch(`/department?name=${name}`)
     .then(department => {
       return department.json();
     }).then(data => {
-      this.setState({data, form: {newName: data.Name, newDescription: data.Description}});
+      const forms = [...this.state.forms];
+      const list = [data.Name, data.Description];
+      let count = 0;
+      forms.forEach(form => {
+        form['value'] = list[count];
+        count++;
+      })
+      this.setState({data, forms, form: {newName: data.Name, newDescription: data.Description}, });
     })
   }
 
   render() {
     console.log(this.state.form);
     console.log(this.state.data);
-    return (
-      <div>
-        <h1><b>Edit Department:</b> {this.state.data.Name}</h1><br />
-
-        <form onSubmit={this.handleSubmit.bind(this)}>
-          <div class="form-group">
-            <label for="newDepartment">Department name</label>
-            <input onChange={this.handleChange} type="text" name="newName" class="form-control" id="newDepartment" value={this.state.form.newName} />
-          </div>
-
-          <div class="form-group">
-            <label for="newDescription">Description</label>
-            <input onChange={this.handleChange} type="text" name="newDescription" class="form-control" id="newDescription" value={this.state.form.newDescription} />
-          </div>
-
-          <button type="submit" class="btn btn-primary">Edit department</button>
-        </form>
-      </div>
-    );
+    const {action, api, forms, buttonname} = this.state;
+    if(typeof(forms) === 'object') {
+      return (
+        <div>
+          <h1><b>Afdeling bewerken: </b>{this.state.data['name']}</h1><br />
+          <form onSubmit={this.handleSubmit.bind(this)}>
+              <Form
+                action={action}
+                api={api}
+                forms={forms}
+                buttonname={buttonname}
+                setForm={this.setForm}
+                setComplete={this.setComplete}
+              />
+              <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
+          </form>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
   }
 }
 

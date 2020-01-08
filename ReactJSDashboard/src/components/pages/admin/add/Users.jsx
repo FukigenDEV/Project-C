@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Form from '../../../form/form';
-import { standard, email } from '../../../form/fieldcheck';
+import { email } from '../../../form/fieldcheck';
 
 class AddUsers extends Component {
   constructor(props) {
@@ -16,7 +16,8 @@ class AddUsers extends Component {
       data: [],
       forms: [
         {fieldname: 'E-mailadres', name: 'Email', type: 'text', placeholder: 'E-mailadres invullen...', check: email},
-        {fieldname: 'Wachtwoord', name: 'Password', type: 'password', placeholder: 'Wachtwoord invullen...', check: standard},
+        {fieldname: 'Nieuw wachtwoord', name: 'Password', type: 'password', placeholder: 'Wachtwoord invullen...', check: "compare"},
+        {fieldname: 'Bevestig wachtwoord', name: '_Password', type: 'password', placeholder: 'Wachtwoord bevestigen...', check: "compare"},
       ],
       action: 'POST',
       api: '/account',
@@ -31,7 +32,6 @@ class AddUsers extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     const {action, api} = this.state;
-    const {onRedirect} = this.props;
     await fetch(api, {
       method: action,
       body: JSON.stringify(this.state.form),
@@ -85,6 +85,7 @@ class AddUsers extends Component {
       form[key] = ext_form[key];
     });
     this.setState({form});
+    return this.state.form;
     console.log(this.state.form);
   }
 
@@ -104,9 +105,11 @@ class AddUsers extends Component {
             action={action}
             api={api}
             forms={forms}
+            form={form}
             buttonname={buttonname}
             setForm={this.setForm}
             setComplete={this.setComplete}
+            setCompare={this.setCompare}
           />
 
           {Object.keys(this.state.depts).map(dept => (
@@ -140,5 +143,4 @@ class AddUsers extends Component {
     }
   }
 }
-
 export default AddUsers;
