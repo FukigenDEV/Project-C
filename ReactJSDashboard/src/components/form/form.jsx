@@ -5,6 +5,7 @@ import { standard } from './fieldcheck';
 class Form extends Component {
   constructor(props) {
     super(props)
+
     this.state = {
       alert: {},
       alert_type: {},
@@ -14,10 +15,16 @@ class Form extends Component {
   }
 
   componentDidMount() {
-    const { forms } = this.props;
+    const { setComplete, getData, forms } = this.props;
+    let data;
+
+    if(getData) { getData(this, this.props.match.params.name); data = true } else { data = false }
+
     this.setState({forms});
     this.setAlertType().then(() => {
-      this.setAlert();
+      this.setAlert(data).then(() => {
+        setComplete(this.isComplete());
+      })
     })
   }
 
@@ -61,14 +68,19 @@ class Form extends Component {
     return Promise.resolve(alert_type);
   }
 
-  setAlert = () => {
+  setAlert = data => {
     const { forms } = this.props;
     const alert = {...this.state.alert};
     for(let i=0; i<forms.length; i++) {
       console.log(this.state.alert_type);
-      alert[forms[i]['name']] = (this.state.alert_type[forms[i]['name']] !== undefined) ? undefined : false;
+      if(!data) {
+        alert[forms[i]['name']] = (this.state.alert_type[forms[i]['name']] !== undefined) ? undefined : false;
+      } else {
+        alert[forms[i]['name']] = false;
+      }
     }
     this.setState({alert});
+    return Promise.resolve(alert);
   }
 
   isComplete = () => {
@@ -94,6 +106,7 @@ class Form extends Component {
   render() {
     const {forms} = this.props;
     console.log(forms);
+    console.log(this.form);
     console.log(this.state.alert_type);
     console.log(this.state.alert);
     return (
@@ -107,7 +120,7 @@ class Form extends Component {
               fieldname={form['fieldname']}
               name={form['name']}
               type={form['type']}
-              value={form['value']}
+              value={this.state.form[form['name']]}
               placeholder={form['placeholder']}
               data={form['data']}
             />

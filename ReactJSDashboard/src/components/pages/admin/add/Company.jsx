@@ -20,6 +20,7 @@ class addCompany extends Component {
         {fieldname: 'E-mailadres', name: 'email', type: 'text', placeholder: 'E-mailadres invullen...', check: standard},
       ],
       buttonname: 'Bedrijf toevoegen',
+      alert: {active: false, type: "", content: ""},
     }
   }
 
@@ -33,6 +34,14 @@ class addCompany extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
+    }).then(response => {
+      const alert = {...this.state.alert};
+      console.log(response['status']);
+      console.log(response['status'].toString()[0]);
+      alert['active'] = true;
+      alert['content'] = (response['status'].toString()[0] === "2") ? "Het bedrijf is succesvol toegevoegd" : "Server error";
+      alert['type'] = (response['status'].toString()[0] === "2") ? "success" : "error";
+      this.setState({alert});
     });
   }
 
@@ -49,11 +58,19 @@ class addCompany extends Component {
     const complete = ext_bool;
     this.setState({complete});
   }
+  
+  getSubmitAlertElement = () => {
+    const alert = this.state.alert;
+    const alert_active = (alert['active']) ? "d-block" : "d-none";
+    const alert_class = (alert['type'] === "success") ? "alert-success" : "alert-danger";
+    return <div class={`alert ${alert_class} ${alert_active}`}>{alert['content']}</div>
+  }
 
   render() {
     const {action, api, forms, buttonname} = this.state;
     return (
       <form onSubmit={this.handleSubmit.bind(this)}>
+        {this.getSubmitAlertElement()}
         <Form
           action={action}
           api={api}

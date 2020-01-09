@@ -14,6 +14,7 @@ class addDepartments extends Component {
       {fieldname: 'Beschrijving', name: 'description', type: 'text', placeholder: 'Beschrijving invullen...', check: standard}
       ],
       buttonname: 'Afdeling toevoegen',
+      alert: {active: false, type: "", content: ""},
     }
   }
 
@@ -27,6 +28,14 @@ class addDepartments extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
+    }).then(response => {
+      const alert = {...this.state.alert};
+      console.log(response['status']);
+      console.log(response['status'].toString()[0]);
+      alert['active'] = true;
+      alert['content'] = (response['status'].toString()[0] === "2") ? "De afdeling is succesvol toegevoegd" : "Server error";
+      alert['type'] = (response['status'].toString()[0] === "2") ? "success" : "error";
+      this.setState({alert});
     });
   }
 
@@ -44,20 +53,28 @@ class addDepartments extends Component {
     this.setState({complete});
   }
 
+  getSubmitAlertElement = () => {
+    const alert = this.state.alert;
+    const alert_active = (alert['active']) ? "d-block" : "d-none";
+    const alert_class = (alert['type'] === "success") ? "alert-success" : "alert-danger";
+    return <div class={`alert ${alert_class} ${alert_active}`}>{alert['content']}</div>
+  }
+
   render() {
     const {action, api, forms, buttonname} = this.state;
     if(typeof(forms) === 'object') {
       return (
         <form onSubmit={this.handleSubmit.bind(this)}>
-            <Form
-              action={action}
-              api={api}
-              forms={forms}
-              buttonname={buttonname}
-              setForm={this.setForm}
-              setComplete={this.setComplete}
-            />
-            <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
+          {this.getSubmitAlertElement()}
+          <Form
+            action={action}
+            api={api}
+            forms={forms}
+            buttonname={buttonname}
+            setForm={this.setForm}
+            setComplete={this.setComplete}
+          />
+          <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
         </form>
       );
     } else {
