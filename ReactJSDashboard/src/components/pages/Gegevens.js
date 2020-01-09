@@ -212,8 +212,9 @@ class Gegevens extends Component {
 					for (var el = 1; el < row.length; el++) {
 						var text = row[el];
 
-						// Change 0/1 to Nee/Ja
-						if (el === row.length - 1) {
+						// If the last row is the validated row
+						if (el === row.length - 1 && json[tableName]["Columns"] === "Validated") {
+						  // Change 0/1 to Nee/Ja
 						  if (text === 0) {
 						  	  text = "Nee";
 						  } else {
