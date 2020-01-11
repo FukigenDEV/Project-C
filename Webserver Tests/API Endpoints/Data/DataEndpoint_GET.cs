@@ -142,7 +142,7 @@ namespace Webserver.API_Endpoints.Tests {
 					} }
 				}
 			},
-						new object[] {
+			new object[] {
 				"/data?table=Table1&begin=2&isunvalidated=true",
 				new JObject() {
 					{"Table1", new JObject() {
