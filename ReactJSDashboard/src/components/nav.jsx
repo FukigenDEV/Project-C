@@ -18,7 +18,7 @@ library.add(
 class Nav extends Component {
   render() {
     const heading = (this.props.nav.id === 1) ? <h1>{this.props.nav.heading}</h1> : this.props.nav.heading;
-    const icon = (this.props.nav.id !== 1) ? <div className="nav-icon">{<FontAwesomeIcon icon={['fas', this.props.nav.icon]} />}</div> : <div></div>;
+    const icon = (this.props.nav.id !== 1) ? <div className="nav-icon">{<FontAwesomeIcon icon={['fas', this.props.nav.icon]} />}</div> : <div className="nav-icon home">{<FontAwesomeIcon icon={['fas', this.props.nav.icon]} />}</div>;
     if (this.props.nav.id === 9) return null;
     if (this.props.nav.link === "/dashboard/Admin" && this.props.admin === false) return null;
     console.log(`nav admin: ${this.props.admin}`);

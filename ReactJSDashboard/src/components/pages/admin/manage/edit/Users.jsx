@@ -36,14 +36,15 @@ class EditUsers extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     const {onRedirect} = this.props;
-    const isNewEmail = (this.props.match.params.name !== this.state.form.Email);
-    const form = this.state.form;
+    const form = {...this.state.form};
+    const isNewEmail = (this.props.match.params.name === this.state.form.Email);
+    const email = form["Email"];
 
-    if(!isNewEmail) {
+    if(isNewEmail) {
       delete form["Email"];
     }
 
-    await fetch(`/account?email=${this.state.data.map(user => (user.Email))}`, {
+    await fetch(`/account?email=${this.props.match.params.name}`, {
       method: 'PATCH',
       body: JSON.stringify(form),
       headers: {
@@ -51,16 +52,16 @@ class EditUsers extends Component {
       }
     }).then(response => {
       const alert = {...this.state.alert};
-      console.log(response['status']);
-      console.log(response['status'].toString()[0]);
       alert['active'] = true;
       alert['content'] = (response['status'].toString()[0] === "2") ? "De gebruiker is succesvol aangepast" : "Server error";
       alert['type'] = (response['status'].toString()[0] === "2") ? "success" : "error";
       this.setState({alert});
     });
 
-    if(isNewEmail) {
-      const link = '/dashboard/Admin/users/manage/edit/' + this.state.form.Email;
+    if(this.state.form.Email !== this.props.match.params.name) {
+      form['Email'] = email;
+      this.setState({form});
+      const link = '/dashboard/Admin/users/manage/edit/' + email;
       onRedirect(link);
     }
 
