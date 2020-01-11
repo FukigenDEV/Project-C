@@ -34,7 +34,8 @@ namespace Webserver_Tests.API_Endpoints.Tests
         private readonly JObject infoTemplate3 = new JObject() {
             {"ID", 3 },
             {"Name", "SomeDepartment" },
-            {"Description", "A department to test the application" }
+            {"Description", "A department to test the application" },
+            {"Users", new JObject() }
         };
 
         /// <summary>
