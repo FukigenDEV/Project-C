@@ -69,7 +69,8 @@ namespace Webserver.API_Endpoints.Tests {
 		/// Creates a RequestWorker and runs it. The RequestWorker will continue to run until all requests in the queue have been processed.
 		/// </summary>
 		public void ExecuteQueue() {
-			RequestWorker Worker = new RequestWorker(Queue, Connection, true);
+			RequestWorker.Queue = Queue;
+			RequestWorker Worker = new RequestWorker(Connection, true);
 			Worker.Run();
 		}
 

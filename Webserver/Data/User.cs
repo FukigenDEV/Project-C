@@ -41,6 +41,13 @@ namespace Webserver.Data {
 		}
 
 		/// <summary>
+		/// Deletes this user account
+		/// </summary>
+		/// <param name="Connection"></param>
+		public void Delete(SQLiteConnection Connection) => Delete(Connection, this);
+		public static void Delete(SQLiteConnection Connection, User Acc) => Connection.Delete(Acc);
+
+		/// <summary>
 		/// Dapper-only constructor for deserializing database rows into user objects. Do not use.
 		/// </summary>
 		public User(
@@ -156,6 +163,24 @@ namespace Webserver.Data {
 		/// <param name="Connection"></param>
 		/// <returns></returns>
 		public static List<string> GetAllEmails(SQLiteConnection Connection) => Connection.Query<string>("SELECT Email FROM Users").AsList();
+
+		/// <summary>
+		/// Get the users that belong to the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Dept"></param>
+		/// <returns></returns>
+		public static List<User> GetUsersByDepartment(SQLiteConnection Connection, Department Dept) => GetUsersByDepartment(Connection, Dept.ID);
+
+		/// <summary>
+		/// Get the users that belong to the specified department.
+		/// </summary>
+		/// <param name="Connection"></param>
+		/// <param name="Dept"></param>
+		public static List<User> GetUsersByDepartment(SQLiteConnection Connection, int DepartmentID) {
+			List<int> IDs = Connection.Query<int>("SELECT User FROM Permissions WHERE Department = @DepartmentID", new { DepartmentID }).ToList();
+			return Connection.Query<User>("SELECT * FROM Users WHERE ID in (@IDs)", new { IDs }).ToList();
+		}
 
 		/// <summary>
 		/// Get a list of all users.
