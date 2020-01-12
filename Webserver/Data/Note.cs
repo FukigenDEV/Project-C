@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Text;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace Webserver.Data {
 	public class Note {
@@ -19,9 +20,10 @@ namespace Webserver.Data {
 		/// </summary>
 		/// <param name="title">The title of the note.</param>
 		/// <param name="text">The text of the note.</param>
-		public Note(string title, string text) {
+		public Note(SQLiteConnection connection, string title, string text) {
 			Title = title;
 			Text = text;
+			connection.Insert(this);
 		}
 
 		/// <summary>

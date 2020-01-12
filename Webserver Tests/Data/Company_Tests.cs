@@ -27,7 +27,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void Constructor()
         {
-            new Company("Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            new Company(connection, "Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
 
             Assert.IsNotNull(Company.GetCompanyByName(connection, "Company name"));
         }
@@ -35,7 +35,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void ChangeNameTest()
         {
-            Company company = new Company("Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            Company company = new Company(connection, "Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
 
             string oldName = company.Name;
             company.Name = "New company name";
@@ -46,7 +46,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void GetCompanyByNameTest()
         {
-            new Company("Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            new Company(connection, "Company name", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
 
             Company companyByName = Company.GetCompanyByName(connection, "Company name");
 
@@ -56,11 +56,13 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void GetAllCompaniesTest()
         {
-            new Company("Company name 1", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
-            new Company("Company name 2", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
-            new Company("Company name 3", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            new Company(connection, "Company name 1", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            new Company(connection, "Company name 2", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
+            new Company(connection, "Company name 3", "Street", 123, "Post code", "City", "Country", "Phone number", "Email");
 
             List<Company> allCompanies = Company.GetAllCompanies(connection);
+
+            System.Diagnostics.Debug.WriteLine(allCompanies.Count);
 
             // We added 3 companies, so we expect the list count to be 3.
             Assert.IsTrue(allCompanies.Count == 3);

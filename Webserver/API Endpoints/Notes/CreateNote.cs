@@ -25,7 +25,7 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
-			Note newNote = new Note((string)title, (string)text);
+			Note newNote = new Note(Connection, (string)title, (string)text);
 
 			// Store note to database
 			Connection.Insert(newNote);

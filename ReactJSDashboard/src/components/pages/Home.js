@@ -37,8 +37,8 @@ class Home extends Component {
 
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					$("#message").html(xhr.responseText);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					$("#message").html("De notitie is succesvol aangemaakt.");
                     $("#message").show().delay(2000).fadeOut();
                     
                     $("#note_title").val("");

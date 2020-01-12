@@ -30,6 +30,7 @@ namespace Webserver.Data {
 		/// <param name="PhoneNumber"The company's phone number></param>
 		/// <param name="Email">The company's Email address</param>
 		public Company(
+			SQLiteConnection Connection,
 			string Name,
 			string Street,
 			long HouseNumber,
@@ -47,6 +48,7 @@ namespace Webserver.Data {
 			this.Country = Country;
 			this.PhoneNumber = PhoneNumber;
 			this.Email = Email;
+			Connection.Insert(this);
 		}
 
 		/// <summary>

@@ -88,8 +88,8 @@ namespace Webserver.Threads {
 				if ( TimeSpent >= 250 ) {
 					Log.Warning("An operation took too long to complete. Took " + TimeSpent + " ms, should be less than 250ms");
 				}
-				RequestTimeWatcher.Update(TimeSpent);
-				Listener.QueueSizeWatcher.Update(RequestWorker.Queue.Count);
+				RequestTimeWatcher?.Update(TimeSpent);
+				Listener.QueueSizeWatcher?.Update(RequestWorker.Queue.Count);
 			} while ( !Debug || Queue.Count != 0);
 			//Connection.Close();
 		}

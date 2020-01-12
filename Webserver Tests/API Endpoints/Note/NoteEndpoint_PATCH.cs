@@ -16,7 +16,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [TestMethod]
         public void EDIT_ValidArguments()
         {
-            new Note("SomeTitle", "SomeText");
+            new Note(Connection, "SomeTitle", "SomeText");
 
             ResponseProvider response = ExecuteSimpleRequest("/note?title=SomeTitle", HttpMethod.PATCH, new JObject() {
                 {"Title", "SomeCoolTitle" },
@@ -57,7 +57,7 @@ namespace Webserver_Tests.API_Endpoints.Tests
         [DynamicData("InvalidPatchTestData")]
         public void EDIT_InvalidArguments(JObject JSON, string URL, HttpStatusCode statusCode, string responseMessage)
         {
-            new Note("SomeTitle", "SomeText");
+            new Note(Connection, "SomeTitle", "SomeText");
 
             ResponseProvider response = ExecuteSimpleRequest(URL, HttpMethod.PATCH, JSON);
 

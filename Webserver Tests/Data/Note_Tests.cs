@@ -27,7 +27,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void Constructor()
         {
-            new Note("Note Title", "Note Text");
+            new Note(connection, "Note Title", "Note Text");
 
             Assert.IsNotNull(Note.GetNoteByTitle(connection, "Note Title"));
         }
@@ -35,7 +35,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void ChangeNameTest()
         {
-            Note note = new Note("Some Note", "Some Note Text");
+            Note note = new Note(connection, "Some Note", "Some Note Text");
 
             string oldTitle = note.Title;
             note.Title = "Some Cool Note";
@@ -46,7 +46,7 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void GetNoteByTitleTest()
         {
-            new Note("Some Note", "Some Note Text");
+            new Note(connection, "Some Note", "Some Note Text");
 
             Note noteByTitle = Note.GetNoteByTitle(connection, "Some Note");
 
@@ -56,9 +56,9 @@ namespace Webserver_Tests.Data
         [TestMethod]
         public void GetAllNotesTest()
         {
-            new Note("Some Note 1", "Some Note Text 1");
-            new Note("Some Note 2", "Some Note Text 2");
-            new Note("Some Note 3", "Some Note Text 3");
+            new Note(connection, "Some Note 1", "Some Note Text 1");
+            new Note(connection, "Some Note 2", "Some Note Text 2");
+            new Note(connection, "Some Note 3", "Some Note Text 3");
 
             List<Note> allNotes = Note.GetAllNotes(connection);
 

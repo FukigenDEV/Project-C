@@ -26,7 +26,7 @@ namespace Webserver.API_Endpoints {
 				return;
 			}
 
-			Company company = new Company((string)name, (string)street, (int)houseNumber, (string)postCode, (string)city, (string)country, (string)phoneNumber, (string)email);
+			Company company = new Company(Connection, (string)name, (string)street, (int)houseNumber, (string)postCode, (string)city, (string)country, (string)phoneNumber, (string)email);
 
 			// Store companty to database
 			Connection.Insert(company);
