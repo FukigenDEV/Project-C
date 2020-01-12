@@ -19,7 +19,7 @@ class App extends Component {
       user: null,
       admin: null,
       navs: [
-        { id: 1, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'tools' },
+        { id: 1, heading: 'Project C', link: '/dashboard', path: '/dashboard', component: Home, active: true, icon: 'home' },
         { id: 2, heading: 'Beheren', link: '/dashboard/Admin', path: '/dashboard/Admin', component: Admin, active: false, icon: 'user-shield' },
         { id: 3, heading: 'Gegevens', link: '/dashboard/Gegevens', path: '/dashboard/Gegevens', component: Gegevens, active: false, icon: 'file-signature' },
         { id: 4, heading: 'Notities', link: '/dashboard/Notities', path: '/dashboard/Notities', component: Notities, active: false, icon: 'clipboard' },

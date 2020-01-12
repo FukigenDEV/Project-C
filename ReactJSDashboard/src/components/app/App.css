@@ -24,12 +24,12 @@
   text-transform: uppercase;
   border-style: solid;
   border-width: 0px 0px 1px 0px;
-  border-color: #0e1111;
+  border-color: #3232a1;
   transition: background 100ms ease-in-out;
 }
 
 a:hover.App-link {
-  background-color: #d8d8d8;
+  background-color: #d7ebff;
   color: #0e1111 !important;
   text-decoration: none;
 }
@@ -54,7 +54,7 @@ a:hover.App-link {
 }
 
 .selected {
-  background-color: #cecece;
+  background-color: #d7ebff;
 }
 
 .logo {
@@ -77,6 +77,10 @@ th, td {
   font-size: 1em;
   display: inline;
   padding: 0 5px 0 5px;
+}
+
+.home {
+  display: none;
 }
 
 .navvv {
@@ -183,16 +187,23 @@ th, td {
 
 @media only screen and (max-width: 1200px) {
   .dash-container {
-    grid-template-columns: 5% 95%;
+    grid-template-columns: 15% 85%;
   }
 
   .navvv {
-    width: 5vw;
-    width: 5%;
+    width: 15vw;
+    width: 15%;
   }
 
   .navvv .App-link {
-    width: 5vw;
+    width: 15vw;
+    padding: 2vw;
+    font-size: calc(1vw + 24px);
+    text-align: center;
+  }
+
+  .home {
+    display: block;
   }
 
   .nav-text {
@@ -200,13 +211,13 @@ th, td {
   }
 
   .App-link {
-    width: 5vw;
-    width: 5%;
+    width: 15vw;
+    width: 15%;
   }
 
   .App-link.logout {
-    width: 5vw;
-    width: 5%;
+    width: 15vw;
+    width: 15%;
   }
 }
 
