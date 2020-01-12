@@ -7,7 +7,6 @@ class Dashboard extends Component {
   render() {
     const {navs, loggedin, admin, setUser, setAdmin, onSelect, onRedirect, onRender} = this.props;
     onRender();
-    console.log(admin);
 
     if(loggedin.value === true) {
       return (

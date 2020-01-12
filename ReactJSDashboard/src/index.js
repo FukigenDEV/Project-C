@@ -34,7 +34,6 @@ import Navs from './components/navs';
 import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
 import NotitiesEditForm from './components/pages/NotitiesEditForm';
-import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
 import Logout from './components/pages/Logout';
 import AdminWizard from './components/pages/AdminWizard';
@@ -72,7 +71,6 @@ export {
     manCompany,
     EditCompany,
     Notities,
-    Logs,
     Backup,
     Logout,
     AdminWizard,

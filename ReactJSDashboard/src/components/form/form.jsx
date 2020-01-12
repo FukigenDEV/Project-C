@@ -51,7 +51,7 @@ class Form extends Component {
       alert[comp_name] = this.compare(dict);
       alert[name] = this.compare(dict);
     }
-    
+
     this.setState({alert});
     Promise.resolve(alert).then(() => {
       setComplete(this.isComplete());
@@ -105,10 +105,6 @@ class Form extends Component {
 
   render() {
     const {forms} = this.props;
-    console.log(forms);
-    console.log(this.form);
-    console.log(this.state.alert_type);
-    console.log(this.state.alert);
     return (
       <>
         {forms.map(form => (

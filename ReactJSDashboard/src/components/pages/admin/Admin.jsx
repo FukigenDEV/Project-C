@@ -1,6 +1,6 @@
 import React, { Component, useReducer } from 'react';
 import {BrowserRouter as Router, Switch, Route, Link, withRouter} from "react-router-dom";
-import { Users, Departments, Company, Logs, AdminWizard, Backup, Auth } from '../../../index';
+import { Users, Departments, Company, AdminWizard, Backup, Auth } from '../../../index';
 
 class Admin extends Component {
   constructor(props) {
@@ -51,7 +51,6 @@ class Admin extends Component {
               <li class={this.getNavClass('users')}><Link to="/dashboard/Admin/users">Gebruikers</Link></li>
               <li class={this.getNavClass('departments')}><Link to="/dashboard/Admin/departments">Afdelingen</Link></li>
               <li class={this.getNavClass('company')}><Link to="/dashboard/Admin/company">Bedrijven</Link></li>
-              <li class={this.getNavClass('logs')}><Link to="/dashboard/Admin/logs">Logs</Link></li>
               <li class={this.getNavClass('wizard')}><Link to="/dashboard/Admin/wizard">Wizard</Link></li>
               <li class={this.getNavClass('backup')}><Link to="/dashboard/Admin/backup">Backup</Link></li>
             </ul>
@@ -62,7 +61,6 @@ class Admin extends Component {
             <Route path="/dashboard/Admin/users" render={props => <Users {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
             <Route path="/dashboard/Admin/departments" render={props => <Departments {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
             <Route path="/dashboard/Admin/company" render={props => <Company {...props} getNavClass={this.getSubNavClass} onRedirect={onRedirect} />} />
-            <Route exact path="/dashboard/Admin/logs" render={props => <Logs {...props} />} />
             <Route exact path="/dashboard/Admin/wizard" render={props => <AdminWizard {...props} />} />
             <Route exact path="/dashboard/Admin/backup" render={props => <Backup {...props} />} />
           </div>

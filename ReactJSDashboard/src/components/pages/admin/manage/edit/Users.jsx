@@ -120,7 +120,7 @@ class EditUsers extends Component {
       return (
         <div>
           {this.getSubmitAlertElement()}
-          <h1><b>Bedrijf bewerken: </b>{this.props.match.params.name}</h1><br />
+          <h1><b>Gebruiker bewerken: </b>{this.props.match.params.name}</h1><br />
           <form onSubmit={this.handleSubmit.bind(this)}>
               <Form
                 {...this.props}
