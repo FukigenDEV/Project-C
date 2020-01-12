@@ -126,7 +126,7 @@ class Notities extends Component {
 	renderForm = (Note, noteId) => {
 		console.log(noteId);
 		console.log(Note);
-		ReactDOM.render(<NotitiesEditForm note={Note} reloadNote={this.reRenderNote} />, document.getElementById(noteId));
+		ReactDOM.render(<NotitiesEditForm note={Note} reloadNote={this.reRenderNote} />, document.getElementById(noteId)); 
 	}
 	reRenderNote = (Note) => {
 		var noteIdString = "note_" + Note.ID.toString();
