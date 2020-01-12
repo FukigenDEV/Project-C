@@ -16,7 +16,7 @@ namespace Webserver {
 
 			//If no Redirects file exists yet, create a default one.
 			if ( !File.Exists("Redirects.config") ) {
-				File.CreateText("Redirects.config");
+				File.CreateText("Redirects.config").Close();
 			}
 
 			ParseRedirectFile("Redirects.config");
