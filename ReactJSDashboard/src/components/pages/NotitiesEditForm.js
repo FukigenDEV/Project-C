@@ -7,12 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, fas, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { delay } from 'q';
+
+const { patchNote } = require('./NoteEditUtils');
+
 library.add(
 	fas,
 	faTrashAlt,
 	faPencilAlt
 )
-
 
 class Notities extends Component {
 	constructor(props) {
@@ -22,13 +24,12 @@ class Notities extends Component {
 			editNoteText: ''
 		}
 	}
+
 	componentDidMount() {
 		this.setState({ editNoteTitle: this.props.note.Title });
 		this.setState({ editNoteText: this.props.note.Text });
 	};
-	componentWillUnmount(){
-		console.log("Form Unmounted");
-	};
+
 	handleTitleChange = event => {
 		this.setState({ editNoteTitle: event.target.value });
 	};
@@ -36,22 +37,13 @@ class Notities extends Component {
 	handleTextChange = event => {
 		this.setState({ editNoteText: event.target.value });
 	};
-	handleSubmit = async () => {
-		console.log("Title: " + this.props.note.Title + "\nText: " + this.state.editNoteText)
-		await fetch('/note', {
-			method: 'PATCH',
-			body: JSON.stringify({ title: this.props.note.Title, newText: this.state.editNoteText, newTitle: this.state.editNoteTitle }),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then(Response =>	{
-			console.log(Response.body);
-			console.log(Response.statusText);
-			var test = Response;
-			// this.props.reloadNotes(test);
-			window.location.reload(true);
-		}
-		);
+
+	handleReset = () => {
+		this.props.reloadNote(this.props.note);
+	};
+
+	handleSubmit = () => {
+		patchNote(this.props.note, this.state);
 	};
 
 	render() {
@@ -64,7 +56,7 @@ class Notities extends Component {
 				<textarea onChange={this.handleTextChange} style={{ width: "50%", height: "225px" }} >{this.props.note.Text}</textarea>
 				<br />
 				<button class="btn btn-primary" onClick={this.handleSubmit}>Veranderen</button>
-				<button class="btn btn-secondary" type="button">Annuleren</button><br /><br />
+				<button class="btn btn-secondary" onClick={this.handleReset}>Annuleren</button><br /><br />
 			</div>
 		);
 	}

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { standard, email } from '../../../../form/fieldcheck';
+import { Form } from '../../../../../index';
 
 class EditCompany extends Component {
   constructor(props) {
@@ -8,21 +10,23 @@ class EditCompany extends Component {
         type: 0,
         value: ''
       },
-
+      forms: [
+        {fieldname: 'Naam bedrijf', name: 'newName', type: 'text', placeholder: false, check: standard},
+        {fieldname: 'Straat', name: 'newStreet', type: 'text', placeholder: false},
+        {fieldname: 'Huisnummer', name: 'newHouseNumber', type: 'text', placeholder: false},
+        {fieldname: 'Postcode', name: 'newPostCode', type: 'text', placeholder: false},
+        {fieldname: 'Woonplaats', name: 'newCity', type: 'text', placeholder: false},
+        {fieldname: 'Land', name: 'newCountry', type: 'text', placeholder: false},
+        {fieldname: 'Telefoonnummer', name: 'newPhoneNumber', type: 'text', placeholder: false},
+        {fieldname: 'E-mailadres', name: 'newEmail', type: 'text', placeholder: false, check: email},
+      ],
+      buttonname: "Bedrijf bewerken",
       form: [],
-      data: []
+      data: [],
     }
   }
 
   componentDidMount() {
-    this.getCompany();
-  }
-
-  handleChange = (event) => {
-    event.preventDefault();
-    const form = {...this.state.form};
-    form[event.target.name] = event.target.value;
-    this.setState({form});
   }
 
   handleSubmit = async (event) => {
@@ -34,22 +38,30 @@ class EditCompany extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
+    }).then(response => {
+      const alert = {...this.state.alert};
+      console.log(response['status']);
+      console.log(response['status'].toString()[0]);
+      alert['active'] = true;
+      alert['content'] = (response['status'].toString()[0] === "2") ? "Het bedrijf is succesvol aangepast" : "Server error";
+      alert['type'] = (response['status'].toString()[0] === "2") ? "success" : "error";
+      this.setState({alert});
     });
     if(this.state.form.newName !== this.props.match.params.name) {
       const link = '/dashboard/Admin/company/manage/edit/' + this.state.form.newName;
       onRedirect(link);
     }
-    const cmp = (this.state.form.newName !== this.props.match.params.name) ? this.state.form.newName : "";
-    this.getCompany(cmp);
+    // const cmp = (this.state.form.newName !== this.props.match.params.name) ? this.state.form.newName : "";
+    // this.getCompany(cmp);
   }
 
-  getCompany = cmp => {
-    const name = (cmp) ? cmp : this.props.match.params.name;
+  getData = (component, cmp) => {
+    const name = (cmp) ? cmp : component.props.match.params.name;
     fetch(`/Company?name=${name}`)
     .then(company => {
       return company.json();
     }).then(data => {
-      this.setState({
+      component.setState({
         data,
         form: {
           newName: data.Name,
@@ -65,58 +77,54 @@ class EditCompany extends Component {
     })
   }
 
+  setForm = ext_form => {
+    const form = {...this.state.form};
+    Object.keys(ext_form).forEach(key => {
+      form[key] = ext_form[key];
+    });
+    this.setState({form});
+    console.log(this.state.form);
+  }
+
+  setComplete = ext_bool => {
+    const complete = ext_bool;
+    this.setState({complete});
+  }
+
+  getSubmitAlertElement = () => {
+    const alert = this.state.alert;
+    const alert_active = (alert['active']) ? "d-block" : "d-none";
+    const alert_class = (alert['type'] === "success") ? "alert-success" : "alert-danger";
+    return <div class={`alert ${alert_class} ${alert_active}`}>{alert['content']}</div>
+  }
+
   render() {
     console.log(this.state.form);
     console.log(this.state.data);
-    return (
-      <div>
-        <h1><b>Edit Company:</b> {this.state.data.Name}</h1><br />
-
-        <form onSubmit={this.handleSubmit.bind(this)}>
-          <div class="form-group">
-            <label for="Name">Name</label>
-            <input onChange={this.handleChange} type="text" name="newName" class="form-control" id="Name" value={this.state.form.newName} />
-          </div>
-
-          <div class="form-group">
-            <label for="street">Street</label>
-            <input onChange={this.handleChange} type="text" name="newStreet" class="form-control" id="street" value={this.state.form.newStreet} />
-          </div>
-
-          <div class="form-group">
-            <label for="houseNumber">House number</label>
-            <input onChange={this.handleChange} type="text" name="newHouseNumber" class="form-control" id="houseNumber" value={this.state.form.newHouseNumber} />
-          </div>
-
-          <div class="form-group">
-            <label for="postCode">Postcode</label>
-            <input onChange={this.handleChange} type="text" name="newPostCode" class="form-control" id="postCode" value={this.state.form.newPostCode} />
-          </div>
-
-          <div class="form-group">
-            <label for="city">City</label>
-            <input onChange={this.handleChange} type="text" name="newCity" class="form-control" id="city" value={this.state.form.newCity} />
-          </div>
-
-          <div class="form-group">
-            <label for="country">Country</label>
-            <input onChange={this.handleChange} type="text" name="newCountry" class="form-control" id="country" value={this.state.form.newCountry} />
-          </div>
-
-          <div class="form-group">
-            <label for="phoneNumber">Phone number</label>
-            <input onChange={this.handleChange} type="text" name="newPhoneNumber" class="form-control" id="phoneNumber" value={this.state.form.newPhoneNumber} />
-          </div>
-
-          <div class="form-group">
-            <label for="email">E-mail</label>
-            <input onChange={this.handleChange} type="text" name="newEmail" class="form-control" id="email" value={this.state.form.newEmail} />
-          </div>
-
-          <button type="submit" class="btn btn-primary">Edit Company</button>
-        </form>
-      </div>
-    );
+    const {action, api, forms, buttonname} = this.state;
+    if(typeof(forms) === 'object') {
+      return (
+        <div>
+          {this.getSubmitAlertElement()}
+          <h1><b>Bedrijf bewerken: </b>{this.props.match.params.name}</h1><br />
+          <form onSubmit={this.handleSubmit.bind(this)}>
+              <Form
+                {...this.props}
+                action={action}
+                api={api}
+                forms={forms}
+                buttonname={buttonname}
+                getData={this.getData}
+                setForm={this.setForm}
+                setComplete={this.setComplete}
+              />
+              <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
+          </form>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
   }
 }
 

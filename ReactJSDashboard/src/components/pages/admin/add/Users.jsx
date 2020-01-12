@@ -1,21 +1,28 @@
 import React, { Component } from 'react';
+import Form from '../../../form/form';
+import { email } from '../../../form/fieldcheck';
 
 class AddUsers extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      alert: {
-        type: 0,
-        value: ''
-      },
-
+      complete: false,
       form: {
-        'Email': '',
-        'Password': '',
-        'AccountType': '',
-        'MemberOf': ''
+        'MemberDepartments': {"_d1" : "User"},
+      },
+      depts: {
+        "_d1" : "_d1",
       },
       data: [],
+      forms: [
+        {fieldname: 'E-mailadres', name: 'Email', type: 'text', placeholder: 'E-mailadres invullen...', check: email},
+        {fieldname: 'Nieuw wachtwoord', name: 'Password', type: 'password', placeholder: 'Wachtwoord invullen...', check: "compare"},
+        {fieldname: 'Bevestig wachtwoord', name: '_Password', type: 'password', placeholder: 'Wachtwoord bevestigen...', check: "compare"},
+      ],
+      action: 'POST',
+      api: '/account',
+      buttonname: 'Gebruiker toevoegen',
+      alert: {active: false, type: "", content: ""},
     }
   }
 
@@ -23,38 +30,42 @@ class AddUsers extends Component {
     this.getDepartments();
   }
 
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const {action, api} = this.state;
+    await fetch(api, {
+      method: action,
+      body: JSON.stringify(this.state.form),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      const alert = {...this.state.alert};
+      console.log(response['status']);
+      console.log(response['status'].toString()[0]);
+      alert['active'] = true;
+      alert['content'] = (response['status'].toString()[0] === "2") ? "De gebruiker is succesvol toegevoegd" : "Server error";
+      alert['type'] = (response['status'].toString()[0] === "2") ? "success" : "error";
+      this.setState({alert});
+    });
+  }
+
   handleChange = (event) => {
     event.preventDefault();
     const form = {...this.state.form};
-    form[event.target.name] = event.target.value;
-    this.setState({form});
-  }
-
-  handleSubmit = (event) => {
-    event.preventDefault();
-    const obj = this.state.form;
-    const data = JSON.stringify(obj);
-
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "/account", true);
-    xhr.onreadystatechange = () => {
-      if(xhr.readyState === 4) {
-        if(xhr.status === 200) {
-          const alert = {...this.state.alert};
-          alert.type = 200;
-          alert.value = 'User succesfully created';
-          this.setState({alert});
-        } else {
-          const alert = {...this.state.alert};
-          alert.type = xhr.status;
-          alert.value = xhr.responseText;
-          this.setState({alert});
-        }
-      }
+    const depts = {...this.state.depts};
+    if(event.target.name.startsWith("_d")) {
+      const item_key = depts[event.target.name];
+      form["MemberDepartments"][event.target.value] = form["MemberDepartments"][item_key];
+      depts[event.target.name] = event.target.value;
+      delete form["MemberDepartments"][item_key];
+    } else if(event.target.name.startsWith("_a")) {
+      const item_key = depts[`_d${event.target.name[2]}`];
+      form["MemberDepartments"][item_key] = event.target.value;
+    } else {
+      form[event.target.name] = event.target.value;
     }
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(data);
+    this.setState({form, depts});
   }
 
   getDepartments = () => {
@@ -66,44 +77,87 @@ class AddUsers extends Component {
     })
   }
 
+  addDept = (event) => {
+    event.preventDefault();
+    const depts = {...this.state.depts};
+    const form = {...this.state.form};
+    const dept_amount = Object.keys(depts).length + 1;
+    const name = "_d" + dept_amount;
+    depts[name] = name;
+    form["MemberDepartments"][name] = "User";
+    this.setState({form, depts});
+  }
+
+  setForm = ext_form => {
+    const form = {...this.state.form};
+    Object.keys(ext_form).forEach(key => {
+      form[key] = ext_form[key];
+    });
+    this.setState({form});
+    return this.state.form;
+    console.log(this.state.form);
+  }
+
+  setComplete = ext_bool => {
+    const complete = ext_bool;
+    this.setState({complete});
+  }
+
+  getSubmitAlertElement = () => {
+    const alert = this.state.alert;
+    const alert_active = (alert['active']) ? "d-block" : "d-none";
+    const alert_class = (alert['type'] === "success") ? "alert-success" : "alert-danger";
+    return <div class={`alert ${alert_class} ${alert_active}`}>{alert['content']}</div>
+  }
+
   render() {
-    return (
-      <div>
+    console.log(this.state.form);
+    const {action, api, form, forms, buttonname} = this.state;
+
+    if (typeof(forms) === 'object') {
+      return (
         <form onSubmit={this.handleSubmit.bind(this)}>
-          <div class="form-group">
-            <label for="Email">Email address</label>
-            <input onChange={this.handleChange} type="text" name="Email" class="form-control" id="Email" placeholder="Enter email" />
-          </div>
+          {this.getSubmitAlertElement()}
+          <Form
+            action={action}
+            api={api}
+            forms={forms}
+            form={form}
+            buttonname={buttonname}
+            setForm={this.setForm}
+            setComplete={this.setComplete}
+            setCompare={this.setCompare}
+          />
 
-          <div class="form-group">
-            <label for="Password">Password</label>
-            <input onChange={this.handleChange} type="password" name="Password" class="form-control" id="Password" placeholder="Enter password" />
-          </div>
+          {Object.keys(this.state.depts).map(dept => (
+            <>
+              <div class="form-group float-left dept">
+                <label for="Type">Afdeling</label>
+                <select onChange={this.handleChange} name={dept} class="form-control" id="Department">
+                  <option value="">Selecteer afdeling...</option>
+                  {this.state.data.map(department => (<option value={department.Name}>{department.Name}</option>))}
+                </select>
+              </div>
 
-          <div class="form-group">
-            <label for="Type">Department</label>
-            <select onChange={this.handleChange} name="MemberOf" class="form-control" id="Department">
-              <option value="">Select department...</option>
-              {this.state.data.map(department => (<option value={department.Name}>{department.Name}</option>))}
-            </select>
-          </div>
+              <div class="form-group float-right dept">
+                <label for="Type">Autorisatie</label><a href onClick={this.addDept.bind(this)} class="float-right">+</a>
+                <select onChange={this.handleChange} name={`_a${dept[2]}`} class="form-control" id="Type">
+                  <option value="">Selecteer autorisatie...</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Manager">Manager</option>
+                  <option value="DeptMember">Department Member</option>
+                  <option value="User">User</option>
+                </select>
+              </div>
+            </>
+          ))}
 
-          <div class="form-group">
-            <label for="Type">Account type</label>
-            <select onChange={this.handleChange} name="AccountType" class="form-control" id="Type">
-              <option value="">Select type...</option>
-              <option value="Administrator">Administrator</option>
-              <option value="Manager">Manager</option>
-              <option value="DeptMember">Department Member</option>
-              <option value="User">User</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary">Add user</button>
+          <button type="submit" class="btn btn-primary" disabled={!this.state.complete}>{buttonname}</button>
         </form>
-      </div>
-    );
+      );
+    } else {
+      return <></>;
+    }
   }
 }
-
 export default AddUsers;

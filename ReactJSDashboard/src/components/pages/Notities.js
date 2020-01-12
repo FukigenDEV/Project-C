@@ -126,67 +126,51 @@ class Notities extends Component {
 	renderForm = (Note, noteId) => {
 		console.log(noteId);
 		console.log(Note);
-		ReactDOM.render(<NotitiesEditForm note={Note} reloadNotes={this.reRenderAllNotes} />, document.getElementById(noteId));
+		ReactDOM.render(<NotitiesEditForm note={Note} reloadNote={this.reRenderNote} />, document.getElementById(noteId)); 
 	}
-	reRenderAllNotes = (responseEdit) => {
-		console.log(responseEdit);
-		this.state.alert = {
-			type: responseEdit.status,
-		};
-		if(this.state.alert.type === 400){
-			this.state.alert.value = "Er zijn lege velden"
-		}
-		if(this.state.alert.type === 404){
-			this.state.alert.value = "Die notitie bestaat niet"
-		}
-		else {
-			this.state.alert.value = "Notitie succesvol aangepast"
-		}
-		console.log(this.state.alert);
-
-		this.getAllNotes().then(ReactDOM.render(
-			this.state.allNotes.map(Note => {
-				return <div className="full_note note_border" id={"note_" + Note.ID.toString()}>
-					<h6>{Note.Title}</h6>
-					<a class="note_edit" onClick={() => { this.renderForm(Note, "note_" + Note.ID.toString()) }}><FontAwesomeIcon icon={['fas', 'pencil-alt']} />
-					</a>
-
-					<a class="note_delete" onClick={() => this.deleteConfirm(Note.Title)}><FontAwesomeIcon icon={['fas', 'trash-alt']} /></a>
-					<p>
-						{Note.Text}
-					</p>
-				</div>
-			}), document.getElementById('all_notes')));
+	reRenderNote = (Note) => {
+		var noteIdString = "note_" + Note.ID.toString();
+		ReactDOM.render(
+			<div className="note_border">
+				<h6>{Note.Title}</h6>
+				<a class="note_edit" onClick={() => { this.renderForm(Note, noteIdString) }}><FontAwesomeIcon icon={['fas', 'pencil-alt']} />
+				</a>
+				<a class="note_delete" onClick={() => this.deleteConfirm(Note.Title)}><FontAwesomeIcon icon={['fas', 'trash-alt']} /></a>
+				<p>
+					{Note.Text}
+				</p>
+			</div>
+			, document.getElementById(noteIdString));
 	}
 
 	render() {
 		return (
 			<div className="shadow-sm p-3 bg-white rounded">
 				<h2>Notities</h2>
-
 				<hr />
 
 				<button type="button" id="alleNotitiesKnop" class="btn btn-outline-primary" onClick={this.getAllNotes} style={{ display: "inline-block" }}>
 					Alle notities</button>
 
 				<button type="button" id="notitieAanmakenKnop" class="btn btn-outline-primary" style={{ display: "inline-block" }}>
-					Notitie aanmaken</button><br/>
+					Notitie aanmaken</button>
 
-				<br/>
 
 				<div id="alleNotities">
 					<h5><b>Een overzicht van alle notities:</b></h5>
 					<div id="all_notes">
-					{this.state.allNotes.map(Note => {
-							return <div className="full_note note_border" id={"note_" + Note.ID.toString()}>
-								<h6>{Note.Title}</h6>
-								<a class="note_edit" onClick={() => { this.renderForm(Note, "note_" + Note.ID.toString()) }}><FontAwesomeIcon icon={['fas', 'pencil-alt']} />
-								</a>
+						{this.state.allNotes.map(Note => {
+							return <div className="full_note" id={"note_" + Note.ID.toString()}>
+								<div className="note_border">
+									<h6>{Note.Title}</h6>
+									<a class="note_edit" onClick={() => { this.renderForm(Note, "note_" + Note.ID.toString()) }}><FontAwesomeIcon icon={['fas', 'pencil-alt']} />
+									</a>
 
-								<a class="note_delete" onClick={() => this.deleteConfirm(Note.Title)}><FontAwesomeIcon icon={['fas', 'trash-alt']} /></a>
-								<p>
-									{Note.Text}
-								</p>
+									<a class="note_delete" onClick={() => this.deleteConfirm(Note.Title)}><FontAwesomeIcon icon={['fas', 'trash-alt']} /></a>
+									<p>
+										{Note.Text}
+									</p>
+								</div>
 							</div>
 						})}
 						<div className={this.getBadgeClasses()}>{this.state.alert.value}</div>
@@ -212,5 +196,4 @@ class Notities extends Component {
 		);
 	}
 }
-
 export default Notities;

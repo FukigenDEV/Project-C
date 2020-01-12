@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom';
 
 import './index.css';
 
+import AdminModal from './components/modal';
+import Form from './components/form/form';
+import Field from './components/form/field';
+
 import NewTable from './components/pages/NewTable';
 
 import App from "./components/app/App";
 import Dashboard from './components/dashboard';
 import Home from './components/pages/Home'
-import AdminModal from './components/modal';
 
 import Admin from './components/pages/admin/Admin';
 
@@ -31,7 +34,6 @@ import Navs from './components/navs';
 import Gegevens from './components/pages/Gegevens';
 import Notities from './components/pages/Notities';
 import NotitiesEditForm from './components/pages/NotitiesEditForm';
-import Logs from './components/pages/Logs';
 import Backup from './components/pages/Backup';
 import Logout from './components/pages/Logout';
 import AdminWizard from './components/pages/AdminWizard';
@@ -51,6 +53,8 @@ serviceWorker.unregister();
 export {
     Dashboard,
     Navs,
+    Form,
+    Field,
     AdminModal,
     Home,
     Admin,
@@ -67,7 +71,6 @@ export {
     manCompany,
     EditCompany,
     Notities,
-    Logs,
     Backup,
     Logout,
     AdminWizard,
