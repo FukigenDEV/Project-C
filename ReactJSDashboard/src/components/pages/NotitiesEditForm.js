@@ -7,12 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, fas, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { delay } from 'q';
+
+const { patchNote } = require('./NoteEditUtils');
+
 library.add(
 	fas,
 	faTrashAlt,
 	faPencilAlt
 )
-
 
 class Notities extends Component {
 	constructor(props) {
@@ -22,13 +24,12 @@ class Notities extends Component {
 			editNoteText: ''
 		}
 	}
+
 	componentDidMount() {
 		this.setState({ editNoteTitle: this.props.note.Title });
 		this.setState({ editNoteText: this.props.note.Text });
 	};
-	componentWillUnmount() {
-		console.log("Form Unmounted");
-	};
+
 	handleTitleChange = event => {
 		this.setState({ editNoteTitle: event.target.value });
 	};
@@ -36,34 +37,14 @@ class Notities extends Component {
 	handleTextChange = event => {
 		this.setState({ editNoteText: event.target.value });
 	};
-	handleSubmit = async () => {
-		console.log("Title: " + this.props.note.Title + "\nText: " + this.state.editNoteText)
-		await fetch('/note', {
-			method: 'PATCH',
-			body: JSON.stringify({ title: this.props.note.Title, newText: this.state.editNoteText, newTitle: this.state.editNoteTitle }),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then(Response => {
-			console.log(Response);
-			this.getChangedNote().then(this.handleReset());
-			window.location.reload(true);
-		}
-		);
-	};
-	getChangedNote = async () => {
-		// // in de /note (endpoint URL) in de backend gaat hij zoeken naar alle notes die gemaakt zijn, dit doet hij aan de hand van de titel omdat geen note dezelfde titel mag hebben dus werkt als ID
-		
-		await fetch('/note?title=' + this.state.editNoteTitle, {
-			method: 'GET'}).then(Response => {
-				console.log("RESPONSE: ")
-				console.log(Response); //Get note as response
-				this.props.note = Response;
-			});
-	}
+
 	handleReset = () => {
 		this.props.reloadNote(this.props.note);
-	}
+	};
+
+	handleSubmit = () => {
+		patchNote(this.props.note, this.state);
+	};
 
 	render() {
 		return (
